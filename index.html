@@ -1620,72 +1620,172 @@ function photoNewImage() {
 <!-- 도움말 탭 -->
 <div id="tab-help" class="tab-content">
 
+  <!-- 1. 수목 중량 -->
   <div class="card">
     <div class="card-title">🌳 수목 중량 계산기</div>
     <div class="mulch-info" style="margin-bottom:12px;">
-      <b>근원직경</b> — 지표면에서 30cm 높이의 줄기 직경 (권장 측정 위치)<br>
-      <b>수고</b> — 지표면에서 수목 최상단까지의 높이 (m)
+      <b>근원직경 (R)</b> — 지표면에서 30cm 높이의 줄기 직경 (권장 측정 위치)<br>
+      <b>수고 (H)</b> — 지표면에서 수목 최상단까지의 높이 (m)
     </div>
     <table class="price-table">
       <tr><th>항목</th><th>설명</th></tr>
-      <tr><td>수목 구분 (U값)</td><td>수종별 목재 밀도. 불명 시 1,200 kg/㎥ 적용</td></tr>
-      <tr><td>고립목 (P=1.0)</td><td>독립적으로 자란 나무, 가지·잎이 풍성</td></tr>
-      <tr><td>임목 (P=0.3)</td><td>군식·밀식 상태, 가지 발달 적음</td></tr>
-      <tr><td>접시분</td><td>얕고 넓은 분, V=0.3927D³</td></tr>
-      <tr><td>보통분</td><td>일반적인 형태, V=0.4581D³</td></tr>
-      <tr><td>조개분</td><td>깊고 좁은 분, V=0.5236D³</td></tr>
+      <tr><td>수목 구분 (U)</td><td>수종별 목재 밀도 (kg/㎥). 불명 시 1,200 적용</td></tr>
+      <tr><td>고립목 (P=1.0)</td><td>독립 식재, 가지·잎이 풍성하게 발달한 상태</td></tr>
+      <tr><td>임목 (P=0.3)</td><td>군식·밀식 상태, 가지 발달이 적은 상태</td></tr>
+      <tr><td>접시분</td><td>얕고 넓은 분 — V = 0.3927 × D³</td></tr>
+      <tr><td>보통분</td><td>일반적인 분 형태 — V = 0.4581 × D³</td></tr>
+      <tr><td>조개분</td><td>깊고 좁은 분 — V = 0.5236 × D³</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">
-      ※ 공식: 조경설계요람 (문석기 외 5인, 1998) + 조경설계기준 기준<br>
-      ※ 장비 추천은 총 중량 기준 참고치이며 현장 조건에 따라 달라집니다.
+      ※ 지상부 공식: W = 0.5 × π × (B/2)² × H × U × (1+P), B = R × 0.8 (m)<br>
+      ※ 뿌리분: V × 1,300 kg/㎥, D = R × 4 / 100 (m)<br>
+      ※ 출처: 조경설계요람 (문석기 외 5인, 1998)
     </p>
   </div>
 
+  <!-- 2. 잔디 소요량 -->
   <div class="card">
     <div class="card-title">🌱 잔디 소요량 계산기</div>
-    <div class="mulch-info" style="margin-bottom:0;">
-      <b>면적 단위</b><br>
-      ㎡(제곱미터) 또는 평으로 입력합니다. 1평 = 3.306㎡
-    </div>
+    <div class="mulch-info" style="margin-bottom:0;">1평 = 3.3058㎡</div>
     <table class="price-table" style="margin-top:12px;">
-      <tr><th>종류</th><th>특징</th></tr>
-      <tr><td>평떼 18×18</td><td>가장 일반적, 주택·소형 공원</td></tr>
-      <tr><td>평떼 30×30</td><td>빠른 시공, 대형 면적에 유리</td></tr>
-      <tr><td>롤잔디 40×60</td><td>골프장·운동장 등 대규모</td></tr>
-      <tr><td>줄떼 1/2</td><td>평떼 수량의 1/2, 비교적 빠른 피복</td></tr>
-      <tr><td>줄떼 1/3</td><td>평떼 수량의 1/3, 최대 비용 절감</td></tr>
+      <tr><th>종류</th><th>규격</th><th>특징</th></tr>
+      <tr><td>평떼</td><td>18×18cm</td><td>가장 일반적, 주택·소형 공원</td></tr>
+      <tr><td>평떼</td><td>30×30cm</td><td>빠른 시공, 대형 면적에 유리</td></tr>
+      <tr><td>롤잔디</td><td>40×60cm</td><td>골프장·운동장 등 대규모</td></tr>
+      <tr><td>줄떼 1/2</td><td>18cm 폭</td><td>평떼 수량의 1/2 — 비교적 빠른 피복</td></tr>
+      <tr><td>줄떼 1/3</td><td>18cm 폭</td><td>평떼 수량의 1/3 — 최대 비용 절감</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">※ 여유율 2% 포함. 경사지·이형 면적은 5~10% 추가 발주 권장</p>
   </div>
 
+  <!-- 3. 멀칭 재료 -->
   <div class="card">
     <div class="card-title">🪵 멀칭 재료 계산기</div>
     <table class="price-table">
       <tr><th>재료</th><th>권장 두께</th><th>특징</th></tr>
       <tr><td>우드칩 (바크)</td><td>8~12cm</td><td>습기 보존, 잡초 억제</td></tr>
       <tr><td>마사토</td><td>3~7cm</td><td>배수 우수, 화단 경계</td></tr>
-      <tr><td>규사</td><td>2~4cm</td><td>잔디 밑 포설, 배수층</td></tr>
+      <tr><td>규사</td><td>2~4cm</td><td>잔디 하부 포설, 배수층</td></tr>
       <tr><td>자갈 (쇄석)</td><td>6~10cm</td><td>영구적, 관리 용이</td></tr>
       <tr><td>배양토</td><td>10~20cm</td><td>식재 기반, 영양 공급</td></tr>
     </table>
-    <p class="price-note" style="margin-top:10px;">※ 여유율 5% 추가 발주 권장</p>
+    <p class="price-note" style="margin-top:10px;">※ 계산된 체적에 여유율 5% 추가 발주 권장</p>
   </div>
 
+  <!-- 4. 식재 주수 -->
   <div class="card">
-    <div class="card-title">📏 수목 규격 용어표</div>
+    <div class="card-title">🌿 식재 주수 계산기</div>
+    <table class="price-table">
+      <tr><th>식재 방식</th><th>1주당 면적</th><th>특징</th></tr>
+      <tr><td>정방형 (방형식)</td><td>가로 × 세로</td><td>일반적, 시공 편리</td></tr>
+      <tr><td>교호식 (삼각형)</td><td>가로 × 세로 × 0.866</td><td>동일 간격 대비 약 15% 더 촘촘</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 여유율: 평지 5%, 경사지 10%, 이형지·불규칙 구역 20% 권장<br>
+      ※ 계산 결과는 이론값이며 현장 여건(경계부·장애물)에 따라 조정 필요
+    </p>
+  </div>
+
+  <!-- 5. 면적 계산 -->
+  <div class="card">
+    <div class="card-title">📐 면적 계산기</div>
+    <table class="price-table">
+      <tr><th>형태</th><th>공식</th></tr>
+      <tr><td>직사각형</td><td>가로 × 세로</td></tr>
+      <tr><td>원형</td><td>π × 반지름²</td></tr>
+      <tr><td>삼각형</td><td>밑변 × 높이 ÷ 2</td></tr>
+      <tr><td>사다리꼴</td><td>(상변 + 하변) × 높이 ÷ 2</td></tr>
+      <tr><td>타원형</td><td>π × 장반경 × 단반경</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">※ 1평 = 3.3058㎡ &nbsp;·&nbsp; 1㎡ = 0.3025평</p>
+  </div>
+
+  <!-- 6. 경사도 -->
+  <div class="card">
+    <div class="card-title">📏 경사도 환산기</div>
+    <table class="price-table">
+      <tr><th>표기</th><th>관계식</th><th>예시</th></tr>
+      <tr><td>경사율 (%)</td><td>수직 ÷ 수평 × 100</td><td>30%</td></tr>
+      <tr><td>경사각 (°)</td><td>arctan(경사율÷100)</td><td>16.70°</td></tr>
+      <tr><td>1 : n 표기</td><td>n = 100 ÷ 경사율</td><td>1 : 3.33</td></tr>
+      <tr><td>비탈면 길이</td><td>√(수평² + 수직²)</td><td>수평 10m → 10.44m</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>경사율</th><th>구분</th><th>비고</th></tr>
+      <tr><td>~ 5%</td><td>완만</td><td>배수 설계 주의</td></tr>
+      <tr><td>5 ~ 30%</td><td>일반 경사</td><td>—</td></tr>
+      <tr><td>30 ~ 60%</td><td>급경사</td><td>비탈면 보호공 검토</td></tr>
+      <tr><td>60% 이상</td><td>초급경사</td><td>구조물 설계 필요</td></tr>
+    </table>
+  </div>
+
+  <!-- 7. 경계석·보도블록 -->
+  <div class="card">
+    <div class="card-title">🧱 경계석 · 보도블록 수량</div>
+    <table class="price-table">
+      <tr><th>항목</th><th>계산 방법</th></tr>
+      <tr><td>경계석 수량</td><td>총 연장 (m) ÷ 경계석 길이 (m)</td></tr>
+      <tr><td>보도블록 수량</td><td>면적 (㎡) ÷ 블록 1매 면적 (㎡)</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>규격</th><th>1매 면적</th><th>용도</th></tr>
+      <tr><td>300×300mm</td><td>0.09㎡</td><td>일반 보도, 공원</td></tr>
+      <tr><td>400×400mm</td><td>0.16㎡</td><td>광장, 대형 보도</td></tr>
+      <tr><td>250×250mm</td><td>0.0625㎡</td><td>정원, 소형 보도</td></tr>
+      <tr><td>200×200mm</td><td>0.04㎡</td><td>소형, 인조석</td></tr>
+      <tr><td>200×100mm</td><td>0.02㎡</td><td>점토벽돌형</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">※ 여유율: 경계석 3~5%, 보도블록 5~10% (절단·파손 고려)</p>
+  </div>
+
+  <!-- 8. 사진 줄자 -->
+  <div class="card">
+    <div class="card-title">📷 사진 줄자</div>
+    <div class="mulch-info" style="margin-bottom:12px;">
+      기준이 되는 물체를 화면에 포함시켜 찍으면 같은 평면의 다른 치수를 측정할 수 있습니다
+    </div>
+    <table class="price-table">
+      <tr><th>순서</th><th>방법</th></tr>
+      <tr><td>① 촬영</td><td>길이를 아는 물체와 측정 대상이 함께 나오도록 찍기</td></tr>
+      <tr><td>② 기준 설정</td><td>기준 물체의 양 끝 클릭 → 실제 길이 입력 → 설정</td></tr>
+      <tr><td>③ 거리 측정</td><td>시작점·끝점 클릭 → 자동 계산</td></tr>
+      <tr><td>④ 면적 측정</td><td>꼭짓점 순서대로 클릭 (3점 이상) → 완료 버튼</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>기준 물체 예시</th><th>실제 크기</th></tr>
+      <tr><td>A4 용지 (세로)</td><td>297mm</td></tr>
+      <tr><td>A4 용지 (가로)</td><td>210mm</td></tr>
+      <tr><td>표준 벽돌</td><td>190 × 90mm</td></tr>
+      <tr><td>콘크리트 블록</td><td>190 × 390mm</td></tr>
+      <tr><td>신용카드 (가로)</td><td>85.6mm</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 기준점과 측정 대상이 <b>같은 평면</b>에 있어야 정확합니다<br>
+      ※ 카메라를 정면·수직으로 맞출수록 오차가 줄어듭니다<br>
+      ※ 원근이 심하거나 경사면은 오차가 커집니다
+    </p>
+  </div>
+
+  <!-- 참고: 수목 규격 용어 -->
+  <div class="card">
+    <div class="card-title">📋 수목 규격 용어표</div>
     <table class="price-table">
       <tr><th>기호</th><th>명칭</th><th>측정 위치</th></tr>
       <tr><td><strong>H</strong></td><td>수고</td><td>지표면 ~ 최상단 높이 (m)</td></tr>
       <tr><td><strong>W</strong></td><td>수관폭</td><td>수관의 최대 너비 (m)</td></tr>
-      <tr><td><strong>R</strong></td><td>근원직경</td><td>지표에서 30cm 높이 줄기 직경 (cm, 권장 측정 위치)</td></tr>
+      <tr><td><strong>R</strong></td><td>근원직경</td><td>지표에서 30cm 높이 줄기 직경 (cm)</td></tr>
       <tr><td><strong>B</strong></td><td>흉고직경</td><td>지표에서 1.2m 높이 줄기 직경 (cm)</td></tr>
-      <tr><td><strong>C</strong></td><td>흉고둘레</td><td>B = C ÷ π, 흉고 위치 줄기 둘레 (cm)</td></tr>
+      <tr><td><strong>C</strong></td><td>흉고둘레</td><td>흉고 위치 줄기 둘레 (cm) — B = C ÷ π</td></tr>
     </table>
-    <p class="price-note" style="margin-top:10px;">※ 환산: B ≈ R × 0.8 &nbsp;·&nbsp; R ≈ B ÷ 0.8<br>※ 교목 규격 표기 예시: H4.0 × W1.5 × R8 (수고4m, 수관폭1.5m, 근원직경8cm)</p>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 환산: B ≈ R × 0.8 &nbsp;·&nbsp; R ≈ B ÷ 0.8<br>
+      ※ 규격 표기 예: H4.0 × W1.5 × R8
+    </p>
   </div>
 
+  <!-- 참고: 지주목 규격 -->
   <div class="card">
-    <div class="card-title">🪵 지주목 규격 참고표</div>
+    <div class="card-title">📋 지주목 규격 참고표</div>
     <table class="price-table">
       <tr><th>지주 형태</th><th>적용 수목 규격</th><th>부재 규격</th></tr>
       <tr><td>단각지주</td><td>H 1.2m 이하</td><td>각목 60×60mm, L=1,200mm</td></tr>
@@ -1694,7 +1794,7 @@ function photoNewImage() {
       <tr><td>사각지주</td><td>H 4.0 ~ 6.0m</td><td>각목 60×60mm, L=4,000mm × 4본</td></tr>
       <tr><td>당김줄 지주</td><td>대형목 (H 6m↑)</td><td>와이어로프 φ9mm + 고무 보호대</td></tr>
     </table>
-    <p class="price-note" style="margin-top:10px;">※ 설계기준: 조경설계기준 (국토교통부) &nbsp;·&nbsp; 현장 수목 상태·풍압 조건에 따라 조정</p>
+    <p class="price-note" style="margin-top:10px;">※ 조경설계기준 (국토교통부) · 현장 수목 상태·풍압 조건에 따라 조정</p>
   </div>
 
 </div>
