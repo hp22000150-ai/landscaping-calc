@@ -356,15 +356,15 @@
 </header>
 
 <nav class="tab-nav">
-  <button class="tab-btn active" onclick="showTab('grass', this)">잔디 소요량</button>
-  <button class="tab-btn" onclick="showTab('tree', this)">수목 중량</button>
+  <button class="tab-btn active" onclick="showTab('tree', this)">수목 중량</button>
+  <button class="tab-btn" onclick="showTab('grass', this)">잔디 소요량</button>
   <button class="tab-btn" onclick="showTab('mulch', this)">멀칭 재료</button>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
   <button class="tab-btn" onclick="showTab('help', this)">도움말</button>
 </nav>
 
 <!-- 잔디 소요량 탭 -->
-<div id="tab-grass" class="tab-content active">
+<div id="tab-grass" class="tab-content">
   <div class="card">
     <div class="card-title">🌱 잔디 소요량 계산기</div>
 
@@ -428,7 +428,7 @@
 </div>
 
 <!-- 수목 중량 탭 -->
-<div id="tab-tree" class="tab-content">
+<div id="tab-tree" class="tab-content active">
   <div class="card">
     <div class="card-title">🌳 수목 중량 계산기</div>
     <div class="mulch-info" style="font-size:11px; line-height:1.7;">
