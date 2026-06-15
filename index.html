@@ -412,10 +412,6 @@
         <span class="result-label">필요 수량</span>
         <span class="result-value big" id="r-qty">-</span>
       </div>
-      <div class="result-row" id="r-truck-row">
-        <span class="result-label">25톤 트럭 환산</span>
-        <span class="result-value" id="r-truck">-</span>
-      </div>
       <div class="result-note" id="r-note">-</div>
     </div>
   </div>
@@ -699,16 +695,7 @@ function calcGrass() {
   document.getElementById('r-type').textContent = typeName;
   document.getElementById('r-qty').textContent = qty.toLocaleString() + ' ' + unitName;
 
-  const truckRow = document.getElementById('r-truck-row');
-  if (truckQty > 0) {
-    truckRow.style.display = 'flex';
-    document.getElementById('r-truck').textContent = (qty / truckQty).toFixed(1) + '대 분량';
-    document.getElementById('r-note').textContent =
-      coverNote + '\n여유율 2% 포함\n25톤 트럭 1대 기준 ' + truckQty.toLocaleString() + unitName + '\n현장에서 간격 조절로 ±5% 범위 조정 가능';
-  } else {
-    truckRow.style.display = 'none';
-    document.getElementById('r-note').textContent = coverNote + '\n여유율 2% 포함\n현장에서 간격 조절로 ±5% 범위 조정 가능';
-  }
+  document.getElementById('r-note').textContent = coverNote + '\n여유율 2% 포함\n현장에서 간격 조절로 ±5% 범위 조정 가능';
 }
 
 function resetGrass() {
