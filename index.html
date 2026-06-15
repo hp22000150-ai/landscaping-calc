@@ -312,17 +312,11 @@
   }
   .reset-btn:active { background: var(--gray-light); }
 
-  .theme-bar {
+  .theme-dots-wrap {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 20px 14px;
-  }
-  .theme-bar span {
-    font-size: 11px;
-    color: rgba(255,255,255,0.65);
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    gap: 7px;
+    margin-top: 8px;
+    justify-content: flex-end;
   }
   .theme-dot {
     width: 20px;
@@ -344,17 +338,20 @@
 
 <header>
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-    <h1>🌿 조경 현장 계산기</h1>
-    <span style="font-size:10px; opacity:0.7; font-weight:500; letter-spacing:0.3px; padding-top:2px;">Created by<br>CONTENT FACTORY</span>
-  </div>
-  <p>현장에서 바로 쓰는 실용 계산기</p>
-  <div class="theme-bar">
-    <span>테마</span>
-    <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
-    <button class="theme-dot"        data-theme="blue"   style="background:#0c4a6e" onclick="setTheme('blue')"   title="바다"></button>
-    <button class="theme-dot"        data-theme="rose"   style="background:#9d174d" onclick="setTheme('rose')"   title="벚꽃"></button>
-    <button class="theme-dot"        data-theme="earth"  style="background:#92400e" onclick="setTheme('earth')"  title="흙"></button>
-    <button class="theme-dot"        data-theme="slate"  style="background:#334155" onclick="setTheme('slate')"  title="슬레이트"></button>
+    <div>
+      <h1>🌿 조경 현장 계산기</h1>
+      <p style="font-size:12px; opacity:0.75; margin-top:3px;">현장에서 바로 쓰는 실용 계산기</p>
+    </div>
+    <div style="text-align:right; flex-shrink:0; padding-left:12px;">
+      <span style="font-size:10px; opacity:0.7; font-weight:500; letter-spacing:0.3px; line-height:1.5; display:block;">Created by<br>CONTENT FACTORY</span>
+      <div class="theme-dots-wrap">
+        <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
+        <button class="theme-dot"        data-theme="blue"   style="background:#0c4a6e" onclick="setTheme('blue')"   title="바다"></button>
+        <button class="theme-dot"        data-theme="rose"   style="background:#9d174d" onclick="setTheme('rose')"   title="벚꽃"></button>
+        <button class="theme-dot"        data-theme="earth"  style="background:#92400e" onclick="setTheme('earth')"  title="흙"></button>
+        <button class="theme-dot"        data-theme="slate"  style="background:#334155" onclick="setTheme('slate')"  title="슬레이트"></button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -363,6 +360,7 @@
   <button class="tab-btn" onclick="showTab('tree', this)">수목 중량</button>
   <button class="tab-btn" onclick="showTab('mulch', this)">멀칭 재료</button>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
+  <button class="tab-btn" onclick="showTab('help', this)">도움말</button>
 </nav>
 
 <!-- 잔디 소요량 탭 -->
@@ -839,6 +837,62 @@ function resetMulch() {
   document.getElementById('mulch-result').classList.remove('show');
 }
 </script>
+
+<!-- 도움말 탭 -->
+<div id="tab-help" class="tab-content">
+
+  <div class="card">
+    <div class="card-title">🌱 잔디 소요량 계산기</div>
+    <div class="mulch-info" style="margin-bottom:0;">
+      <b>면적 단위</b><br>
+      ㎡(제곱미터) 또는 평으로 입력합니다. 1평 = 3.306㎡
+    </div>
+    <table class="price-table" style="margin-top:12px;">
+      <tr><th>종류</th><th>특징</th></tr>
+      <tr><td>평떼 18×18</td><td>가장 일반적, 주택·소형 공원</td></tr>
+      <tr><td>평떼 30×30</td><td>빠른 시공, 대형 면적에 유리</td></tr>
+      <tr><td>롤잔디 40×60</td><td>골프장·운동장 등 대규모</td></tr>
+      <tr><td>줄떼 (20cm 간격)</td><td>커버율 45%, 자연 확장 유도</td></tr>
+      <tr><td>줄떼 (한 줄 띄우기)</td><td>커버율 50%, 비용 절감형</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">※ 여유율 2% 포함. 경사지·이형 면적은 5~10% 추가 발주 권장</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🌳 수목 중량 계산기</div>
+    <div class="mulch-info" style="margin-bottom:12px;">
+      <b>근원직경</b> — 지표면에서 30cm 높이의 줄기 직경 (cm)<br>
+      <b>수고</b> — 지표면에서 수목 최상단까지의 높이 (m)
+    </div>
+    <table class="price-table">
+      <tr><th>항목</th><th>설명</th></tr>
+      <tr><td>수목 구분 (U값)</td><td>수종별 목재 밀도. 불명 시 1,200 kg/㎥ 적용</td></tr>
+      <tr><td>고립목 (P=1.0)</td><td>독립적으로 자란 나무, 가지·잎이 풍성</td></tr>
+      <tr><td>임목 (P=0.3)</td><td>군식·밀식 상태, 가지 발달 적음</td></tr>
+      <tr><td>접시분</td><td>얕고 넓은 분, V=0.3927D³</td></tr>
+      <tr><td>보통분</td><td>일반적인 형태, V=0.4581D³</td></tr>
+      <tr><td>조개분</td><td>깊고 좁은 분, V=0.5236D³</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 공식: 조경설계요람 (문석기 외 5인, 1998) + 조경설계기준 기준<br>
+      ※ 장비 추천은 총 중량 기준 참고치이며 현장 조건에 따라 달라집니다.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🪵 멀칭 재료 계산기</div>
+    <table class="price-table">
+      <tr><th>재료</th><th>권장 두께</th><th>특징</th></tr>
+      <tr><td>우드칩 (바크)</td><td>8~12cm</td><td>습기 보존, 잡초 억제</td></tr>
+      <tr><td>마사토</td><td>3~7cm</td><td>배수 우수, 화단 경계</td></tr>
+      <tr><td>규사</td><td>2~4cm</td><td>잔디 밑 포설, 배수층</td></tr>
+      <tr><td>자갈 (쇄석)</td><td>6~10cm</td><td>영구적, 관리 용이</td></tr>
+      <tr><td>배양토</td><td>10~20cm</td><td>식재 기반, 영양 공급</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">※ 여유율 5% 추가 발주 권장</p>
+  </div>
+
+</div>
 
 <footer style="text-align:center; padding:20px 16px 32px; font-size:12px; color:#9ca3af; line-height:1.8;">
   <div style="margin-bottom:4px; font-weight:600; color:#6b7280;">🌿 조경 현장 계산기</div>
