@@ -11,6 +11,7 @@
     --green: #2d6a4f;
     --green-light: #40916c;
     --green-pale: #d8f3dc;
+    --bg: #f0f4f0;
     --soil: #6b4c2a;
     --soil-light: #f0e6d6;
     --white: #ffffff;
@@ -24,7 +25,7 @@
 
   body {
     font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-    background: #f0f4f0;
+    background: var(--bg);
     color: var(--text);
     min-height: 100vh;
   }
@@ -310,6 +311,33 @@
     transition: all 0.2s;
   }
   .reset-btn:active { background: var(--gray-light); }
+
+  .theme-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px 14px;
+  }
+  .theme-bar span {
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .theme-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+  }
+  .theme-dot.active {
+    border-color: white;
+    transform: scale(1.3);
+  }
 </style>
 </head>
 <body>
@@ -320,6 +348,14 @@
     <span style="font-size:10px; opacity:0.7; font-weight:500; letter-spacing:0.3px; padding-top:2px;">Created by<br>CONTENT FACTORY</span>
   </div>
   <p>현장에서 바로 쓰는 실용 계산기</p>
+  <div class="theme-bar">
+    <span>테마</span>
+    <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
+    <button class="theme-dot"        data-theme="blue"   style="background:#0c4a6e" onclick="setTheme('blue')"   title="바다"></button>
+    <button class="theme-dot"        data-theme="rose"   style="background:#9d174d" onclick="setTheme('rose')"   title="벚꽃"></button>
+    <button class="theme-dot"        data-theme="earth"  style="background:#92400e" onclick="setTheme('earth')"  title="흙"></button>
+    <button class="theme-dot"        data-theme="slate"  style="background:#334155" onclick="setTheme('slate')"  title="슬레이트"></button>
+  </div>
 </header>
 
 <nav class="tab-nav">
@@ -584,6 +620,30 @@
 </div>
 
 <script>
+const THEMES = {
+  green: { '--green':'#2d6a4f', '--green-light':'#40916c', '--green-pale':'#d8f3dc', '--bg':'#f0f4f0' },
+  blue:  { '--green':'#0c4a6e', '--green-light':'#0284c7', '--green-pale':'#dbeafe', '--bg':'#f0f6ff' },
+  rose:  { '--green':'#9d174d', '--green-light':'#db2777', '--green-pale':'#fce7f3', '--bg':'#fff0f6' },
+  earth: { '--green':'#92400e', '--green-light':'#ea580c', '--green-pale':'#ffedd5', '--bg':'#fdf4ef' },
+  slate: { '--green':'#334155', '--green-light':'#64748b', '--green-pale':'#f1f5f9', '--bg':'#f1f5f9' },
+};
+
+function setTheme(name) {
+  const t = THEMES[name];
+  if (!t) return;
+  const root = document.documentElement;
+  Object.entries(t).forEach(([k, v]) => root.style.setProperty(k, v));
+  document.querySelectorAll('.theme-dot').forEach(d =>
+    d.classList.toggle('active', d.dataset.theme === name)
+  );
+  localStorage.setItem('wdr-theme', name);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('wdr-theme') || 'green';
+  setTheme(saved);
+});
+
 function showTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
