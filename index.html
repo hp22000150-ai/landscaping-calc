@@ -359,6 +359,10 @@
   <button class="tab-btn active" onclick="showTab('tree', this)">수목 중량</button>
   <button class="tab-btn" onclick="showTab('grass', this)">잔디 소요량</button>
   <button class="tab-btn" onclick="showTab('mulch', this)">멀칭 재료</button>
+  <button class="tab-btn" onclick="showTab('plant', this)">식재 주수</button>
+  <button class="tab-btn" onclick="showTab('area', this)">면적 계산</button>
+  <button class="tab-btn" onclick="showTab('slope', this)">경사도</button>
+  <button class="tab-btn" onclick="showTab('pave', this)">경계석·블록</button>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
   <button class="tab-btn" onclick="showTab('help', this)">도움말</button>
 </nav>
@@ -814,7 +818,435 @@ function resetMulch() {
   document.getElementById('mulch-area').value = '';
   document.getElementById('mulch-result').classList.remove('show');
 }
+
+// ── 식재 주수 ──────────────────────────────────────────
+function calcPlant() {
+  let area = parseFloat(document.getElementById('plant-area').value);
+  const unit = document.getElementById('plant-unit').value;
+  const sx = parseFloat(document.getElementById('plant-spacing-x').value);
+  const sy = parseFloat(document.getElementById('plant-spacing-y').value);
+  const method = document.querySelector('input[name="plant-method"]:checked').value;
+  const margin = parseFloat(document.querySelector('input[name="plant-margin"]:checked').value);
+  if (!area || area <= 0) { alert('면적을 입력해주세요'); return; }
+  if (!sx || sx <= 0 || !sy || sy <= 0) { alert('식재 간격을 입력해주세요'); return; }
+  if (unit === 'pyeong') area = area * 3.3058;
+  let unitArea = sx * sy;
+  if (method === 'triangle') unitArea *= 0.866;
+  const baseQty = Math.ceil(area / unitArea);
+  const totalQty = margin > 0 ? Math.ceil(baseQty * (1 + margin / 100)) : baseQty;
+  document.getElementById('plant-result').classList.add('show');
+  document.getElementById('r-plant-area').textContent = area.toFixed(1) + ' ㎡ (' + (area/3.3058).toFixed(1) + ' 평)';
+  document.getElementById('r-plant-unit-area').textContent = unitArea.toFixed(3) + ' ㎡/주';
+  document.getElementById('r-plant-qty').textContent = totalQty.toLocaleString() + ' 주';
+  document.getElementById('r-plant-note').textContent =
+    (method === 'square' ? '정방형 식재' : '교호식(삼각형) 식재') +
+    ' · 기본 ' + baseQty.toLocaleString() + '주' +
+    (margin > 0 ? ' + 여유 ' + margin + '% = ' + totalQty.toLocaleString() + '주' : '') +
+    '\n※ 현장 여건에 따라 조정 필요';
+}
+function resetPlant() {
+  ['plant-area','plant-spacing-x','plant-spacing-y'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('plant-result').classList.remove('show');
+}
+
+// ── 면적 계산 ──────────────────────────────────────────
+function updateAreaInputs() {
+  const shape = document.getElementById('area-shape').value;
+  ['rect','circle','triangle','trapezoid','ellipse'].forEach(s =>
+    document.getElementById('area-' + s + '-inputs').style.display = 'none');
+  document.getElementById('area-' + shape + '-inputs').style.display = 'block';
+}
+function calcArea() {
+  const shape = document.getElementById('area-shape').value;
+  let sqm = 0, note = '';
+  if (shape === 'rect') {
+    const w = parseFloat(document.getElementById('area-w').value);
+    const h = parseFloat(document.getElementById('area-h').value);
+    if (!w || !h) { alert('가로, 세로를 입력해주세요'); return; }
+    sqm = w * h; note = '직사각형 ' + w + 'm × ' + h + 'm';
+  } else if (shape === 'circle') {
+    const r = parseFloat(document.getElementById('area-r').value);
+    if (!r) { alert('반지름을 입력해주세요'); return; }
+    sqm = Math.PI * r * r; note = '원형 반지름 ' + r + 'm (지름 ' + (r*2) + 'm)';
+  } else if (shape === 'triangle') {
+    const base = parseFloat(document.getElementById('area-base').value);
+    const th = parseFloat(document.getElementById('area-th').value);
+    if (!base || !th) { alert('밑변과 높이를 입력해주세요'); return; }
+    sqm = base * th / 2; note = '삼각형 밑변 ' + base + 'm × 높이 ' + th + 'm ÷ 2';
+  } else if (shape === 'trapezoid') {
+    const top = parseFloat(document.getElementById('area-top').value);
+    const bot = parseFloat(document.getElementById('area-bottom').value);
+    const th  = parseFloat(document.getElementById('area-trap-h').value);
+    if (!top || !bot || !th) { alert('상변, 하변, 높이를 입력해주세요'); return; }
+    sqm = (top + bot) * th / 2; note = '사다리꼴 (상변 ' + top + 'm + 하변 ' + bot + 'm) × 높이 ' + th + 'm ÷ 2';
+  } else if (shape === 'ellipse') {
+    const a = parseFloat(document.getElementById('area-a').value);
+    const b = parseFloat(document.getElementById('area-b').value);
+    if (!a || !b) { alert('장반경과 단반경을 입력해주세요'); return; }
+    sqm = Math.PI * a * b; note = '타원 장반경 ' + a + 'm × 단반경 ' + b + 'm × π';
+  }
+  document.getElementById('area-result').classList.add('show');
+  document.getElementById('r-area-sqm').textContent = sqm.toFixed(2) + ' ㎡';
+  document.getElementById('r-area-pyeong').textContent = (sqm / 3.3058).toFixed(2) + ' 평';
+  document.getElementById('r-area-note').textContent = note;
+}
+function resetArea() {
+  ['area-w','area-h','area-r','area-base','area-th','area-top','area-bottom','area-trap-h','area-a','area-b']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('area-result').classList.remove('show');
+}
+
+// ── 경사도 ──────────────────────────────────────────────
+function calcSlope() {
+  const pct = parseFloat(document.getElementById('slope-pct').value);
+  const deg = parseFloat(document.getElementById('slope-deg').value);
+  const n   = parseFloat(document.getElementById('slope-n').value);
+  let ratio;
+  if (!isNaN(pct) && pct > 0)      ratio = pct / 100;
+  else if (!isNaN(deg) && deg > 0) ratio = Math.tan(deg * Math.PI / 180);
+  else if (!isNaN(n)   && n   > 0) ratio = 1 / n;
+  else { alert('경사율(%), 경사각(°), 1:n 중 하나를 입력해주세요'); return; }
+  const calcPct = ratio * 100;
+  const calcDeg = Math.atan(ratio) * 180 / Math.PI;
+  const calcN   = 1 / ratio;
+  document.getElementById('slope-result').classList.add('show');
+  document.getElementById('r-slope-pct').textContent = calcPct.toFixed(1) + '%';
+  document.getElementById('r-slope-deg').textContent = calcDeg.toFixed(2) + '°';
+  document.getElementById('r-slope-n').textContent   = '1 : ' + calcN.toFixed(2);
+  document.getElementById('r-slope-note').textContent =
+    calcPct < 5  ? '완만한 경사 (배수 설계 주의)' :
+    calcPct < 30 ? '일반 경사' :
+    calcPct < 60 ? '급경사 — 비탈면 보호공 검토' : '초급경사 — 구조물 설계 필요';
+}
+function calcSlopeLen() {
+  const horiz = parseFloat(document.getElementById('slope-horiz').value);
+  if (!horiz || horiz <= 0) { alert('수평 거리를 입력해주세요'); return; }
+  const pctVal = parseFloat(document.getElementById('slope-pct').value);
+  const degVal = parseFloat(document.getElementById('slope-deg').value);
+  const nVal   = parseFloat(document.getElementById('slope-n').value);
+  let ratio;
+  if (!isNaN(pctVal) && pctVal > 0)      ratio = pctVal / 100;
+  else if (!isNaN(degVal) && degVal > 0) ratio = Math.tan(degVal * Math.PI / 180);
+  else if (!isNaN(nVal)   && nVal   > 0) ratio = 1 / nVal;
+  else { alert('경사율, 경사각, 1:n 중 하나를 먼저 입력해주세요'); return; }
+  const vert  = horiz * ratio;
+  const slant = Math.sqrt(horiz * horiz + vert * vert);
+  document.getElementById('slope-len-result').classList.add('show');
+  document.getElementById('r-slope-len').textContent  = slant.toFixed(2) + ' m';
+  document.getElementById('r-slope-vert').textContent = vert.toFixed(2) + ' m';
+}
+function resetSlope() {
+  ['slope-pct','slope-deg','slope-n','slope-horiz'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('slope-result').classList.remove('show');
+  document.getElementById('slope-len-result').classList.remove('show');
+}
+
+// ── 경계석·보도블록 ────────────────────────────────────
+function updatePaveInputs() {
+  const type = document.querySelector('input[name="pave-type"]:checked').value;
+  document.getElementById('pave-edge-inputs').style.display = type === 'edge' ? 'block' : 'none';
+  document.getElementById('pave-block-inputs').style.display = type === 'block' ? 'block' : 'none';
+}
+function calcPave() {
+  const type   = document.querySelector('input[name="pave-type"]:checked').value;
+  const margin = parseFloat(document.querySelector('input[name="pave-margin"]:checked').value) / 100;
+  if (type === 'edge') {
+    const length = parseFloat(document.getElementById('edge-length').value);
+    const size   = parseFloat(document.getElementById('edge-size').value);
+    if (!length || length <= 0) { alert('총 연장을 입력해주세요'); return; }
+    const qty  = Math.ceil(length / size);
+    const qtyM = Math.ceil(qty * (1 + margin));
+    document.getElementById('pave-result').classList.add('show');
+    document.getElementById('r-pave-qty').textContent  = qty.toLocaleString() + ' 개';
+    document.getElementById('r-pave-qty-m').textContent = qtyM.toLocaleString() + ' 개';
+    document.getElementById('r-pave-note').textContent =
+      '총 연장 ' + length + 'm ÷ 규격 ' + (size * 1000) + 'mm\n여유 ' + (margin*100) + '% 포함';
+  } else {
+    let area = parseFloat(document.getElementById('block-area').value);
+    const bUnit = document.getElementById('block-unit').value;
+    const bSize = parseFloat(document.getElementById('block-size').value);
+    if (!area || area <= 0) { alert('면적을 입력해주세요'); return; }
+    if (bUnit === 'pyeong') area = area * 3.3058;
+    const qty  = Math.ceil(area / bSize);
+    const qtyM = Math.ceil(qty * (1 + margin));
+    document.getElementById('pave-result').classList.add('show');
+    document.getElementById('r-pave-qty').textContent  = qty.toLocaleString() + ' 매';
+    document.getElementById('r-pave-qty-m').textContent = qtyM.toLocaleString() + ' 매';
+    document.getElementById('r-pave-note').textContent =
+      '면적 ' + area.toFixed(1) + '㎡ ÷ 1매 ' + bSize + '㎡\n여유 ' + (margin*100) + '% 포함';
+  }
+}
+function resetPave() {
+  document.getElementById('edge-length').value = '';
+  document.getElementById('block-area').value  = '';
+  document.getElementById('pave-result').classList.remove('show');
+}
 </script>
+
+<!-- 식재 주수 탭 -->
+<div id="tab-plant" class="tab-content">
+  <div class="card">
+    <div class="card-title">🌿 식재 주수 계산기</div>
+
+    <label>시공 면적</label>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <input type="number" id="plant-area" placeholder="면적 입력" inputmode="decimal" style="flex:1">
+      <div class="select-wrap" style="width:88px; flex-shrink:0;">
+        <select id="plant-unit">
+          <option value="sqm">㎡</option>
+          <option value="pyeong">평</option>
+        </select>
+      </div>
+    </div>
+
+    <label style="margin-top:14px;">식재 간격</label>
+    <div style="display:flex; gap:6px; align-items:center;">
+      <input type="number" id="plant-spacing-x" placeholder="가로 (m)" inputmode="decimal" style="flex:1;" step="0.1">
+      <span style="color:var(--gray); font-size:16px; font-weight:700; flex-shrink:0;">×</span>
+      <input type="number" id="plant-spacing-y" placeholder="세로 (m)" inputmode="decimal" style="flex:1;" step="0.1">
+    </div>
+    <div class="mulch-info" style="margin-top:6px; margin-bottom:0;">정방형은 가로=세로, 교호식은 가로×세로 입력 후 방식 선택</div>
+
+    <label style="margin-top:14px;">식재 방식</label>
+    <div class="radio-group">
+      <label><input type="radio" name="plant-method" value="square" checked><span>정방형<br><small style="font-weight:400; color:var(--gray);">방형식</small></span></label>
+      <label><input type="radio" name="plant-method" value="triangle"><span>교호식<br><small style="font-weight:400; color:var(--gray);">삼각형</small></span></label>
+    </div>
+
+    <label>여유율</label>
+    <div class="radio-group">
+      <label><input type="radio" name="plant-margin" value="0" checked><span>없음</span></label>
+      <label><input type="radio" name="plant-margin" value="5"><span>5%</span></label>
+      <label><input type="radio" name="plant-margin" value="10"><span>10%</span></label>
+      <label><input type="radio" name="plant-margin" value="20"><span>20%</span></label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcPlant()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetPlant()" style="flex:0 0 80px;">초기화</button>
+    </div>
+
+    <div id="plant-result" class="result-box">
+      <div class="result-title">📊 계산 결과</div>
+      <div class="result-row">
+        <span class="result-label">시공 면적</span>
+        <span class="result-value" id="r-plant-area">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">1주당 면적</span>
+        <span class="result-value" id="r-plant-unit-area">-</span>
+      </div>
+      <div class="result-row" style="border-top:2px solid var(--border); margin-top:4px; padding-top:4px;">
+        <span class="result-label">필요 주수</span>
+        <span class="result-value big" id="r-plant-qty">-</span>
+      </div>
+      <div class="result-note" id="r-plant-note"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 면적 계산 탭 -->
+<div id="tab-area" class="tab-content">
+  <div class="card">
+    <div class="card-title">📐 면적 계산기</div>
+
+    <label>형태 선택</label>
+    <div class="select-wrap">
+      <select id="area-shape" onchange="updateAreaInputs()">
+        <option value="rect">직사각형</option>
+        <option value="circle">원형</option>
+        <option value="triangle">삼각형</option>
+        <option value="trapezoid">사다리꼴</option>
+        <option value="ellipse">타원형</option>
+      </select>
+    </div>
+
+    <div id="area-rect-inputs">
+      <label style="margin-top:14px;">가로 (m)</label>
+      <input type="number" id="area-w" placeholder="가로 길이" inputmode="decimal" step="0.1">
+      <label>세로 (m)</label>
+      <input type="number" id="area-h" placeholder="세로 길이" inputmode="decimal" step="0.1">
+    </div>
+    <div id="area-circle-inputs" style="display:none">
+      <label style="margin-top:14px;">반지름 (m)</label>
+      <input type="number" id="area-r" placeholder="반지름" inputmode="decimal" step="0.1">
+    </div>
+    <div id="area-triangle-inputs" style="display:none">
+      <label style="margin-top:14px;">밑변 (m)</label>
+      <input type="number" id="area-base" placeholder="밑변 길이" inputmode="decimal" step="0.1">
+      <label>높이 (m)</label>
+      <input type="number" id="area-th" placeholder="높이" inputmode="decimal" step="0.1">
+    </div>
+    <div id="area-trapezoid-inputs" style="display:none">
+      <label style="margin-top:14px;">윗변 (m)</label>
+      <input type="number" id="area-top" placeholder="윗변 길이" inputmode="decimal" step="0.1">
+      <label>아랫변 (m)</label>
+      <input type="number" id="area-bottom" placeholder="아랫변 길이" inputmode="decimal" step="0.1">
+      <label>높이 (m)</label>
+      <input type="number" id="area-trap-h" placeholder="높이" inputmode="decimal" step="0.1">
+    </div>
+    <div id="area-ellipse-inputs" style="display:none">
+      <label style="margin-top:14px;">장반경 a (m)</label>
+      <input type="number" id="area-a" placeholder="장반경" inputmode="decimal" step="0.1">
+      <label>단반경 b (m)</label>
+      <input type="number" id="area-b" placeholder="단반경" inputmode="decimal" step="0.1">
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcArea()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetArea()" style="flex:0 0 80px;">초기화</button>
+    </div>
+
+    <div id="area-result" class="result-box">
+      <div class="result-title">📊 계산 결과</div>
+      <div class="result-row">
+        <span class="result-label">면적 (㎡)</span>
+        <span class="result-value big" id="r-area-sqm">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">면적 (평)</span>
+        <span class="result-value" id="r-area-pyeong">-</span>
+      </div>
+      <div class="result-note" id="r-area-note"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 경사도 탭 -->
+<div id="tab-slope" class="tab-content">
+  <div class="card">
+    <div class="card-title">📏 경사도 환산기</div>
+    <div class="mulch-info">💡 세 가지 중 <strong>하나만</strong> 입력하고 계산하면 나머지를 자동으로 구합니다</div>
+
+    <label style="margin-top:14px;">경사율 (%)</label>
+    <input type="number" id="slope-pct" placeholder="예: 30" inputmode="decimal" step="0.1">
+
+    <label>경사각 (°)</label>
+    <input type="number" id="slope-deg" placeholder="예: 16.7" inputmode="decimal" step="0.01">
+
+    <label>경사 표기 (1 : n)</label>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:16px; font-weight:700; color:var(--text); flex-shrink:0;">1 :</span>
+      <input type="number" id="slope-n" placeholder="예: 1.5" inputmode="decimal" step="0.01" style="flex:1;">
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcSlope()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetSlope()" style="flex:0 0 80px;">초기화</button>
+    </div>
+
+    <div id="slope-result" class="result-box">
+      <div class="result-title">📊 환산 결과</div>
+      <div class="result-row">
+        <span class="result-label">경사율</span>
+        <span class="result-value big" id="r-slope-pct">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">경사각</span>
+        <span class="result-value" id="r-slope-deg">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">경사 표기</span>
+        <span class="result-value" id="r-slope-n">-</span>
+      </div>
+      <div class="result-note" id="r-slope-note"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;">
+    <div class="card-title" style="font-size:14px;">📐 비탈면 실제 길이 계산</div>
+    <div class="mulch-info">위에서 경사도를 먼저 계산한 후 수평 거리를 입력해주세요</div>
+    <label style="margin-top:12px;">수평 거리 (m)</label>
+    <input type="number" id="slope-horiz" placeholder="예: 10.0" inputmode="decimal" step="0.1">
+    <button class="calc-btn" onclick="calcSlopeLen()" style="margin-top:14px;">길이 계산하기</button>
+    <div id="slope-len-result" class="result-box" style="margin-top:10px;">
+      <div class="result-row">
+        <span class="result-label">비탈면 실제 길이</span>
+        <span class="result-value big" id="r-slope-len">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">수직 높이</span>
+        <span class="result-value" id="r-slope-vert">-</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 경계석·보도블록 탭 -->
+<div id="tab-pave" class="tab-content">
+  <div class="card">
+    <div class="card-title">🧱 경계석 · 보도블록 수량</div>
+
+    <label>구분</label>
+    <div class="radio-group">
+      <label><input type="radio" name="pave-type" value="edge" checked onchange="updatePaveInputs()"><span>경계석</span></label>
+      <label><input type="radio" name="pave-type" value="block" onchange="updatePaveInputs()"><span>보도블록</span></label>
+    </div>
+
+    <!-- 경계석 -->
+    <div id="pave-edge-inputs">
+      <label>총 연장 (m)</label>
+      <input type="number" id="edge-length" placeholder="예: 50" inputmode="decimal" step="0.5">
+      <label>경계석 규격</label>
+      <div class="select-wrap">
+        <select id="edge-size">
+          <option value="0.30">300×150×200mm — 표준형</option>
+          <option value="0.60">600×150×200mm — 600형</option>
+          <option value="1.00">1000×150×200mm — 1000형</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 보도블록 -->
+    <div id="pave-block-inputs" style="display:none">
+      <label>시공 면적</label>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input type="number" id="block-area" placeholder="면적 입력" inputmode="decimal" style="flex:1;">
+        <div class="select-wrap" style="width:88px; flex-shrink:0;">
+          <select id="block-unit">
+            <option value="sqm">㎡</option>
+            <option value="pyeong">평</option>
+          </select>
+        </div>
+      </div>
+      <label>블록 규격 (1매 기준)</label>
+      <div class="select-wrap">
+        <select id="block-size">
+          <option value="0.09">300×300mm (0.09㎡/매)</option>
+          <option value="0.16">400×400mm (0.16㎡/매)</option>
+          <option value="0.0625">250×250mm (0.0625㎡/매)</option>
+          <option value="0.04">200×200mm (0.04㎡/매)</option>
+          <option value="0.02">200×100mm (0.02㎡/매)</option>
+        </select>
+      </div>
+    </div>
+
+    <label>여유율</label>
+    <div class="radio-group">
+      <label><input type="radio" name="pave-margin" value="3" checked><span>3%</span></label>
+      <label><input type="radio" name="pave-margin" value="5"><span>5%</span></label>
+      <label><input type="radio" name="pave-margin" value="10"><span>10%</span></label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcPave()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetPave()" style="flex:0 0 80px;">초기화</button>
+    </div>
+
+    <div id="pave-result" class="result-box">
+      <div class="result-title">📊 계산 결과</div>
+      <div class="result-row">
+        <span class="result-label">기본 수량</span>
+        <span class="result-value" id="r-pave-qty">-</span>
+      </div>
+      <div class="result-row" style="border-top:2px solid var(--border); margin-top:4px; padding-top:4px;">
+        <span class="result-label">여유 포함</span>
+        <span class="result-value big" id="r-pave-qty-m">-</span>
+      </div>
+      <div class="result-note" id="r-pave-note"></div>
+    </div>
+  </div>
+</div>
 
 <!-- 도움말 탭 -->
 <div id="tab-help" class="tab-content">
@@ -868,6 +1300,32 @@ function resetMulch() {
       <tr><td>배양토</td><td>10~20cm</td><td>식재 기반, 영양 공급</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">※ 여유율 5% 추가 발주 권장</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📏 수목 규격 용어표</div>
+    <table class="price-table">
+      <tr><th>기호</th><th>명칭</th><th>측정 위치</th></tr>
+      <tr><td><strong>H</strong></td><td>수고</td><td>지표면 ~ 최상단 높이 (m)</td></tr>
+      <tr><td><strong>W</strong></td><td>수관폭</td><td>수관의 최대 너비 (m)</td></tr>
+      <tr><td><strong>R</strong></td><td>근원직경</td><td>지표에서 30cm 높이 줄기 직경 (cm, 권장 측정 위치)</td></tr>
+      <tr><td><strong>B</strong></td><td>흉고직경</td><td>지표에서 1.2m 높이 줄기 직경 (cm)</td></tr>
+      <tr><td><strong>C</strong></td><td>흉고둘레</td><td>B = C ÷ π, 흉고 위치 줄기 둘레 (cm)</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">※ 환산: B ≈ R × 0.8 &nbsp;·&nbsp; R ≈ B ÷ 0.8<br>※ 교목 규격 표기 예시: H4.0 × W1.5 × R8 (수고4m, 수관폭1.5m, 근원직경8cm)</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🪵 지주목 규격 참고표</div>
+    <table class="price-table">
+      <tr><th>지주 형태</th><th>적용 수목 규격</th><th>부재 규격</th></tr>
+      <tr><td>단각지주</td><td>H 1.2m 이하</td><td>각목 60×60mm, L=1,200mm</td></tr>
+      <tr><td>이각지주</td><td>H 1.5 ~ 2.5m</td><td>각목 60×60mm, L=2,400mm × 2본</td></tr>
+      <tr><td>삼각지주</td><td>H 2.5 ~ 4.0m</td><td>각목 60×60mm, L=3,000mm × 3본</td></tr>
+      <tr><td>사각지주</td><td>H 4.0 ~ 6.0m</td><td>각목 60×60mm, L=4,000mm × 4본</td></tr>
+      <tr><td>당김줄 지주</td><td>대형목 (H 6m↑)</td><td>와이어로프 φ9mm + 고무 보호대</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">※ 설계기준: 조경설계기준 (국토교통부) &nbsp;·&nbsp; 현장 수목 상태·풍압 조건에 따라 조정</p>
   </div>
 
 </div>
