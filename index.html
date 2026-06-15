@@ -395,12 +395,6 @@
       </div>
     </div>
 
-    <label>공사 규모</label>
-    <div class="radio-group">
-      <label><input type="radio" name="grass-scale" value="small" checked><span>소규모<br>(가정집)</span></label>
-      <label><input type="radio" name="grass-scale" value="large"><span>대규모<br>(25톤 트럭)</span></label>
-    </div>
-
     <button class="calc-btn" onclick="calcGrass()">계산하기</button>
     <button class="reset-btn" onclick="resetGrass()">초기화</button>
 
@@ -418,8 +412,8 @@
         <span class="result-label">필요 수량</span>
         <span class="result-value big" id="r-qty">-</span>
       </div>
-      <div class="result-row" id="r-truck-row" style="display:none">
-        <span class="result-label">25톤 트럭</span>
+      <div class="result-row" id="r-truck-row">
+        <span class="result-label">25톤 트럭 환산</span>
         <span class="result-value" id="r-truck">-</span>
       </div>
       <div class="result-note" id="r-note">-</div>
@@ -660,7 +654,7 @@ function calcGrass() {
   let area = parseFloat(document.getElementById('grass-area').value);
   const unit = document.getElementById('grass-unit').value;
   const type = document.querySelector('input[name="grass-type"]:checked').value;
-  const scale = document.querySelector('input[name="grass-scale"]:checked').value;
+
 
   if (!area || area <= 0) { alert('면적을 입력해주세요'); return; }
   if (unit === 'pyeong') area = area * 3.3058;
@@ -706,7 +700,7 @@ function calcGrass() {
   document.getElementById('r-qty').textContent = qty.toLocaleString() + ' ' + unitName;
 
   const truckRow = document.getElementById('r-truck-row');
-  if (scale === 'large' && truckQty > 0) {
+  if (truckQty > 0) {
     truckRow.style.display = 'flex';
     document.getElementById('r-truck').textContent = (qty / truckQty).toFixed(1) + '대 분량';
     document.getElementById('r-note').textContent =
@@ -721,8 +715,7 @@ function resetGrass() {
   document.getElementById('grass-area').value = '';
   document.getElementById('grass-result').classList.remove('show');
   document.querySelector('input[name="grass-type"][value="flat18"]').checked = true;
-  document.querySelector('input[name="grass-scale"][value="small"]').checked = true;
-  document.querySelector('input[name="strip-method"][value="20gap"]').checked = true;
+document.querySelector('input[name="strip-method"][value="20gap"]').checked = true;
   document.getElementById('strip-options').style.display = 'none';
 }
 
