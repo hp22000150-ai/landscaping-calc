@@ -312,6 +312,50 @@
   }
   .reset-btn:active { background: var(--gray-light); }
 
+  .photo-mode-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .photo-mode-btn.active-mode {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .photo-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .photo-upload-btn:active { background: var(--gray-light); }
+  .photo-measure-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .photo-measure-row:last-child { border-bottom: none; }
+
   .theme-dots-wrap {
     display: flex;
     gap: 7px;
@@ -363,6 +407,7 @@
   <button class="tab-btn" onclick="showTab('area', this)">면적 계산</button>
   <button class="tab-btn" onclick="showTab('slope', this)">경사도</button>
   <button class="tab-btn" onclick="showTab('pave', this)">경계석·블록</button>
+  <button class="tab-btn" onclick="showTab('photo', this)">사진 줄자</button>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
   <button class="tab-btn" onclick="showTab('help', this)">도움말</button>
 </nav>
@@ -981,6 +1026,254 @@ function resetPave() {
   document.getElementById('block-area').value  = '';
   document.getElementById('pave-result').classList.remove('show');
 }
+
+// ── 사진 줄자 ──────────────────────────────────────────
+const photo = {
+  img: null, mode: 'ref',
+  refPts: [], pxPerMeter: 0,
+  curPts: [], saved: [], count: 0,
+  canvasListened: false,
+};
+
+function loadPhotoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = '';
+  const img = new Image();
+  img.onload = () => {
+    photo.img = img;
+    photo.refPts = []; photo.pxPerMeter = 0;
+    photo.curPts = []; photo.saved = []; photo.count = 0;
+    document.getElementById('photo-upload-area').style.display  = 'none';
+    document.getElementById('photo-canvas-wrap').style.display  = 'block';
+    document.getElementById('photo-toolbar').style.display      = 'block';
+    document.getElementById('photo-results').style.display      = 'block';
+    document.getElementById('photo-ref-status').style.display   = 'none';
+    document.getElementById('photo-measure-list').innerHTML     = '';
+    renderPhotoCanvas();
+    if (!photo.canvasListened) {
+      const c = document.getElementById('photo-canvas');
+      c.addEventListener('click',    onPhotoClick);
+      c.addEventListener('touchend', onPhotoClick, { passive: false });
+      window.addEventListener('resize', () => { if (photo.img) renderPhotoCanvas(); });
+      photo.canvasListened = true;
+    }
+    setPhotoMode('ref');
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+function renderPhotoCanvas() {
+  const canvas = document.getElementById('photo-canvas');
+  const wrap   = document.getElementById('photo-canvas-wrap');
+  const w = wrap.clientWidth || 360;
+  canvas.width  = w;
+  canvas.height = Math.round(w * photo.img.naturalHeight / photo.img.naturalWidth);
+  photo.scale   = w / photo.img.naturalWidth;
+  redrawPhoto();
+}
+
+function redrawPhoto() {
+  const canvas = document.getElementById('photo-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(photo.img, 0, 0, canvas.width, canvas.height);
+
+  // 기준선 (녹색)
+  if (photo.refPts.length >= 1) photoDot(ctx, photo.refPts[0], '#22c55e');
+  if (photo.refPts.length === 2) photoLine(ctx, photo.refPts[0], photo.refPts[1], '#22c55e', '기준');
+
+  // 저장된 측정값
+  photo.saved.forEach(m => {
+    if (m.type === 'dist') photoLine(ctx, m.pts[0], m.pts[1], '#f97316', m.label);
+    else                   photoPoly(ctx, m.pts, '#f97316', m.label);
+  });
+
+  // 현재 진행 중인 점
+  const col = photo.mode === 'ref' ? '#22c55e' : '#f97316';
+  photo.curPts.forEach(p => photoDot(ctx, p, col));
+  if (photo.curPts.length >= 2 && photo.mode !== 'area')
+    photoLine(ctx, photo.curPts[0], photo.curPts[1], col, '');
+  if (photo.mode === 'area' && photo.curPts.length >= 2)
+    photoPoly(ctx, photo.curPts, col, '');
+}
+
+function photoDot(ctx, p, col) {
+  ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI*2);
+  ctx.fillStyle = col; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+}
+function photoLine(ctx, a, b, col, label) {
+  photoDot(ctx, a, col); photoDot(ctx, b, col);
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+  ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+  ctx.setLineDash([8,4]); ctx.stroke(); ctx.setLineDash([]);
+  if (label) {
+    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+    ctx.font = 'bold 13px sans-serif';
+    ctx.lineWidth = 3; ctx.strokeStyle = col; ctx.strokeText(label, mx+5, my-5);
+    ctx.fillStyle = '#fff'; ctx.fillText(label, mx+5, my-5);
+  }
+}
+function photoPoly(ctx, pts, col, label) {
+  if (pts.length < 2) return;
+  pts.forEach(p => photoDot(ctx, p, col));
+  ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  if (pts.length > 2) ctx.closePath();
+  ctx.strokeStyle = col; ctx.lineWidth = 2.5;
+  ctx.setLineDash([8,4]); ctx.stroke(); ctx.setLineDash([]);
+  if (pts.length > 2) { ctx.fillStyle = 'rgba(249,115,22,0.18)'; ctx.fill(); }
+  if (label && pts.length > 0) {
+    const cx = pts.reduce((s,p)=>s+p.x,0)/pts.length;
+    const cy = pts.reduce((s,p)=>s+p.y,0)/pts.length;
+    ctx.font = 'bold 13px sans-serif';
+    ctx.lineWidth = 3; ctx.strokeStyle = col; ctx.strokeText(label, cx, cy);
+    ctx.fillStyle = '#fff'; ctx.fillText(label, cx, cy);
+  }
+}
+
+function getPhotoPoint(e) {
+  const canvas = document.getElementById('photo-canvas');
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+  let cx, cy;
+  if (e.changedTouches && e.changedTouches.length) {
+    cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY;
+  } else { cx = e.clientX; cy = e.clientY; }
+  return { x: (cx - rect.left)*sx, y: (cy - rect.top)*sy };
+}
+
+function onPhotoClick(e) {
+  e.preventDefault();
+  if (!photo.img) return;
+  const pt = getPhotoPoint(e);
+  if (photo.mode === 'ref') {
+    photo.refPts.push(pt);
+    if (photo.refPts.length > 2) photo.refPts = [pt];
+  } else if (photo.mode === 'dist') {
+    photo.curPts.push(pt);
+    if (photo.curPts.length === 2) saveDistMeasure();
+  } else if (photo.mode === 'area') {
+    photo.curPts.push(pt);
+  }
+  redrawPhoto();
+}
+
+function setPhotoMode(mode) {
+  photo.mode = mode; photo.curPts = [];
+  ['ref','dist','area'].forEach(m =>
+    document.getElementById('btn-mode-'+m).classList.toggle('active-mode', m===mode));
+  document.getElementById('photo-ref-input').style.display   = mode==='ref'  ? 'flex'  : 'none';
+  document.getElementById('photo-area-done').style.display   = mode==='area' ? 'block' : 'none';
+  const hints = {
+    ref:  '두 점을 클릭해 기준선을 표시한 뒤 실제 길이를 입력하고 설정 버튼을 누르세요',
+    dist: '시작점 → 끝점 클릭 시 거리가 자동 계산됩니다',
+    area: '꼭짓점을 순서대로 클릭한 후 "면적 측정 완료"를 누르세요 (3점 이상)',
+  };
+  document.getElementById('photo-mode-hint').textContent = hints[mode];
+  redrawPhoto();
+}
+
+function setPhotoReference() {
+  if (photo.refPts.length !== 2) { alert('사진에서 두 점을 먼저 클릭해주세요'); return; }
+  const val  = parseFloat(document.getElementById('photo-ref-value').value);
+  const unit = parseFloat(document.getElementById('photo-ref-unit').value);
+  if (!val || val <= 0) { alert('실제 길이를 입력해주세요'); return; }
+  const meters = val * unit;
+  const dx = photo.refPts[1].x - photo.refPts[0].x;
+  const dy = photo.refPts[1].y - photo.refPts[0].y;
+  const px = Math.sqrt(dx*dx + dy*dy);
+  photo.pxPerMeter = px / meters;
+  const unitLabel = unit===1 ? 'm' : unit===0.01 ? 'cm' : 'mm';
+  const statusEl = document.getElementById('photo-ref-status');
+  statusEl.style.display = 'block';
+  statusEl.textContent = '✓ 기준 설정 완료 — ' + val + unitLabel + ' = ' + Math.round(px) + 'px · 1px ≈ ' + (1000/photo.pxPerMeter).toFixed(1) + 'mm';
+  setPhotoMode('dist');
+}
+
+function saveDistMeasure() {
+  if (photo.pxPerMeter === 0) { alert('먼저 기준을 설정해주세요'); photo.curPts=[]; return; }
+  const dx = photo.curPts[1].x - photo.curPts[0].x;
+  const dy = photo.curPts[1].y - photo.curPts[0].y;
+  const m  = Math.sqrt(dx*dx + dy*dy) / photo.pxPerMeter;
+  photo.count++;
+  const label = m >= 1 ? m.toFixed(2)+'m' : (m*100).toFixed(1)+'cm';
+  photo.saved.push({ type:'dist', pts:[...photo.curPts], label, value:m });
+  photo.curPts = [];
+  updatePhotoList();
+}
+
+function finishAreaMeasure() {
+  if (photo.curPts.length < 3) { alert('3점 이상 클릭해주세요'); return; }
+  if (photo.pxPerMeter === 0)  { alert('먼저 기준을 설정해주세요'); return; }
+  const pts = photo.curPts;
+  let area = 0;
+  for (let i=0; i<pts.length; i++) {
+    const j = (i+1) % pts.length;
+    area += pts[i].x * pts[j].y - pts[j].x * pts[i].y;
+  }
+  const sqm = Math.abs(area) / 2 / (photo.pxPerMeter * photo.pxPerMeter);
+  photo.count++;
+  const label = sqm.toFixed(2)+'㎡';
+  photo.saved.push({ type:'area', pts:[...photo.curPts], label, value:sqm });
+  photo.curPts = [];
+  updatePhotoList();
+  redrawPhoto();
+}
+
+function updatePhotoList() {
+  const el = document.getElementById('photo-measure-list');
+  el.innerHTML = '';
+  photo.saved.forEach((m, i) => {
+    const row = document.createElement('div');
+    row.className = 'photo-measure-row';
+    const num = document.createElement('span');
+    num.style.cssText = 'flex:0 0 20px; font-weight:700; color:var(--green);';
+    num.textContent = i+1;
+    const type = document.createElement('span');
+    type.style.cssText = 'flex:0 0 40px; font-size:12px; color:var(--gray);';
+    type.textContent = m.type==='dist' ? '거리' : '면적';
+    const val = document.createElement('span');
+    val.style.cssText = 'flex:1; font-weight:700;';
+    if (m.type === 'dist') {
+      val.textContent = m.value>=1 ? m.value.toFixed(2)+' m' : (m.value*100).toFixed(1)+' cm';
+    } else {
+      val.textContent = m.value.toFixed(2)+' ㎡  (' + (m.value/3.3058).toFixed(2)+' 평)';
+    }
+    const del = document.createElement('button');
+    del.textContent = '✕';
+    del.style.cssText = 'background:none; border:none; color:var(--gray); cursor:pointer; font-size:15px; padding:0 4px;';
+    del.onclick = () => { photo.saved.splice(i,1); updatePhotoList(); redrawPhoto(); };
+    row.append(num, type, val, del);
+    el.appendChild(row);
+  });
+  redrawPhoto();
+}
+
+function photoUndo() {
+  if (photo.curPts.length > 0)         { photo.curPts.pop(); }
+  else if (photo.mode==='ref' && photo.refPts.length > 0) { photo.refPts.pop(); }
+  else if (photo.saved.length > 0)     { photo.saved.pop(); updatePhotoList(); }
+  redrawPhoto();
+}
+
+function photoClearAll() {
+  photo.refPts=[]; photo.pxPerMeter=0; photo.curPts=[]; photo.saved=[]; photo.count=0;
+  document.getElementById('photo-ref-status').style.display = 'none';
+  document.getElementById('photo-ref-value').value = '';
+  document.getElementById('photo-measure-list').innerHTML = '';
+  setPhotoMode('ref');
+}
+
+function photoNewImage() {
+  photoClearAll();
+  photo.img = null;
+  document.getElementById('photo-upload-area').style.display = 'block';
+  document.getElementById('photo-canvas-wrap').style.display = 'none';
+  document.getElementById('photo-toolbar').style.display     = 'none';
+  document.getElementById('photo-results').style.display     = 'none';
+}
 </script>
 
 <!-- 식재 주수 탭 -->
@@ -1244,6 +1537,82 @@ function resetPave() {
         <span class="result-value big" id="r-pave-qty-m">-</span>
       </div>
       <div class="result-note" id="r-pave-note"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 사진 줄자 탭 -->
+<div id="tab-photo" class="tab-content">
+  <div class="card">
+    <div class="card-title">📷 사진 줄자</div>
+    <div class="mulch-info">💡 줄자·A4용지·사람처럼 길이를 아는 물체가 화면에 보이도록 찍으면 다른 부분의 치수도 측정할 수 있습니다</div>
+
+    <!-- 업로드 버튼 2개 -->
+    <div id="photo-upload-area" style="margin-top:14px;">
+      <div style="display:flex; gap:10px;">
+        <button class="photo-upload-btn" onclick="document.getElementById('photo-camera-input').click()">
+          <span style="font-size:20px;">📷</span> 카메라 촬영
+        </button>
+        <button class="photo-upload-btn" onclick="document.getElementById('photo-file-input').click()">
+          <span style="font-size:20px;">🖼</span> 사진 선택
+        </button>
+      </div>
+      <p class="price-note" style="margin-top:10px; text-align:center;">JPG · PNG · HEIC 지원</p>
+    </div>
+    <!-- 카메라: capture=environment 로 후면카메라 직접 실행 -->
+    <input type="file" id="photo-camera-input" accept="image/*" capture="environment" style="display:none" onchange="loadPhotoFile(this)">
+    <input type="file" id="photo-file-input"   accept="image/*" style="display:none" onchange="loadPhotoFile(this)">
+
+    <!-- 캔버스 (사진 로드 후 표시) -->
+    <div id="photo-canvas-wrap" style="display:none; margin-top:14px; position:relative; overflow:hidden; border-radius:10px; background:#000;">
+      <canvas id="photo-canvas" style="width:100%; display:block; touch-action:none; cursor:crosshair;"></canvas>
+    </div>
+
+    <!-- 조작 툴바 (사진 로드 후 표시) -->
+    <div id="photo-toolbar" style="display:none; margin-top:12px;">
+
+      <!-- 모드 버튼 -->
+      <div style="display:flex; gap:8px;">
+        <button id="btn-mode-ref"  class="photo-mode-btn active-mode" onclick="setPhotoMode('ref')">📏 기준 설정</button>
+        <button id="btn-mode-dist" class="photo-mode-btn"             onclick="setPhotoMode('dist')">📐 거리 측정</button>
+        <button id="btn-mode-area" class="photo-mode-btn"             onclick="setPhotoMode('area')">⬜ 면적 측정</button>
+      </div>
+
+      <!-- 힌트 -->
+      <div class="mulch-info" id="photo-mode-hint" style="margin-top:8px; margin-bottom:0;">두 점을 클릭해 기준선을 표시하고 실제 거리를 입력하세요</div>
+
+      <!-- 기준 입력 (ref 모드) -->
+      <div id="photo-ref-input" style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+        <input type="number" id="photo-ref-value" placeholder="실제 길이" inputmode="decimal" step="0.01" style="flex:1;">
+        <div class="select-wrap" style="width:76px; flex-shrink:0;">
+          <select id="photo-ref-unit">
+            <option value="1">m</option>
+            <option value="0.01">cm</option>
+            <option value="0.001">mm</option>
+          </select>
+        </div>
+        <button class="calc-btn" onclick="setPhotoReference()" style="flex:0 0 auto; padding:10px 14px; font-size:13px; width:auto;">설정</button>
+      </div>
+
+      <!-- 면적 완료 버튼 (area 모드) -->
+      <div id="photo-area-done" style="display:none; margin-top:10px;">
+        <button class="calc-btn" onclick="finishAreaMeasure()" style="width:100%;">면적 측정 완료 (3점 이상)</button>
+      </div>
+
+      <!-- 보조 버튼 -->
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button class="reset-btn" onclick="photoUndo()"    style="flex:1; padding:10px 4px; font-size:13px;">↩ 되돌리기</button>
+        <button class="reset-btn" onclick="photoClearAll()" style="flex:1; padding:10px 4px; font-size:13px;">🗑 전체 초기화</button>
+        <button class="reset-btn" onclick="photoNewImage()" style="flex:1; padding:10px 4px; font-size:13px;">📷 새 사진</button>
+      </div>
+    </div>
+
+    <!-- 결과 목록 -->
+    <div id="photo-results" style="display:none; margin-top:16px;">
+      <div class="result-title">📊 측정 결과</div>
+      <div id="photo-ref-status" style="font-size:12px; color:#15803d; background:rgba(34,197,94,0.1); border-radius:8px; padding:8px 10px; margin:8px 0; display:none;"></div>
+      <div id="photo-measure-list"></div>
+      <p class="price-note" style="margin-top:10px;">※ 기준점과 측정 대상이 같은 평면에 있을 때만 정확합니다. 원근·경사가 있으면 오차 발생.</p>
     </div>
   </div>
 </div>
