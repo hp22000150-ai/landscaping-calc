@@ -541,6 +541,10 @@
         <span class="result-label">총 중량</span>
         <span class="result-value big" id="r-total-weight">-</span>
       </div>
+      <div class="result-row" style="border-top:2px solid var(--border); margin-top:4px; padding-top:4px;">
+        <span class="result-label">25톤 트럭 1대</span>
+        <span class="result-value" id="r-truck">-</span>
+      </div>
       <div style="margin-top:12px">
         <div class="result-label" style="margin-bottom:6px">추천 장비</div>
         <div id="r-equipment">-</div>
@@ -653,6 +657,19 @@
       <tr><td>배양토</td><td>㎥</td><td>약 35,000~55,000원</td></tr>
     </table>
     <p class="price-note">※ 운반비 별도. 지역 및 공급처에 따라 차이 있음.</p>
+  </div>
+
+  <div class="card">
+    <div class="section-label">경계석 · 보도블록 <span style="font-weight:400; opacity:0.75;">· 시중 참고치</span></div>
+    <table class="price-table">
+      <tr><th>공종</th><th>단위</th><th>노무비 (참고)</th></tr>
+      <tr><td>경계석 설치 (표준형)</td><td>m</td><td>약 4,000~6,000원</td></tr>
+      <tr><td>경계석 설치 (대형)</td><td>m</td><td>약 6,000~10,000원</td></tr>
+      <tr><td>보도블록 포장 (일반)</td><td>㎡</td><td>약 8,000~12,000원</td></tr>
+      <tr><td>보도블록 포장 (이형)</td><td>㎡</td><td>약 12,000~18,000원</td></tr>
+      <tr><td>모래 기층 (t=5cm)</td><td>㎡</td><td>약 2,000~3,500원</td></tr>
+    </table>
+    <p class="price-note">※ 시중 참고치. 지역·규격·시공 조건에 따라 달라집니다.</p>
   </div>
 </div>
 
@@ -805,6 +822,12 @@ function calcTree() {
     ? belowWeight.toFixed(1) + ' kg  (' + ballTypeName + ', ' + ballVol.toFixed(3) + ' ㎥)'
     : '해당없음 (나근)';
   document.getElementById('r-total-weight').textContent = totalWeight.toFixed(1) + ' kg';
+  const truckCap = 25000;
+  const perTruck = Math.floor(truckCap / totalWeight);
+  document.getElementById('r-truck').textContent =
+    totalWeight > truckCap
+      ? '초과 — 분리 운반 필요'
+      : perTruck + '주 적재 가능';
   document.getElementById('r-equipment').innerHTML     = equipment;
   document.getElementById('r-tree-note').textContent   =
     'U=' + U.toLocaleString() + ' kg/㎥, P=' + P +
@@ -1274,6 +1297,31 @@ function photoNewImage() {
   document.getElementById('photo-toolbar').style.display     = 'none';
   document.getElementById('photo-results').style.display     = 'none';
 }
+
+function photoSave() {
+  if (!photo.img) { alert('저장할 사진이 없습니다'); return; }
+  const canvas = document.getElementById('photo-canvas');
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+  // Web Share API (모바일)
+  if (navigator.share && navigator.canShare) {
+    canvas.toBlob(blob => {
+      const file = new File([blob], 'photo-measure.jpg', { type: 'image/jpeg' });
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: '사진 줄자 측정 결과' }).catch(() => photoDownload(dataUrl));
+        return;
+      }
+      photoDownload(dataUrl);
+    }, 'image/jpeg', 0.95);
+  } else {
+    photoDownload(dataUrl);
+  }
+}
+function photoDownload(dataUrl) {
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = 'photo-measure-' + new Date().toISOString().slice(0,10) + '.jpg';
+  a.click();
+}
 </script>
 
 <!-- 식재 주수 탭 -->
@@ -1602,8 +1650,9 @@ function photoNewImage() {
       <!-- 보조 버튼 -->
       <div style="display:flex; gap:8px; margin-top:10px;">
         <button class="reset-btn" onclick="photoUndo()"    style="flex:1; padding:10px 4px; font-size:13px;">↩ 되돌리기</button>
-        <button class="reset-btn" onclick="photoClearAll()" style="flex:1; padding:10px 4px; font-size:13px;">🗑 전체 초기화</button>
+        <button class="reset-btn" onclick="photoClearAll()" style="flex:1; padding:10px 4px; font-size:13px;">🗑 초기화</button>
         <button class="reset-btn" onclick="photoNewImage()" style="flex:1; padding:10px 4px; font-size:13px;">📷 새 사진</button>
+        <button class="calc-btn"  onclick="photoSave()"    style="flex:1; padding:10px 4px; font-size:13px;">💾 저장</button>
       </div>
     </div>
 
@@ -1801,7 +1850,7 @@ function photoNewImage() {
 
 <footer style="text-align:center; padding:20px 16px 32px; font-size:12px; color:#9ca3af; line-height:1.8;">
   <div style="margin-bottom:4px; font-weight:600; color:#6b7280;">🌿 조경 현장 계산기</div>
-  <div>v0.615.20 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
+  <div>v0.616.26 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
   <div style="margin-top:4px;">※ 본 계산기는 참고용이며 실제 현장 조건에 따라 달라질 수 있습니다.</div>
 </footer>
 
