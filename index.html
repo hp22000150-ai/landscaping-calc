@@ -382,6 +382,90 @@
     border-color: white;
     transform: scale(1.3);
   }
+
+  /* ── 공유·설치 모달 ── */
+  #share-modal {
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,.55);
+    align-items: flex-end;
+    justify-content: center;
+  }
+  #share-modal.open { display: flex; }
+  .share-modal-card {
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 36px;
+    width: 100%; max-width: 480px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.15);
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .share-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 18px;
+  }
+  .share-modal-header h3 { margin:0; font-size:17px; font-weight:700; color:var(--text); }
+  .share-modal-close {
+    background: none; border: none; font-size: 22px; cursor: pointer;
+    color: var(--gray); line-height: 1; padding: 2px 4px;
+  }
+  .share-url-box {
+    display: flex; align-items: center; gap: 8px;
+    background: #f4f7f4; border-radius: 10px; padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+  .share-url-box span { flex: 1; font-size: 12px; color: var(--gray); word-break: break-all; }
+  .share-url-copy {
+    background: var(--primary); color: #fff; border: none; border-radius: 7px;
+    padding: 6px 11px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .share-big-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 15px; border-radius: 12px; border: none;
+    font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 10px;
+  }
+  .share-kakao-btn { background: #FEE500; color: #3C1E1E; }
+  .share-native-btn { background: var(--primary); color: #fff; }
+  .install-os-tabs {
+    display: flex; gap: 8px; margin: 18px 0 14px;
+  }
+  .install-os-tab {
+    flex: 1; padding: 9px; border-radius: 10px; border: 2px solid var(--border);
+    background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--gray);
+  }
+  .install-os-tab.active {
+    border-color: var(--primary); background: var(--primary); color: #fff;
+  }
+  .install-steps { margin: 0; padding: 0; list-style: none; }
+  .install-steps li {
+    display: flex; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--border); align-items: flex-start;
+  }
+  .install-steps li:last-child { border-bottom: none; }
+  .install-step-num {
+    background: var(--primary); color: #fff;
+    border-radius: 50%; width: 22px; height: 22px; min-width: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .install-step-txt { font-size: 13px; line-height: 1.6; color: var(--text); }
+  .install-step-txt b { color: var(--primary); }
+  .install-note {
+    font-size: 11px; color: var(--gray); margin-top: 14px; line-height: 1.7;
+    background: #f4f7f4; border-radius: 8px; padding: 10px 12px;
+  }
+  .pwa-install-btn {
+    display: none; width: 100%; padding: 14px; margin-top: 14px;
+    background: #1a73e8; color: #fff; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .share-header-btn {
+    background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.5);
+    border-radius: 8px; color: #fff; padding: 5px 9px; font-size: 13px;
+    cursor: pointer; display: flex; align-items: center; gap: 5px;
+    font-weight: 600; white-space: nowrap;
+  }
 </style>
 </head>
 <body>
@@ -391,7 +475,8 @@
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
     </div>
-    <div style="text-align:right; flex-shrink:0; padding-left:12px;">
+    <div style="text-align:right; flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+      <button class="share-header-btn" onclick="openShareModal()">📤 공유·설치</button>
       <span style="font-size:10px; opacity:0.7; font-weight:500; letter-spacing:0.3px; line-height:1.5; display:block;">Created by<br>CONTENT FACTORY</span>
       <div class="theme-dots-wrap">
         <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
@@ -1834,6 +1919,73 @@ function photoDownload(dataUrl) {
   a.download = 'photo-measure-' + new Date().toISOString().slice(0,10) + '.jpg';
   a.click();
 }
+
+// ── 공유·설치 ──────────────────────────────────────────
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('pwa-install-btn').style.display = 'block';
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  document.getElementById('pwa-install-btn').style.display = 'none';
+});
+
+function openShareModal() {
+  document.getElementById('share-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function showInstallTab(tab, btn) {
+  document.getElementById('install-android').style.display = tab === 'android' ? 'block' : 'none';
+  document.getElementById('install-ios').style.display     = tab === 'ios'     ? 'block' : 'none';
+  document.querySelectorAll('.install-os-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function shareApp() {
+  const url   = 'https://landscaping-calc.vercel.app/';
+  const title = '현장에서 바로 쓰는 계산기';
+  const text  = '조경·건설 현장 실용 계산기 — 수목중량·면적·경사도·배수·토공·사진측정 등';
+  if (navigator.share) {
+    navigator.share({ title, text, url }).catch(() => {});
+  } else {
+    copyUrl();
+  }
+}
+
+function copyUrl() {
+  const url = 'https://landscaping-calc.vercel.app/';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = event.currentTarget || document.querySelector('.share-url-copy');
+      const orig = btn.textContent;
+      btn.textContent = '✓ 복사됨';
+      setTimeout(() => { btn.textContent = orig; }, 1800);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('주소 복사 완료!\n카카오톡에 붙여넣기 하세요.');
+  }
+}
+
+async function installPWA() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  document.getElementById('pwa-install-btn').style.display = 'none';
+  if (outcome === 'accepted') closeShareModal();
+}
 </script>
 
 <!-- 식재 주수 탭 -->
@@ -2825,9 +2977,100 @@ function photoDownload(dataUrl) {
 
 <footer style="text-align:center; padding:20px 16px 32px; font-size:12px; color:#9ca3af; line-height:1.8;">
   <div style="margin-bottom:4px; font-weight:600; color:#6b7280;">🌿 현장에서 바로 쓰는 계산기</div>
-  <div>v0.617.17 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
+  <div>v0.617.2033 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
   <div style="margin-top:4px;">※ 본 계산기는 참고용이며 실제 현장 조건에 따라 달라질 수 있습니다.</div>
 </footer>
+
+<!-- ── 공유·설치 모달 ── -->
+<div id="share-modal" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-modal-card">
+    <div class="share-modal-header">
+      <h3>📤 공유 &amp; 홈화면 설치</h3>
+      <button class="share-modal-close" onclick="closeShareModal()">✕</button>
+    </div>
+
+    <!-- URL 복사 -->
+    <div class="share-url-box">
+      <span>landscaping-calc.vercel.app</span>
+      <button class="share-url-copy" onclick="copyUrl()">복사</button>
+    </div>
+
+    <!-- 카카오톡 / 공유 버튼 -->
+    <button class="share-big-btn share-kakao-btn" onclick="shareApp()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.477 3 2 6.477 2 11c0 2.943 1.626 5.53 4.1 7.1l-.9 3.3 3.7-2.4C10.2 19.3 11.1 19.4 12 19.4c5.523 0 10-3.477 10-8.4S17.523 3 12 3z"/></svg>
+      카카오톡으로 보내기
+    </button>
+    <button class="share-big-btn share-native-btn" onclick="shareApp()">
+      📲 다른 앱으로 공유하기
+    </button>
+
+    <!-- 홈화면 설치 안내 -->
+    <div style="border-top:1.5px solid var(--border); margin-top:6px; padding-top:16px;">
+      <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:2px;">홈화면에 앱처럼 설치하기</div>
+      <div style="font-size:12px; color:var(--gray); margin-bottom:4px;">설치하면 앱 아이콘이 생기고 전체화면으로 실행됩니다</div>
+      <div class="install-os-tabs">
+        <button class="install-os-tab active" id="tab-android-btn" onclick="showInstallTab('android',this)">🤖 안드로이드</button>
+        <button class="install-os-tab" id="tab-ios-btn" onclick="showInstallTab('ios',this)">🍎 아이폰</button>
+      </div>
+
+      <!-- 안드로이드 -->
+      <div id="install-android">
+        <ul class="install-steps">
+          <li>
+            <div class="install-step-num">1</div>
+            <div class="install-step-txt">위 <b>카카오톡으로 보내기</b> 탭 → 친구 또는 나에게 전송</div>
+          </li>
+          <li>
+            <div class="install-step-num">2</div>
+            <div class="install-step-txt">카카오톡에서 링크 탭 → 우측 상단 <b>⋮ 메뉴</b> → <b>"Chrome으로 열기"</b></div>
+          </li>
+          <li>
+            <div class="install-step-num">3</div>
+            <div class="install-step-txt">Chrome 우측 상단 <b>⋮</b> → <b>"앱 설치"</b> 또는 <b>"홈 화면에 추가"</b> 탭</div>
+          </li>
+          <li>
+            <div class="install-step-num">4</div>
+            <div class="install-step-txt"><b>"설치"</b> 확인 → 홈화면에 아이콘 생성 완료 ✓</div>
+          </li>
+        </ul>
+        <button class="pwa-install-btn" id="pwa-install-btn" onclick="installPWA()">
+          ✨ 지금 바로 설치 (Chrome에서 열려 있을 때)
+        </button>
+        <div class="install-note">
+          ※ 삼성 인터넷에서는 <b>⋮ → 페이지 추가 → 홈 화면</b> 순서로 진행<br>
+          ※ 카카오톡 인앱 브라우저에서는 직접 설치 불가 — Chrome으로 먼저 열어야 합니다
+        </div>
+      </div>
+
+      <!-- 아이폰 -->
+      <div id="install-ios" style="display:none;">
+        <ul class="install-steps">
+          <li>
+            <div class="install-step-num">1</div>
+            <div class="install-step-txt">위 <b>카카오톡으로 보내기</b> 탭 → 친구 또는 나에게 전송</div>
+          </li>
+          <li>
+            <div class="install-step-num">2</div>
+            <div class="install-step-txt">카카오톡에서 링크 탭 → 우측 하단 <b>Safari 아이콘</b> 탭 → <b>"Safari로 열기"</b></div>
+          </li>
+          <li>
+            <div class="install-step-num">3</div>
+            <div class="install-step-txt">Safari 하단 가운데 <b>공유 버튼 □↑</b> 탭</div>
+          </li>
+          <li>
+            <div class="install-step-num">4</div>
+            <div class="install-step-txt">스크롤해서 <b>"홈 화면에 추가"</b> 탭 → <b>"추가"</b> 확인 ✓</div>
+          </li>
+        </ul>
+        <div class="install-note">
+          ※ 아이폰은 반드시 <b>Safari</b>에서만 홈화면 추가 가능합니다<br>
+          ※ 카카오톡 인앱 브라우저에서는 하단에 Safari 아이콘이 나타납니다<br>
+          ※ iOS 16.4 이상에서 알림 등 PWA 기능이 더 잘 작동합니다
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
