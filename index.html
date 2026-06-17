@@ -978,6 +978,105 @@ function resetArea() {
   document.getElementById('area-result').classList.remove('show');
 }
 
+// ── 삼각형 변 길이 ──────────────────────────────────────────
+function updateTriInputs() {
+  const type = document.querySelector('input[name="tri-type"]:checked').value;
+  document.getElementById('tri-right-wrap').style.display   = type === 'right'   ? 'block' : 'none';
+  document.getElementById('tri-general-wrap').style.display = type === 'general' ? 'block' : 'none';
+  document.getElementById('tri-result').classList.remove('show');
+}
+function updateTriMethod() {
+  const m = document.getElementById('tri-method').value;
+  ['sas','aas','sss'].forEach(k =>
+    document.getElementById('tri-' + k + '-inputs').style.display = k === m ? 'block' : 'none');
+  document.getElementById('tri-result').classList.remove('show');
+}
+function displayTriResult(a, b, c, A, B, C, isRight, note) {
+  const fm = v => v.toFixed(3) + ' m';
+  const fa = v => v.toFixed(1) + '°';
+  const s = (a + b + c) / 2;
+  const area = Math.sqrt(Math.max(0, s * (s-a) * (s-b) * (s-c)));
+  document.getElementById('r-tri-a-lbl').textContent = isRight ? '직각변 a' : '변 a';
+  document.getElementById('r-tri-b-lbl').textContent = isRight ? '직각변 b' : '변 b';
+  document.getElementById('r-tri-c-lbl').textContent = isRight ? '빗변 c' : '변 c';
+  document.getElementById('r-tri-a').textContent = fm(a);
+  document.getElementById('r-tri-b').textContent = fm(b);
+  document.getElementById('r-tri-c').textContent = fm(c);
+  document.getElementById('r-tri-A').textContent = fa(A);
+  document.getElementById('r-tri-B').textContent = fa(B);
+  document.getElementById('r-tri-C').textContent = fa(C) + (isRight ? ' (직각)' : '');
+  document.getElementById('r-tri-peri').textContent = (a + b + c).toFixed(3) + ' m';
+  document.getElementById('r-tri-area').textContent = area.toFixed(3) + ' ㎡  (' + (area / 3.3058).toFixed(2) + ' 평)';
+  document.getElementById('r-tri-note').textContent = note;
+  document.getElementById('tri-result').classList.add('show');
+}
+function calcTriangle() {
+  const type = document.querySelector('input[name="tri-type"]:checked').value;
+  const DEG = Math.PI / 180;
+  if (type === 'right') {
+    const ra = parseFloat(document.getElementById('tri-ra').value) || 0;
+    const rb = parseFloat(document.getElementById('tri-rb').value) || 0;
+    const rc = parseFloat(document.getElementById('tri-rc').value) || 0;
+    if ((ra>0?1:0)+(rb>0?1:0)+(rc>0?1:0) < 2) { alert('두 변을 입력해주세요'); return; }
+    let a, b, c, note;
+    if (ra > 0 && rb > 0) {
+      a = ra; b = rb; c = Math.sqrt(a*a + b*b); note = 'c = √(a²+b²)';
+    } else if (ra > 0 && rc > 0) {
+      if (rc <= ra) { alert('빗변(c)은 직각변(a)보다 커야 합니다'); return; }
+      a = ra; c = rc; b = Math.sqrt(c*c - a*a); note = 'b = √(c²−a²)';
+    } else {
+      if (rc <= rb) { alert('빗변(c)은 직각변(b)보다 커야 합니다'); return; }
+      b = rb; c = rc; a = Math.sqrt(c*c - b*b); note = 'a = √(c²−b²)';
+    }
+    const A = Math.atan2(a, b) * 180 / Math.PI;
+    const B = 90 - A;
+    displayTriResult(a, b, c, A, B, 90, true, '피타고라스 정리 · ' + note);
+  } else {
+    const method = document.getElementById('tri-method').value;
+    let a, b, c, A, B, C, note;
+    if (method === 'sas') {
+      a = parseFloat(document.getElementById('tri-sas-a').value);
+      C = parseFloat(document.getElementById('tri-sas-C').value);
+      b = parseFloat(document.getElementById('tri-sas-b').value);
+      if (!a||!C||!b||a<=0||b<=0) { alert('두 변과 끼인각을 모두 입력해주세요'); return; }
+      if (C<=0||C>=180) { alert('각도는 0°~180° 사이여야 합니다'); return; }
+      c = Math.sqrt(a*a + b*b - 2*a*b*Math.cos(C*DEG));
+      A = Math.asin(Math.min(1, a * Math.sin(C*DEG) / c)) * 180 / Math.PI;
+      B = 180 - A - C;
+      note = '코사인 법칙 · c² = a²+b²−2ab·cos(C)';
+    } else if (method === 'aas') {
+      A = parseFloat(document.getElementById('tri-aas-A').value);
+      B = parseFloat(document.getElementById('tri-aas-B').value);
+      a = parseFloat(document.getElementById('tri-aas-a').value);
+      if (!A||!B||!a||a<=0) { alert('두 각도와 변 a를 모두 입력해주세요'); return; }
+      if (A+B>=180) { alert('두 각도의 합이 180° 미만이어야 합니다'); return; }
+      C = 180 - A - B;
+      b = a * Math.sin(B*DEG) / Math.sin(A*DEG);
+      c = a * Math.sin(C*DEG) / Math.sin(A*DEG);
+      note = '사인 법칙 · a/sin(A) = b/sin(B) = c/sin(C)';
+    } else {
+      a = parseFloat(document.getElementById('tri-sss-a').value);
+      b = parseFloat(document.getElementById('tri-sss-b').value);
+      c = parseFloat(document.getElementById('tri-sss-c').value);
+      if (!a||!b||!c||a<=0||b<=0||c<=0) { alert('세 변을 모두 입력해주세요'); return; }
+      if (a+b<=c||a+c<=b||b+c<=a) { alert('삼각형 불성립 — 두 변의 합이 나머지 변보다 커야 합니다'); return; }
+      A = Math.acos(Math.min(1, Math.max(-1, (b*b+c*c-a*a)/(2*b*c)))) * 180 / Math.PI;
+      B = Math.acos(Math.min(1, Math.max(-1, (a*a+c*c-b*b)/(2*a*c)))) * 180 / Math.PI;
+      C = 180 - A - B;
+      note = '코사인 법칙 · cos(A) = (b²+c²−a²)/(2bc)';
+    }
+    displayTriResult(a, b, c, A, B, C, false, note);
+  }
+}
+function resetTriangle() {
+  ['tri-ra','tri-rb','tri-rc',
+   'tri-sas-a','tri-sas-C','tri-sas-b',
+   'tri-aas-A','tri-aas-B','tri-aas-a',
+   'tri-sss-a','tri-sss-b','tri-sss-c']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('tri-result').classList.remove('show');
+}
+
 // ── 경사도 ──────────────────────────────────────────────
 function calcSlope() {
   const pct = parseFloat(document.getElementById('slope-pct').value);
@@ -1595,6 +1694,109 @@ function photoDownload(dataUrl) {
       <div class="result-note" id="r-area-note"></div>
     </div>
   </div>
+
+  <!-- 삼각형 변 길이 계산 -->
+  <div class="card">
+    <div class="card-title">📏 삼각형 변 길이 계산</div>
+
+    <label>삼각형 종류</label>
+    <div class="radio-group">
+      <label><input type="radio" name="tri-type" value="right" checked onchange="updateTriInputs()"><span>직각삼각형</span></label>
+      <label><input type="radio" name="tri-type" value="general" onchange="updateTriInputs()"><span>일반삼각형</span></label>
+    </div>
+
+    <!-- 직각삼각형 -->
+    <div id="tri-right-wrap">
+      <div class="mulch-info" style="font-size:12px; margin:10px 0 4px;">세 칸 중 두 칸만 입력하면 나머지 변과 각도를 구합니다</div>
+      <label>직각변 a (m)</label>
+      <input type="number" id="tri-ra" placeholder="비워도 됨" inputmode="decimal" step="0.001">
+      <label>직각변 b (m)</label>
+      <input type="number" id="tri-rb" placeholder="비워도 됨" inputmode="decimal" step="0.001">
+      <label>빗변 c (m)</label>
+      <input type="number" id="tri-rc" placeholder="비워도 됨" inputmode="decimal" step="0.001">
+    </div>
+
+    <!-- 일반삼각형 -->
+    <div id="tri-general-wrap" style="display:none;">
+      <label style="margin-top:10px;">풀이 방법</label>
+      <div class="select-wrap">
+        <select id="tri-method" onchange="updateTriMethod()">
+          <option value="sas">두 변 + 끼인각 (SAS)</option>
+          <option value="aas">두 각 + 한 변 (AAS)</option>
+          <option value="sss">세 변으로 각도 구하기 (SSS)</option>
+        </select>
+      </div>
+      <!-- SAS -->
+      <div id="tri-sas-inputs">
+        <label style="margin-top:14px;">변 a (m)</label>
+        <input type="number" id="tri-sas-a" placeholder="첫 번째 변" inputmode="decimal" step="0.001">
+        <label>끼인각 C (°) — a 와 b 사이의 각도</label>
+        <input type="number" id="tri-sas-C" placeholder="두 변 사이의 각도" inputmode="decimal" step="0.1">
+        <label>변 b (m)</label>
+        <input type="number" id="tri-sas-b" placeholder="두 번째 변" inputmode="decimal" step="0.001">
+      </div>
+      <!-- AAS -->
+      <div id="tri-aas-inputs" style="display:none;">
+        <label style="margin-top:14px;">각도 A (°)</label>
+        <input type="number" id="tri-aas-A" placeholder="첫 번째 각도" inputmode="decimal" step="0.1">
+        <label>각도 B (°)</label>
+        <input type="number" id="tri-aas-B" placeholder="두 번째 각도" inputmode="decimal" step="0.1">
+        <label>변 a (m) — 각도 A 건너편 변 길이</label>
+        <input type="number" id="tri-aas-a" placeholder="A 각도 건너편 변" inputmode="decimal" step="0.001">
+      </div>
+      <!-- SSS -->
+      <div id="tri-sss-inputs" style="display:none;">
+        <label style="margin-top:14px;">변 a (m)</label>
+        <input type="number" id="tri-sss-a" inputmode="decimal" step="0.001">
+        <label>변 b (m)</label>
+        <input type="number" id="tri-sss-b" inputmode="decimal" step="0.001">
+        <label>변 c (m)</label>
+        <input type="number" id="tri-sss-c" inputmode="decimal" step="0.001">
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcTriangle()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetTriangle()" style="flex:0 0 80px;">초기화</button>
+    </div>
+
+    <div id="tri-result" class="result-box">
+      <div class="result-title">📊 삼각형 계산 결과</div>
+      <div class="result-row">
+        <span class="result-label" id="r-tri-a-lbl">변 a</span>
+        <span class="result-value" id="r-tri-a">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label" id="r-tri-b-lbl">변 b</span>
+        <span class="result-value" id="r-tri-b">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label" id="r-tri-c-lbl">변 c</span>
+        <span class="result-value big" id="r-tri-c">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">각도 A</span>
+        <span class="result-value" id="r-tri-A">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">각도 B</span>
+        <span class="result-value" id="r-tri-B">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">각도 C</span>
+        <span class="result-value" id="r-tri-C">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">둘레</span>
+        <span class="result-value" id="r-tri-peri">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">넓이</span>
+        <span class="result-value" id="r-tri-area">-</span>
+      </div>
+      <div class="result-note" id="r-tri-note"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 경사도 탭 -->
@@ -1893,6 +2095,23 @@ function photoDownload(dataUrl) {
     <p class="price-note" style="margin-top:10px;">※ 1평 = 3.3058㎡ &nbsp;·&nbsp; 1㎡ = 0.3025평</p>
   </div>
 
+  <!-- 5-2. 삼각형 변 길이 -->
+  <div class="card">
+    <div class="card-title">📏 삼각형 변 길이 계산</div>
+    <table class="price-table">
+      <tr><th>방법</th><th>입력</th><th>구하는 것</th></tr>
+      <tr><td>직각삼각형</td><td>두 변 중 아무거나 2개</td><td>나머지 변 + 각도</td></tr>
+      <tr><td>SAS</td><td>두 변 + 끼인각</td><td>제3변 + 나머지 각도</td></tr>
+      <tr><td>AAS</td><td>두 각도 + A 건너편 변</td><td>나머지 두 변</td></tr>
+      <tr><td>SSS</td><td>세 변 모두</td><td>세 각도</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 직각삼각형: 빗변(c) = √(a²+b²)<br>
+      ※ SAS: 코사인 법칙 &nbsp;·&nbsp; AAS: 사인 법칙<br>
+      ※ 결과에 둘레·넓이도 함께 표시됩니다
+    </p>
+  </div>
+
   <!-- 6. 경사도 -->
   <div class="card">
     <div class="card-title">📏 경사도 환산기</div>
@@ -2017,7 +2236,7 @@ function photoDownload(dataUrl) {
 
 <footer style="text-align:center; padding:20px 16px 32px; font-size:12px; color:#9ca3af; line-height:1.8;">
   <div style="margin-bottom:4px; font-weight:600; color:#6b7280;">🌿 조경 현장 계산기</div>
-  <div>v0.617.22 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
+  <div>v0.617.23 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
   <div style="margin-top:4px;">※ 본 계산기는 참고용이며 실제 현장 조건에 따라 달라질 수 있습니다.</div>
 </footer>
 
