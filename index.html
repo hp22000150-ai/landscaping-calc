@@ -990,11 +990,87 @@ function updateTriMethod() {
     document.getElementById('tri-' + k + '-inputs').style.display = k === m ? 'block' : 'none');
   document.getElementById('tri-result').classList.remove('show');
 }
+function renderTriangleSVG(a, b, c, A, B, C, isRight) {
+  const R = Math.PI / 180;
+  const f  = n => n.toFixed(1);
+  const fm = v => v >= 1 ? v.toFixed(2) + 'm' : (v * 100).toFixed(1) + 'cm';
+  const fa = v => v.toFixed(1) + '°';
+
+  // Vertex positions: A at origin, B on x-axis, C above (math coords, y-up → SVG negate y)
+  const raw = [
+    { x: 0, y: 0 },
+    { x: c, y: 0 },
+    { x: b * Math.cos(A * R), y: -b * Math.sin(A * R) }
+  ];
+  const xs = raw.map(p => p.x), ys = raw.map(p => p.y);
+  const mnX = Math.min(...xs), mnY = Math.min(...ys);
+  const rnX = Math.max(...xs) - mnX || 1, rnY = Math.max(...ys) - mnY || 1;
+  const W = 280, H = 180, pad = 52;
+  const sc = Math.min((W - 2*pad) / rnX, (H - 2*pad) / rnY);
+  const T = p => ({ x: (p.x - mnX)*sc + pad, y: (p.y - mnY)*sc + pad });
+  const [pA, pB, pC] = raw.map(T);
+  const gcx = (pA.x+pB.x+pC.x)/3, gcy = (pA.y+pB.y+pC.y)/3;
+
+  const out = (pt, d) => {
+    const dx = pt.x-gcx, dy = pt.y-gcy, l = Math.sqrt(dx*dx+dy*dy)||1;
+    return { x: pt.x+dx/l*d, y: pt.y+dy/l*d };
+  };
+  const [lBC, lAC, lAB] = [
+    { x:(pB.x+pC.x)/2, y:(pB.y+pC.y)/2 },
+    { x:(pA.x+pC.x)/2, y:(pA.y+pC.y)/2 },
+    { x:(pA.x+pB.x)/2, y:(pA.y+pB.y)/2 }
+  ].map(m => out(m, 17));
+  const [lA, lB, lC] = [pA, pB, pC].map(p => out(p, 26));
+
+  // Angle arc
+  const arcPath = (vx, vy, dx1, dy1, dx2, dy2, r) => {
+    const a1 = Math.atan2(dy1,dx1), a2 = Math.atan2(dy2,dx2);
+    let da = a2 - a1;
+    while (da > Math.PI)  da -= 2*Math.PI;
+    while (da < -Math.PI) da += 2*Math.PI;
+    if (Math.abs(da) < 0.02) return '';
+    const x1 = vx+r*Math.cos(a1), y1 = vy+r*Math.sin(a1);
+    const x2 = vx+r*Math.cos(a2), y2 = vy+r*Math.sin(a2);
+    return `<path d="M${f(x1)},${f(y1)} A${r},${r} 0 0,${da>0?1:0} ${f(x2)},${f(y2)}" fill="none" stroke="#f97316" stroke-width="1.5"/>`;
+  };
+  // Right-angle square at vertex with 90°
+  const rightSq = (vx, vy, p1x, p1y, p2x, p2y) => {
+    const sz = 10;
+    const nv = (dx,dy)=>{ const l=Math.sqrt(dx*dx+dy*dy)||1; return {x:dx/l*sz,y:dy/l*sz}; };
+    const u1 = nv(p1x-vx, p1y-vy), u2 = nv(p2x-vx, p2y-vy);
+    const pts = [
+      {x:vx+u1.x,y:vy+u1.y},
+      {x:vx+u1.x+u2.x,y:vy+u1.y+u2.y},
+      {x:vx+u2.x,y:vy+u2.y}
+    ];
+    return `<polyline points="${pts.map(p=>f(p.x)+','+f(p.y)).join(' ')}" fill="none" stroke="#2d6a4f" stroke-width="1.5"/>`;
+  };
+  const mkArc = (vx, vy, p1, p2, angle) =>
+    (isRight && Math.abs(angle-90) < 0.2)
+      ? rightSq(vx, vy, p1.x, p1.y, p2.x, p2.y)
+      : arcPath(vx, vy, p1.x-vx, p1.y-vy, p2.x-vx, p2.y-vy, 14);
+
+  const txt = (x, y, size, col, weight, val) =>
+    `<text x="${f(x)}" y="${f(y)}" text-anchor="middle" dominant-baseline="middle" font-size="${size}" fill="${col}" font-weight="${weight}">${val}</text>`;
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;border-radius:8px;background:rgba(255,255,255,0.55);margin:6px 0 10px;">
+  <polygon points="${f(pA.x)},${f(pA.y)} ${f(pB.x)},${f(pB.y)} ${f(pC.x)},${f(pC.y)}" fill="rgba(45,106,79,0.1)" stroke="#2d6a4f" stroke-width="2.5" stroke-linejoin="round"/>
+  ${mkArc(pA.x,pA.y,pB,pC,A)}${mkArc(pB.x,pB.y,pA,pC,B)}${mkArc(pC.x,pC.y,pA,pB,C)}
+  ${txt(lBC.x,lBC.y,11,'#ea580c','700','a='+fm(a))}
+  ${txt(lAC.x,lAC.y,11,'#ea580c','700','b='+fm(b))}
+  ${txt(lAB.x,lAB.y,11,'#ea580c','700','c='+fm(c))}
+  ${txt(lA.x,lA.y-8,13,'#1b4332','700','A')}${txt(lA.x,lA.y+8,10,'#374151','400',fa(A))}
+  ${txt(lB.x,lB.y-8,13,'#1b4332','700','B')}${txt(lB.x,lB.y+8,10,'#374151','400',fa(B))}
+  ${txt(lC.x,lC.y-8,13,'#1b4332','700','C')}${txt(lC.x,lC.y+8,10,'#374151','400',fa(C))}
+</svg>`;
+}
+
 function displayTriResult(a, b, c, A, B, C, isRight, note) {
   const fm = v => v.toFixed(3) + ' m';
   const fa = v => v.toFixed(1) + '°';
   const s = (a + b + c) / 2;
   const area = Math.sqrt(Math.max(0, s * (s-a) * (s-b) * (s-c)));
+  document.getElementById('tri-svg-wrap').innerHTML = renderTriangleSVG(a, b, c, A, B, C, isRight);
   document.getElementById('r-tri-a-lbl').textContent = isRight ? '직각변 a' : '변 a';
   document.getElementById('r-tri-b-lbl').textContent = isRight ? '직각변 b' : '변 b';
   document.getElementById('r-tri-c-lbl').textContent = isRight ? '빗변 c' : '변 c';
@@ -1761,6 +1837,7 @@ function photoDownload(dataUrl) {
 
     <div id="tri-result" class="result-box">
       <div class="result-title">📊 삼각형 계산 결과</div>
+      <div id="tri-svg-wrap"></div>
       <div class="result-row">
         <span class="result-label" id="r-tri-a-lbl">변 a</span>
         <span class="result-value" id="r-tri-a">-</span>
@@ -2235,7 +2312,7 @@ function photoDownload(dataUrl) {
 
 <footer style="text-align:center; padding:20px 16px 32px; font-size:12px; color:#9ca3af; line-height:1.8;">
   <div style="margin-bottom:4px; font-weight:600; color:#6b7280;">🌿 현장에서 바로 쓰는 계산기</div>
-  <div>v0.617.20 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
+  <div>v0.617.21 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
   <div style="margin-top:4px;">※ 본 계산기는 참고용이며 실제 현장 조건에 따라 달라질 수 있습니다.</div>
 </footer>
 
