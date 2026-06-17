@@ -476,11 +476,6 @@
 <div id="tab-tree" class="tab-content active">
   <div class="card">
     <div class="card-title">🌳 수목 중량 계산기</div>
-    <div class="mulch-info" style="font-size:11px; line-height:1.7;">
-      📐 W = K × π × (B/2)² × H × U × (1+P)<br>
-      K=0.5, B=근원직경×0.8(m)
-    </div>
-
     <label>근원직경 (cm)</label>
     <input type="number" id="tree-rcd" placeholder="예: 15" inputmode="decimal">
 
@@ -523,7 +518,11 @@
 
     <button class="calc-btn" onclick="calcTree()">계산하기</button>
     <button class="reset-btn" onclick="resetTree()">초기화</button>
-    <p class="price-note" style="margin-top:8px;">출처: 조경설계요람 / 문석기 외 5인 (1998)</p>
+    <div class="mulch-info" style="font-size:11px; line-height:1.7; margin-top:10px;">
+      📐 W = K × π × (B/2)² × H × U × (1+P)<br>
+      K=0.5, B=근원직경×0.8(m)<br>
+      출처: 조경설계요람 / 문석기 외 5인 (1998)
+    </div>
 
     <div id="tree-result" class="result-box">
       <div class="result-title">📊 계산 결과</div>
