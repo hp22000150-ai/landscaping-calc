@@ -3137,12 +3137,13 @@ async function installPWA() {
       <tr><td>고립목 (P=1.0)</td><td>독립 식재, 가지·잎이 풍성하게 발달한 상태</td></tr>
       <tr><td>임목 (P=0.3)</td><td>군식·밀식 상태, 가지 발달이 적은 상태</td></tr>
       <tr><td>접시분</td><td>얕고 넓은 분 — V = 0.3927 × D³</td></tr>
-      <tr><td>보통분</td><td>일반적인 분 형태 — V = 0.4581 × D³</td></tr>
+      <tr><td>보통분 ★</td><td>일반적인 분 형태 — V = 0.4581 × D³ (기본값)</td></tr>
       <tr><td>조개분</td><td>깊고 좁은 분 — V = 0.5236 × D³</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">
       ※ 지상부 공식: W = 0.5 × π × (B/2)² × H × U × (1+P), B = R × 0.8 (m)<br>
       ※ 뿌리분: V × 1,300 kg/㎥, D = R × 4 / 100 (m)<br>
+      ※ 계산 후 지상부·뿌리분 무게를 나무 그림으로 시각화하여 표시<br>
       ※ 출처: 조경설계요람 (문석기 외 5인, 1998)
     </p>
   </div>
@@ -3282,7 +3283,8 @@ async function installPWA() {
     </table>
     <p class="price-note" style="margin-top:10px;">
       ※ 콘크리트: 손실 5% 포함, 레미콘 6㎥/대 기준으로 대수 자동 계산<br>
-      ※ 선형(보·벽체): 단면적 × 연장으로 계산
+      ※ 선형(보·벽체): 단면적 × 연장으로 계산<br>
+      ※ 철근 소요량은 같은 탭 아래 🔩 별도 카드에서 계산
     </p>
   </div>
 
