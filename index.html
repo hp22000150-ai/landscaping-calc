@@ -690,6 +690,54 @@
       <div class="result-note" id="r-tree-note">-</div>
     </div>
   </div>
+
+  <!-- 지주목 수량 -->
+  <div class="card">
+    <div class="card-title">🪵 지주목 수량 <button class="help-btn" onclick="showHelp('stake')">?</button></div>
+    <label>수목 수고 H (m)</label>
+    <input type="number" id="stake-h" placeholder="예: 3.5" inputmode="decimal" step="0.1" oninput="autoStakeType()">
+    <label>근원직경 R (cm)</label>
+    <input type="number" id="stake-r" placeholder="예: 8" inputmode="decimal" step="0.5" oninput="autoStakeType()">
+    <label>지주목 종류 <span style="font-size:11px; font-weight:400; opacity:.7;">(H·R 입력 시 자동 추천)</span></label>
+    <div class="select-wrap">
+      <select id="stake-type">
+        <option value="2">이각지주 — H 2.5m 이하 소교목</option>
+        <option value="3">삼각지주 — H 2.5 ~ 4.5m 중교목</option>
+        <option value="4">사각지주 — H 4.5m 이상 대교목</option>
+        <option value="wire">당김줄지주 — 대형목 (R ≥ 10cm)</option>
+      </select>
+    </div>
+    <label>수목 수량 (주)</label>
+    <input type="number" id="stake-count" placeholder="예: 10" inputmode="numeric">
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button class="calc-btn" onclick="calcStake()" style="flex:1;">계산</button>
+      <button class="reset-btn" onclick="resetStake()" style="flex:0 0 80px;">초기화</button>
+    </div>
+    <div id="stake-result" class="result-box">
+      <div class="result-title">📊 지주목 소요량</div>
+      <div class="result-row">
+        <span class="result-label">지주목 규격</span>
+        <span class="result-value" id="r-stake-spec">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">지주목 본수</span>
+        <span class="result-value big" id="r-stake-poles">-</span>
+      </div>
+      <div class="result-row" id="r-stake-cross-row">
+        <span class="result-label">가로대</span>
+        <span class="result-value" id="r-stake-cross">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">완충재</span>
+        <span class="result-value" id="r-stake-pad">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">결속재</span>
+        <span class="result-value" id="r-stake-wire">-</span>
+      </div>
+      <div class="result-note" id="r-stake-note"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 멀칭 재료 탭 -->
@@ -1484,6 +1532,100 @@ function calcCon() {
 function resetCon() {
   ['con-w','con-l','con-t','con-dia','con-h','con-bw','con-bh','con-bl'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
   document.getElementById('con-result').classList.remove('show');
+}
+
+// ── 철근 소요량 ──────────────────────────────────────────
+function updateRebarInputs() {
+  const s = document.getElementById('rebar-shape').value;
+  document.getElementById('rebar-slab-inputs').style.display  = s === 'slab' ? 'block' : 'none';
+  document.getElementById('rebar-wall-inputs').style.display  = s === 'wall' ? 'block' : 'none';
+  document.getElementById('rebar-pitchy-wrap').style.display  = s === 'slab' ? 'block' : 'none';
+}
+function calcRebar() {
+  const shape  = document.getElementById('rebar-shape').value;
+  const wpu    = parseFloat(document.getElementById('rebar-dia').value);
+  const pitchX = parseFloat(document.getElementById('rebar-pitch').value) / 1000;
+  const pyVal  = parseFloat(document.getElementById('rebar-pitchy').value);
+  const pitchY = (pyVal === 0 || shape === 'wall') ? pitchX : pyVal / 1000;
+  const cover  = parseFloat(document.getElementById('rebar-cover').value) / 1000;
+  let totalLen = 0, note = '';
+
+  if (shape === 'slab') {
+    const W = parseFloat(document.getElementById('rebar-w').value);
+    const L = parseFloat(document.getElementById('rebar-l').value);
+    if (!W || !L) { alert('가로, 세로를 입력해주세요'); return; }
+    const effW = W - cover * 2, effL = L - cover * 2;
+    const cntX = Math.ceil(effL / pitchX) + 1;
+    const cntY = Math.ceil(effW / pitchY) + 1;
+    totalLen = cntX * effW + cntY * effL;
+    note = `X방향 ${cntX}본(간격@${pitchX*1000}mm) + Y방향 ${cntY}본(간격@${pitchY*1000}mm)`;
+  } else {
+    const bw = parseFloat(document.getElementById('rebar-bw').value);
+    const bh = parseFloat(document.getElementById('rebar-bh').value);
+    const bl = parseFloat(document.getElementById('rebar-bl').value);
+    if (!bw || !bh || !bl) { alert('단면 폭, 높이, 연장을 입력해주세요'); return; }
+    const perim  = 2 * ((bw - cover*2) + (bh - cover*2));
+    const cntMain = Math.ceil(perim / pitchX) + 1;
+    const cntHoop = Math.ceil(bl / pitchX) + 1;
+    const lenMain = cntMain * bl;
+    const lenHoop = cntHoop * (perim + 0.3);
+    totalLen = lenMain + lenHoop;
+    note = `주근 ${cntMain}본 × L${bl}m + 띠철근 ${cntHoop}개`;
+  }
+
+  const netKg   = totalLen * wpu;
+  const grossKg = netKg * 1.05;
+  document.getElementById('rebar-result').classList.add('show');
+  document.getElementById('r-rebar-len').textContent   = totalLen.toFixed(1) + ' m';
+  document.getElementById('r-rebar-net').textContent   = netKg.toFixed(1) + ' kg  (' + (netKg/1000).toFixed(3) + ' 톤)';
+  document.getElementById('r-rebar-gross').textContent = grossKg.toFixed(1) + ' kg  (' + (grossKg/1000).toFixed(3) + ' 톤)';
+  document.getElementById('r-rebar-note').textContent  = note + ' · 손실 5% 포함';
+}
+function resetRebar() {
+  ['rebar-w','rebar-l','rebar-bw','rebar-bh','rebar-bl'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('rebar-result').classList.remove('show');
+}
+
+// ── 지주목 수량 ──────────────────────────────────────────
+const STAKE_TYPES = {
+  '2':    { name:'이각지주', spec:'φ60 × L2,400mm', poles:2, cross:1,  crossSpec:'φ60 × L1,200mm', pads:2, wire:'#8 철선 4m · 완충고무 2개' },
+  '3':    { name:'삼각지주', spec:'φ70 × L2,400mm', poles:3, cross:3,  crossSpec:'φ70 × L1,200mm', pads:2, wire:'#8 철선 6m · 완충고무 2개' },
+  '4':    { name:'사각지주', spec:'φ75 × L2,700mm', poles:4, cross:4,  crossSpec:'φ75 × L1,500mm', pads:2, wire:'#8 철선 8m · 완충고무 2개' },
+  'wire': { name:'당김줄지주', spec:'강선 φ5.0mm',   poles:3, cross:0, crossSpec:'-',               pads:3, wire:'턴버클 3개 · 지중말뚝 3개' },
+};
+function autoStakeType() {
+  const H = parseFloat(document.getElementById('stake-h').value) || 0;
+  const R = parseFloat(document.getElementById('stake-r').value) || 0;
+  let type = '2';
+  if      (R >= 10) type = 'wire';
+  else if (H >= 4.5) type = '4';
+  else if (H >= 2.5) type = '3';
+  document.getElementById('stake-type').value = type;
+}
+function calcStake() {
+  const type  = document.getElementById('stake-type').value;
+  const count = parseFloat(document.getElementById('stake-count').value);
+  if (!count || count <= 0) { alert('수목 수량을 입력해주세요'); return; }
+  const st = STAKE_TYPES[type];
+  document.getElementById('stake-result').classList.add('show');
+  document.getElementById('r-stake-spec').textContent  = st.name + '  ·  ' + st.spec;
+  document.getElementById('r-stake-poles').textContent = (st.poles * count) + ' 본';
+  const crossRow = document.getElementById('r-stake-cross-row');
+  if (st.cross > 0) {
+    document.getElementById('r-stake-cross').textContent = (st.cross * count) + ' 본  (' + st.crossSpec + ')';
+    crossRow.style.display = '';
+  } else { crossRow.style.display = 'none'; }
+  document.getElementById('r-stake-pad').textContent   = (st.pads * count) + ' 개  (완충 고무)';
+  document.getElementById('r-stake-wire').textContent  = count + ' 세트  (' + st.wire + '/주)';
+  document.getElementById('r-stake-note').textContent  =
+    type === '2'    ? '소교목 표준 · 도로변·강풍지역은 삼각지주 검토' :
+    type === '3'    ? '중교목 가장 일반적인 형태 · 조경공사 표준 시방서 기준' :
+    type === '4'    ? '대교목 4방향 고정 · 지주목 상단 결속 필수' :
+    '대형목·경사지 · 지중 말뚝 3방향 + 턴버클로 장력 조절';
+}
+function resetStake() {
+  ['stake-h','stake-r','stake-count'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('stake-result').classList.remove('show');
 }
 
 // ── 인력 계산 ──────────────────────────────────────────
@@ -2600,6 +2742,95 @@ async function installPWA() {
       <div class="result-note" id="r-con-note"></div>
     </div>
   </div>
+
+  <!-- 철근 소요량 -->
+  <div class="card">
+    <div class="card-title">🔩 철근 소요량 <button class="help-btn" onclick="showHelp('rebar')">?</button></div>
+    <label>배근 형태</label>
+    <div class="select-wrap">
+      <select id="rebar-shape" onchange="updateRebarInputs()">
+        <option value="slab">슬래브 (면 배근)</option>
+        <option value="wall">벽체 · 보 (띠철근 배근)</option>
+      </select>
+    </div>
+    <div id="rebar-slab-inputs">
+      <label>가로 (m)</label>
+      <input type="number" id="rebar-w" placeholder="예: 5.0" inputmode="decimal" step="0.1">
+      <label>세로 (m)</label>
+      <input type="number" id="rebar-l" placeholder="예: 8.0" inputmode="decimal" step="0.1">
+    </div>
+    <div id="rebar-wall-inputs" style="display:none;">
+      <label>단면 폭 (m)</label>
+      <input type="number" id="rebar-bw" placeholder="예: 0.3" inputmode="decimal" step="0.01">
+      <label>단면 높이 (m)</label>
+      <input type="number" id="rebar-bh" placeholder="예: 1.5" inputmode="decimal" step="0.1">
+      <label>연장 (m)</label>
+      <input type="number" id="rebar-bl" placeholder="예: 10.0" inputmode="decimal" step="0.1">
+    </div>
+    <label>철근 규격</label>
+    <div class="select-wrap">
+      <select id="rebar-dia">
+        <option value="0.560">D10 — 0.560 kg/m</option>
+        <option value="0.995" selected>D13 — 0.995 kg/m</option>
+        <option value="1.560">D16 — 1.560 kg/m</option>
+        <option value="2.250">D19 — 2.250 kg/m</option>
+        <option value="3.040">D22 — 3.040 kg/m</option>
+        <option value="3.850">D25 — 3.850 kg/m</option>
+      </select>
+    </div>
+    <label>배근 간격</label>
+    <div class="select-wrap">
+      <select id="rebar-pitch">
+        <option value="100">@100 mm</option>
+        <option value="150">@150 mm</option>
+        <option value="200" selected>@200 mm</option>
+        <option value="250">@250 mm</option>
+        <option value="300">@300 mm</option>
+      </select>
+    </div>
+    <div id="rebar-pitchy-wrap">
+      <label>Y방향 간격 <span style="font-size:11px; font-weight:400; opacity:.7;">(X와 다를 때만)</span></label>
+      <div class="select-wrap">
+        <select id="rebar-pitchy">
+          <option value="0">X방향과 동일</option>
+          <option value="100">@100 mm</option>
+          <option value="150">@150 mm</option>
+          <option value="200">@200 mm</option>
+          <option value="250">@250 mm</option>
+          <option value="300">@300 mm</option>
+        </select>
+      </div>
+    </div>
+    <label>피복두께</label>
+    <div class="select-wrap">
+      <select id="rebar-cover">
+        <option value="30">30 mm — 실내 슬래브</option>
+        <option value="40" selected>40 mm — 일반 (기본값)</option>
+        <option value="60">60 mm — 흙에 접하는 면</option>
+        <option value="80">80 mm — 수중·기초</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button class="calc-btn" onclick="calcRebar()" style="flex:1;">계산</button>
+      <button class="reset-btn" onclick="resetRebar()" style="flex:0 0 80px;">초기화</button>
+    </div>
+    <div id="rebar-result" class="result-box">
+      <div class="result-title">📊 철근 소요량</div>
+      <div class="result-row">
+        <span class="result-label">철근 총 길이</span>
+        <span class="result-value" id="r-rebar-len">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">순 중량</span>
+        <span class="result-value" id="r-rebar-net">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">할증 포함 (5%)</span>
+        <span class="result-value big" id="r-rebar-gross">-</span>
+      </div>
+      <div class="result-note" id="r-rebar-note"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 현장 관리 탭 -->
@@ -3010,6 +3241,49 @@ async function installPWA() {
       ※ 펌프카: 2025~2026 시장가 (2022 권장단가 대비 20~40% 인상 수준)<br>
       ※ 크레인·스카이차: 2025 시중 참고치<br>
       ※ 지역·현장·업체·시기에 따라 실제 금액 차이 있음 — 반드시 현장 견적 확인
+    </p>
+  </div>
+
+  <!-- 철근 소요량 -->
+  <div class="card" id="hc-rebar">
+    <div class="card-title">🔩 철근 소요량 계산기</div>
+    <table class="price-table">
+      <tr><th>규격</th><th>단위중량</th><th>주요 용도</th></tr>
+      <tr><td>D10</td><td>0.560 kg/m</td><td>슬래브 배력근, 작은 구조물</td></tr>
+      <tr><td>D13</td><td>0.995 kg/m</td><td>슬래브·벽체 일반 배근</td></tr>
+      <tr><td>D16</td><td>1.560 kg/m</td><td>보·기둥 주근</td></tr>
+      <tr><td>D19</td><td>2.250 kg/m</td><td>큰 보·기초</td></tr>
+      <tr><td>D22</td><td>3.040 kg/m</td><td>대형 기초·옹벽</td></tr>
+      <tr><td>D25</td><td>3.850 kg/m</td><td>대형 구조물</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>피복두께</th><th>적용 위치</th></tr>
+      <tr><td>30 mm</td><td>실내 슬래브·벽</td></tr>
+      <tr><td>40 mm</td><td>일반 (기본값)</td></tr>
+      <tr><td>60 mm</td><td>흙에 접하는 면</td></tr>
+      <tr><td>80 mm</td><td>수중·기초 저면</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 슬래브: X·Y 두 방향 모두 계산 · 손실 5% 포함<br>
+      ※ 벽체·보: 주근(연장 방향) + 띠철근(간격 방향) 합산
+    </p>
+  </div>
+
+  <!-- 지주목 수량 -->
+  <div class="card" id="hc-stake">
+    <div class="card-title">🪵 지주목 수량 계산기</div>
+    <table class="price-table">
+      <tr><th>종류</th><th>대상 수목</th><th>지주목 규격</th></tr>
+      <tr><td>이각지주</td><td>H 2.5m 이하</td><td>φ60 × L2,400 × 2본</td></tr>
+      <tr><td>삼각지주</td><td>H 2.5 ~ 4.5m</td><td>φ70 × L2,400 × 3본</td></tr>
+      <tr><td>사각지주</td><td>H 4.5m 이상</td><td>φ75 × L2,700 × 4본</td></tr>
+      <tr><td>당김줄</td><td>R 10cm 이상 대형목</td><td>강선 φ5.0 · 말뚝 3개</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ H·R 입력 시 종류 자동 추천<br>
+      ※ 결속재: #8 철선 + 완충 고무 (수피 보호)<br>
+      ※ 도로변·바람 강한 지역은 한 단계 위 규격 적용 권장<br>
+      ※ 조경공사 표준시방서 기준
     </p>
   </div>
 
