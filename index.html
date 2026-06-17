@@ -393,6 +393,38 @@
     border-color: #333; transform: scale(1.2);
   }
 
+  /* ── 항목별 도움말 ── */
+  .help-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 19px; height: 19px; border-radius: 50%;
+    background: rgba(255,255,255,.25); border: 1.5px solid rgba(255,255,255,.5);
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    color: #fff; vertical-align: middle; margin-left: 6px;
+    line-height: 1; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+  }
+  #help-modal {
+    display: none; position: fixed; inset: 0; z-index: 9998;
+    background: rgba(0,0,0,.5); align-items: flex-end; justify-content: center;
+  }
+  #help-modal.open { display: flex; }
+  .help-modal-card {
+    background: #fff; border-radius: 20px 20px 0 0;
+    padding: 0 0 36px; width: 100%; max-width: 480px;
+    max-height: 82vh; display: flex; flex-direction: column;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.15);
+  }
+  .help-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .help-modal-header h3 { margin:0; font-size:16px; font-weight:700; color:var(--text); }
+  .help-modal-close {
+    background:none; border:none; font-size:22px; cursor:pointer; color:var(--gray);
+    line-height:1; padding:2px 4px;
+  }
+  .help-modal-body { padding: 16px 20px; overflow-y: auto; }
+  .help-modal-body .card-title { display: none; }
+
   /* ── 공유·설치 모달 ── */
   #share-modal {
     display: none;
@@ -517,13 +549,12 @@
   <button class="tab-btn" onclick="showTab('manage', this)">현장 관리</button>
   <button class="tab-btn" onclick="showTab('photo', this)">사진 측정</button>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
-  <button class="tab-btn" onclick="showTab('help', this)">도움말</button>
 </nav>
 
 <!-- 잔디 소요량 탭 -->
 <div id="tab-grass" class="tab-content">
   <div class="card">
-    <div class="card-title">🌱 잔디 소요량 계산기</div>
+    <div class="card-title">🌱 잔디 소요량 계산기 <button class="help-btn" onclick="showHelp('grass')">?</button></div>
 
     <label>시공 면적</label>
     <div style="display:flex; gap:8px; align-items:center;">
@@ -577,7 +608,7 @@
 <!-- 수목 중량 탭 -->
 <div id="tab-tree" class="tab-content active">
   <div class="card">
-    <div class="card-title">🌳 수목 중량 계산기</div>
+    <div class="card-title">🌳 수목 중량 계산기 <button class="help-btn" onclick="showHelp('tree')">?</button></div>
     <label>근원직경 (cm)</label>
     <input type="number" id="tree-rcd" placeholder="예: 15" inputmode="decimal">
 
@@ -664,7 +695,7 @@
 <!-- 멀칭 재료 탭 -->
 <div id="tab-mulch" class="tab-content">
   <div class="card">
-    <div class="card-title">🪵 멀칭 재료 계산기</div>
+    <div class="card-title">🪵 멀칭 재료 계산기 <button class="help-btn" onclick="showHelp('mulch')">?</button></div>
     <div class="mulch-info">
       💡 면적과 포설 두께를 입력하면 필요한 재료량을 계산합니다
     </div>
@@ -719,7 +750,7 @@
 <!-- 단가 참고표 탭 -->
 <div id="tab-price" class="tab-content">
   <div class="card">
-    <div class="card-title">📋 조경 공사 단가 참고표</div>
+    <div class="card-title">📋 조경 공사 단가 참고표 <button class="help-btn" onclick="showHelp('price')">?</button></div>
     <div class="section-label">잔디 시공 <span style="font-weight:400; opacity:0.75;">· 2024 표준시장단가</span></div>
     <table class="price-table">
       <tr><th>공종</th><th>단위</th><th>노무비</th></tr>
@@ -1945,6 +1976,21 @@ function photoDownload(dataUrl) {
   a.click();
 }
 
+// ── 도움말 팝업 ──────────────────────────────────────────
+function showHelp(key) {
+  const src = document.getElementById('hc-' + key);
+  if (!src) return;
+  const title = src.querySelector('.card-title');
+  document.getElementById('help-modal-title').textContent = title ? title.textContent.trim() : '사용법';
+  document.getElementById('help-modal-body').innerHTML = src.innerHTML;
+  document.getElementById('help-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeHelpModal() {
+  document.getElementById('help-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 // ── 공유·설치 ──────────────────────────────────────────
 let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
@@ -2016,7 +2062,7 @@ async function installPWA() {
 <!-- 식재 주수 탭 -->
 <div id="tab-plant" class="tab-content">
   <div class="card">
-    <div class="card-title">🌿 식재 주수 계산기</div>
+    <div class="card-title">🌿 식재 주수 계산기 <button class="help-btn" onclick="showHelp('plant')">?</button></div>
 
     <label>시공 면적</label>
     <div style="display:flex; gap:8px; align-items:center;">
@@ -2078,7 +2124,7 @@ async function installPWA() {
 <!-- 면적 계산 탭 -->
 <div id="tab-area" class="tab-content">
   <div class="card">
-    <div class="card-title">📐 면적 계산기</div>
+    <div class="card-title">📐 면적 계산기 <button class="help-btn" onclick="showHelp('area')">?</button></div>
 
     <label>형태 선택</label>
     <div class="select-wrap">
@@ -2143,7 +2189,7 @@ async function installPWA() {
 
   <!-- 삼각형 변 길이 계산 -->
   <div class="card">
-    <div class="card-title">📏 삼각형 변 길이 계산</div>
+    <div class="card-title">📏 삼각형 변 길이 계산 <button class="help-btn" onclick="showHelp('tri')">?</button></div>
 
     <label>삼각형 종류</label>
     <div class="radio-group">
@@ -2249,7 +2295,7 @@ async function installPWA() {
 <!-- 경사도 탭 -->
 <div id="tab-slope" class="tab-content">
   <div class="card">
-    <div class="card-title">📏 경사도 환산기</div>
+    <div class="card-title">📏 경사도 환산기 <button class="help-btn" onclick="showHelp('slope')">?</button></div>
     <div class="mulch-info">💡 세 가지 중 <strong>하나만</strong> 입력하고 계산하면 나머지를 자동으로 구합니다</div>
 
     <label style="margin-top:14px;">경사율 (%)</label>
@@ -2306,7 +2352,7 @@ async function installPWA() {
   </div>
 
   <div class="card">
-    <div class="card-title">🌊 배수 경사 계산</div>
+    <div class="card-title">🌊 배수 경사 계산 <button class="help-btn" onclick="showHelp('drain')">?</button></div>
     <div class="mulch-info">만관 기준 유속·유량 계산 — 맨닝 공식 (V = R²⁄³·S½ / n)</div>
     <label>관경 D</label>
     <div class="select-wrap">
@@ -2362,7 +2408,7 @@ async function installPWA() {
 <!-- 경계석·보도블록 탭 -->
 <div id="tab-pave" class="tab-content">
   <div class="card">
-    <div class="card-title">🧱 경계석 · 보도블록 수량</div>
+    <div class="card-title">🧱 경계석 · 보도블록 수량 <button class="help-btn" onclick="showHelp('pave')">?</button></div>
 
     <label>구분</label>
     <div class="radio-group">
@@ -2439,7 +2485,7 @@ async function installPWA() {
 <div id="tab-civil" class="tab-content">
   <!-- 토량 계산 -->
   <div class="card">
-    <div class="card-title">🚛 토량 계산</div>
+    <div class="card-title">🚛 토량 계산 <button class="help-btn" onclick="showHelp('civil')">?</button></div>
     <label>굴착 형태</label>
     <div class="select-wrap">
       <select id="earth-shape" onchange="updateEarthInputs()">
@@ -2502,7 +2548,7 @@ async function installPWA() {
 
   <!-- 콘크리트 량 -->
   <div class="card">
-    <div class="card-title">🏗 콘크리트 량 계산</div>
+    <div class="card-title">🏗 콘크리트 량 계산 <button class="help-btn" onclick="showHelp('civil')">?</button></div>
     <label>구조물 형태</label>
     <div class="select-wrap">
       <select id="con-shape" onchange="updateConInputs()">
@@ -2560,7 +2606,7 @@ async function installPWA() {
 <div id="tab-manage" class="tab-content">
   <!-- 인력 계산 -->
   <div class="card">
-    <div class="card-title">👷 인력 계산</div>
+    <div class="card-title">👷 인력 계산 <button class="help-btn" onclick="showHelp('manage')">?</button></div>
     <label>계산 방향</label>
     <div class="radio-group">
       <label><input type="radio" name="labor-mode" value="day" checked onchange="updateLaborMode()"><span>인원 → 공기</span></label>
@@ -2610,7 +2656,7 @@ async function installPWA() {
 
   <!-- 재료비 계산기 -->
   <div class="card">
-    <div class="card-title">💰 재료비 계산기</div>
+    <div class="card-title">💰 재료비 계산기 <button class="help-btn" onclick="showHelp('manage')">?</button></div>
     <div class="mulch-info">항목별 단가 × 수량으로 합계와 부가세를 계산합니다</div>
     <div id="mat-items" style="margin-top:12px;">
       <p class="price-note" style="text-align:center; padding:8px 0;">아래 버튼으로 항목을 추가하세요</p>
@@ -2642,7 +2688,7 @@ async function installPWA() {
 <!-- 사진 측정 탭 -->
 <div id="tab-photo" class="tab-content">
   <div class="card">
-    <div class="card-title">📷 사진 측정</div>
+    <div class="card-title">📷 사진 측정 <button class="help-btn" onclick="showHelp('photo')">?</button></div>
     <div class="mulch-info">💡 줄자·A4용지·사람처럼 길이를 아는 물체가 화면에 보이도록 찍으면 다른 부분의 치수도 측정할 수 있습니다</div>
 
     <!-- 업로드 버튼 2개 -->
@@ -2716,11 +2762,11 @@ async function installPWA() {
   </div>
 </div>
 
-<!-- 도움말 탭 -->
-<div id="tab-help" class="tab-content">
+<!-- 도움말 데이터 (숨김 — ? 버튼 팝업용) -->
+<div id="tab-help" style="display:none !important;">
 
   <!-- 1. 수목 중량 -->
-  <div class="card">
+  <div class="card" id="hc-tree">
     <div class="card-title">🌳 수목 중량 계산기</div>
     <div class="mulch-info" style="margin-bottom:12px;">
       <b>근원직경 (R)</b> — 지표면에서 30cm 높이의 줄기 직경 (권장 측정 위치)<br>
@@ -2743,7 +2789,7 @@ async function installPWA() {
   </div>
 
   <!-- 2. 잔디 소요량 -->
-  <div class="card">
+  <div class="card" id="hc-grass">
     <div class="card-title">🌱 잔디 소요량 계산기</div>
     <div class="mulch-info" style="margin-bottom:0;">1평 = 3.3058㎡</div>
     <table class="price-table" style="margin-top:12px;">
@@ -2758,7 +2804,7 @@ async function installPWA() {
   </div>
 
   <!-- 3. 멀칭 재료 -->
-  <div class="card">
+  <div class="card" id="hc-mulch">
     <div class="card-title">🪵 멀칭 재료 계산기</div>
     <table class="price-table">
       <tr><th>재료</th><th>권장 두께</th><th>특징</th></tr>
@@ -2772,7 +2818,7 @@ async function installPWA() {
   </div>
 
   <!-- 4. 식재 주수 -->
-  <div class="card">
+  <div class="card" id="hc-plant">
     <div class="card-title">🌿 식재 주수 계산기</div>
     <table class="price-table">
       <tr><th>식재 방식</th><th>1주당 면적</th><th>특징</th></tr>
@@ -2786,7 +2832,7 @@ async function installPWA() {
   </div>
 
   <!-- 5. 면적 계산 -->
-  <div class="card">
+  <div class="card" id="hc-area">
     <div class="card-title">📐 면적 계산기</div>
     <table class="price-table">
       <tr><th>형태</th><th>공식</th></tr>
@@ -2800,7 +2846,7 @@ async function installPWA() {
   </div>
 
   <!-- 5-2. 삼각형 변 길이 -->
-  <div class="card">
+  <div class="card" id="hc-tri">
     <div class="card-title">📏 삼각형 변 길이 계산</div>
     <table class="price-table">
       <tr><th>방법</th><th>입력</th><th>구하는 것</th></tr>
@@ -2817,7 +2863,7 @@ async function installPWA() {
   </div>
 
   <!-- 6. 경사도 -->
-  <div class="card">
+  <div class="card" id="hc-slope">
     <div class="card-title">📏 경사도 환산기</div>
     <table class="price-table">
       <tr><th>표기</th><th>관계식</th><th>예시</th></tr>
@@ -2836,7 +2882,7 @@ async function installPWA() {
   </div>
 
   <!-- 6-2. 배수 경사 -->
-  <div class="card">
+  <div class="card" id="hc-drain">
     <div class="card-title">💧 배수 경사 계산기</div>
     <table class="price-table">
       <tr><th>항목</th><th>설명</th></tr>
@@ -2858,7 +2904,7 @@ async function installPWA() {
   </div>
 
   <!-- 6-3. 토공·콘크리트 -->
-  <div class="card">
+  <div class="card" id="hc-civil">
     <div class="card-title">🚜 토공 · 콘크리트 계산기</div>
     <table class="price-table">
       <tr><th>항목</th><th>설명</th></tr>
@@ -2882,7 +2928,7 @@ async function installPWA() {
   </div>
 
   <!-- 6-4. 현장 관리 -->
-  <div class="card">
+  <div class="card" id="hc-manage">
     <div class="card-title">👷 현장 관리 계산기</div>
     <table class="price-table">
       <tr><th>기능</th><th>설명</th></tr>
@@ -2898,7 +2944,7 @@ async function installPWA() {
   </div>
 
   <!-- 7. 경계석·보도블록 -->
-  <div class="card">
+  <div class="card" id="hc-pave">
     <div class="card-title">🧱 경계석 · 보도블록 수량</div>
     <table class="price-table">
       <tr><th>항목</th><th>계산 방법</th></tr>
@@ -2917,7 +2963,7 @@ async function installPWA() {
   </div>
 
   <!-- 8. 사진 측정 -->
-  <div class="card">
+  <div class="card" id="hc-photo">
     <div class="card-title">📷 사진 측정</div>
     <div class="mulch-info" style="margin-bottom:12px;">
       기준이 되는 물체를 화면에 포함시켜 찍으면 같은 평면의 다른 치수를 측정할 수 있습니다
@@ -2947,7 +2993,7 @@ async function installPWA() {
   </div>
 
   <!-- 단가 참고표 도움말 -->
-  <div class="card">
+  <div class="card" id="hc-price">
     <div class="card-title">💰 단가 참고표 보는 법</div>
     <table class="price-table">
       <tr><th>항목</th><th>내용</th></tr>
@@ -3004,6 +3050,17 @@ async function installPWA() {
   <div style="margin-bottom:4px; font-weight:600; color:#6b7280;">Created by CONTENT FACTORY</div>
   <div style="margin-top:4px;">※ 본 계산기는 참고용이며 실제 현장 조건에 따라 달라질 수 있습니다.</div>
 </footer>
+
+<!-- ── 도움말 모달 ── -->
+<div id="help-modal" onclick="if(event.target===this)closeHelpModal()">
+  <div class="help-modal-card">
+    <div class="help-modal-header">
+      <h3 id="help-modal-title">사용법</h3>
+      <button class="help-modal-close" onclick="closeHelpModal()">✕</button>
+    </div>
+    <div class="help-modal-body" id="help-modal-body"></div>
+  </div>
+</div>
 
 <!-- ── 공유·설치 모달 ── -->
 <div id="share-modal" onclick="if(event.target===this)closeShareModal()">
