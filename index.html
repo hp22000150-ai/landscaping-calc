@@ -1044,94 +1044,121 @@ function calcTree() {
 }
 
 function renderTreeWeightSVG(aboveKg, rootKg, totalKg, hasBall, treeH, rcd) {
-  const W = 300, H = 310;
-  const gY = 175; // 지면 Y 위치
+  const W = 300, H = 330;
+  const gY = 188;
+  const cx = 138; // 트리 중심 (라벨 공간 확보)
 
-  // 수관 크기: 수고 비례, 최소~최대 클램프
-  const crownRx = Math.min(Math.max(treeH * 10, 44), 88);
-  const crownRy = crownRx * 0.78;
-  const trunkW  = Math.min(Math.max(rcd * 0.8, 8), 22);
-  const trunkH  = Math.min(Math.max(treeH * 8, 30), 60);
-  const crownCY = gY - trunkH - crownRy + 4;
-  const cx = W / 2;
+  const cr   = Math.min(Math.max(treeH * 9, 40), 72);  // 수관 반경
+  const trW  = Math.min(Math.max(rcd * 0.72, 8), 20);  // 수간 폭
+  const trH  = Math.min(Math.max(treeH * 9, 30), 62);  // 수간 높이
+  const cY   = gY - trH - cr * 0.78;                   // 수관 중심 Y
 
-  // 뿌리분 크기
-  const ballRx = hasBall ? Math.min(Math.max(rcd * 0.9, 30), 65) : 0;
-  const ballRy = ballRx * 0.65;
-  const ballCY = gY + ballRy * 0.6;
+  const bRx  = hasBall ? Math.min(Math.max(rcd * 0.82, 26), 58) : 0;
+  const bRy  = bRx * 0.6;
+  const bY   = gY + bRy * 0.7;
 
-  const fmtW = kg => kg >= 1000
-    ? (kg/1000).toFixed(2) + ' 톤'
-    : Math.round(kg) + ' kg';
+  const fmtW = kg => kg >= 1000 ? (kg/1000).toFixed(2)+' 톤' : Math.round(kg)+' kg';
 
-  // 라벨 위치 — 수관 우측, 뿌리분 우측
-  const crownLX = cx + crownRx + 10;
-  const crownLY = crownCY;
-  const rootLX  = hasBall ? cx + ballRx + 10 : cx + 40;
-  const rootLY  = hasBall ? ballCY : gY + 28;
+  // 라벨 영역 (우측 고정)
+  const lX = cx + cr + 14;
+  const lW = W - lX - 6;
 
   const svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"
-    style="width:100%;max-width:300px;display:block;margin:0 auto;border-radius:12px;overflow:visible;">
+    style="width:100%;max-width:320px;display:block;margin:4px auto 0;border-radius:16px;">
+  <defs>
+    <linearGradient id="tSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b2dfdb"/>
+      <stop offset="100%" stop-color="#e8f5e9"/>
+    </linearGradient>
+    <linearGradient id="tSoil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d7ccc8"/>
+      <stop offset="100%" stop-color="#bcaaa4"/>
+    </linearGradient>
+    <radialGradient id="tBall" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#a1887f"/>
+      <stop offset="100%" stop-color="#6d4c41"/>
+    </radialGradient>
+    <radialGradient id="tCrown" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#52b788"/>
+      <stop offset="100%" stop-color="#1b5e20"/>
+    </radialGradient>
+    <filter id="tShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="4" flood-opacity="0.18"/>
+    </filter>
+  </defs>
 
-    <!-- 하늘 배경 -->
-    <rect x="0" y="0" width="${W}" height="${gY}" fill="#e8f5e9" rx="10 10 0 0"/>
-    <!-- 지하 배경 -->
-    <rect x="0" y="${gY}" width="${W}" height="${H - gY}" fill="#efebe9" rx="0 0 10 10"/>
+  <!-- 배경 -->
+  <rect x="0" y="0"   width="${W}" height="${gY}"     fill="url(#tSky)"  rx="16 16 0 0"/>
+  <rect x="0" y="${gY}" width="${W}" height="${H-gY}" fill="url(#tSoil)" rx="0 0 16 16"/>
 
-    <!-- 지면선 -->
-    <line x1="0" y1="${gY}" x2="${W}" y2="${gY}" stroke="#8d6e63" stroke-width="2"/>
-    <text x="8" y="${gY - 5}" font-size="10" fill="#8d6e63" font-family="sans-serif">지상</text>
-    <text x="8" y="${gY + 14}" font-size="10" fill="#8d6e63" font-family="sans-serif">지하</text>
+  <!-- 잔디 띠 -->
+  <rect x="0" y="${gY-6}" width="${W}" height="10" fill="#66bb6a" opacity="0.5" rx="1"/>
+  <rect x="0" y="${gY-4}" width="${W}" height="5"  fill="#43a047" opacity="0.35"/>
 
-    <!-- 뿌리분 -->
-    ${hasBall ? `
-    <ellipse cx="${cx}" cy="${ballCY}" rx="${ballRx}" ry="${ballRy}" fill="#8d6e63" opacity="0.75"/>
-    <ellipse cx="${cx}" cy="${ballCY - ballRy*0.15}" rx="${ballRx * 0.65}" ry="${ballRy * 0.5}" fill="#a1887f" opacity="0.5"/>
-    <!-- 뿌리 잔가지 -->
-    <line x1="${cx - ballRx*0.4}" y1="${ballCY + ballRy*0.5}" x2="${cx - ballRx*0.7}" y2="${ballCY + ballRy*0.9}" stroke="#6d4c41" stroke-width="1.5" opacity="0.6"/>
-    <line x1="${cx + ballRx*0.4}" y1="${ballCY + ballRy*0.5}" x2="${cx + ballRx*0.7}" y2="${ballCY + ballRy*0.9}" stroke="#6d4c41" stroke-width="1.5" opacity="0.6"/>
-    <line x1="${cx}" y1="${ballCY + ballRy*0.7}" x2="${cx}" y2="${ballCY + ballRy*1.1}" stroke="#6d4c41" stroke-width="1.5" opacity="0.6"/>
-    ` : `
-    <!-- 나근: 실선 뿌리 표시 -->
-    <line x1="${cx - 22}" y1="${gY + 8}" x2="${cx - 36}" y2="${gY + 28}" stroke="#6d4c41" stroke-width="2" opacity="0.7"/>
-    <line x1="${cx}"      y1="${gY + 6}" x2="${cx}"      y2="${gY + 30}" stroke="#6d4c41" stroke-width="2" opacity="0.7"/>
-    <line x1="${cx + 22}" y1="${gY + 8}" x2="${cx + 36}" y2="${gY + 28}" stroke="#6d4c41" stroke-width="2" opacity="0.7"/>
-    `}
+  <!-- 지상·지하 텍스트 -->
+  <text x="8" y="${gY-10}" font-size="9" fill="#558b2f" font-weight="600" font-family="sans-serif" opacity="0.9">지 상</text>
+  <text x="8" y="${gY+16}" font-size="9" fill="#795548" font-weight="600" font-family="sans-serif" opacity="0.9">지 하</text>
 
-    <!-- 수간 (기둥) -->
-    <rect x="${cx - trunkW/2}" y="${gY - trunkH}" width="${trunkW}" height="${trunkH + 3}"
-      fill="#795548" rx="${trunkW * 0.3}"/>
+  ${hasBall ? `
+  <!-- 뿌리분 -->
+  <ellipse cx="${cx}" cy="${bY}" rx="${bRx}" ry="${bRy}" fill="url(#tBall)" filter="url(#tShadow)"/>
+  <ellipse cx="${cx-bRx*.2}" cy="${bY-bRy*.2}" rx="${bRx*.6}" ry="${bRy*.45}" fill="#bcaaa4" opacity="0.3"/>
+  <circle cx="${cx-bRx*.45}" cy="${bY+bRy*.2}" r="2.5" fill="#4e342e" opacity="0.45"/>
+  <circle cx="${cx+bRx*.35}" cy="${bY+bRy*.35}" r="2" fill="#4e342e" opacity="0.4"/>
+  <circle cx="${cx+bRx*.55}" cy="${bY-bRy*.1}" r="1.8" fill="#4e342e" opacity="0.3"/>
+  <line x1="${cx-bRx*.3}" y1="${bY+bRy*.65}" x2="${cx-bRx*.55}" y2="${bY+bRy*1.05}" stroke="#6d4c41" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="${cx}"         y1="${bY+bRy*.75}" x2="${cx}"         y2="${bY+bRy*1.1}"  stroke="#6d4c41" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="${cx+bRx*.3}"  y1="${bY+bRy*.65}" x2="${cx+bRx*.55}" y2="${bY+bRy*1.05}" stroke="#6d4c41" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  ` : `
+  <!-- 나근 -->
+  <line x1="${cx-16}" y1="${gY+8}"  x2="${cx-30}" y2="${gY+28}" stroke="#8d6e63" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="${cx}"    y1="${gY+7}"  x2="${cx}"    y2="${gY+30}" stroke="#8d6e63" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="${cx+16}" y1="${gY+8}"  x2="${cx+30}" y2="${gY+28}" stroke="#8d6e63" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="${cx-8}"  y1="${gY+14}" x2="${cx-18}" y2="${gY+36}" stroke="#8d6e63" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+  <line x1="${cx+8}"  y1="${gY+14}" x2="${cx+18}" y2="${gY+36}" stroke="#8d6e63" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
+  `}
 
-    <!-- 수관 그림자 -->
-    <ellipse cx="${cx + 3}" cy="${crownCY + 4}" rx="${crownRx}" ry="${crownRy}" fill="#1b5e20" opacity="0.18"/>
-    <!-- 수관 본체 -->
-    <ellipse cx="${cx}" cy="${crownCY}" rx="${crownRx}" ry="${crownRy}" fill="#2d6a4f"/>
-    <!-- 수관 하이라이트 -->
-    <ellipse cx="${cx - crownRx*0.28}" cy="${crownCY - crownRy*0.22}" rx="${crownRx*0.55}" ry="${crownRy*0.45}" fill="#40916c" opacity="0.65"/>
-    <ellipse cx="${cx + crownRx*0.2}" cy="${crownCY - crownRy*0.4}" rx="${crownRx*0.28}" ry="${crownRy*0.22}" fill="#52b788" opacity="0.45"/>
+  <!-- 수간 (테이퍼드) -->
+  <path d="M${cx-trW*.52} ${gY} L${cx-trW*.32} ${gY-trH} L${cx+trW*.32} ${gY-trH} L${cx+trW*.52} ${gY} Z"
+    fill="#6d4c41"/>
+  <path d="M${cx+trW*.05} ${gY} L${cx+trW*.06} ${gY-trH} L${cx+trW*.22} ${gY-trH} L${cx+trW*.24} ${gY} Z"
+    fill="#8d6e63" opacity="0.35"/>
 
-    <!-- 지상부 라벨 -->
-    <line x1="${cx + crownRx}" y1="${crownCY}" x2="${crownLX - 2}" y2="${crownLY}" stroke="#2d6a4f" stroke-width="1.2" stroke-dasharray="3,2"/>
-    <rect x="${crownLX}" y="${crownLY - 20}" width="${W - crownLX - 4}" height="38" fill="white" opacity="0.88" rx="6"/>
-    <text x="${crownLX + 6}" y="${crownLY - 5}" font-size="10" fill="#1b5e20" font-weight="600" font-family="sans-serif">지상부</text>
-    <text x="${crownLX + 6}" y="${crownLY + 12}" font-size="12" fill="#2d6a4f" font-weight="700" font-family="sans-serif">${fmtW(aboveKg)}</text>
+  <!-- 수관 — 여러 원 겹침으로 유기적 형태 -->
+  <circle cx="${cx}"        cy="${cY+cr*.12}" r="${cr*.72}" fill="#1b5e20"/>
+  <circle cx="${cx-cr*.42}" cy="${cY+cr*.18}" r="${cr*.58}" fill="#2d6a4f"/>
+  <circle cx="${cx+cr*.42}" cy="${cY+cr*.18}" r="${cr*.58}" fill="#2d6a4f"/>
+  <circle cx="${cx-cr*.3}"  cy="${cY-cr*.2}"  r="${cr*.55}" fill="#33805e"/>
+  <circle cx="${cx+cr*.3}"  cy="${cY-cr*.2}"  r="${cr*.55}" fill="#33805e"/>
+  <circle cx="${cx}"        cy="${cY-cr*.32}" r="${cr*.62}" fill="#40916c" filter="url(#tShadow)"/>
+  <circle cx="${cx-cr*.18}" cy="${cY-cr*.5}"  r="${cr*.38}" fill="#52b788" opacity="0.85"/>
+  <circle cx="${cx+cr*.14}" cy="${cY-cr*.38}" r="${cr*.26}" fill="#74c69d" opacity="0.7"/>
+  <circle cx="${cx-cr*.35}" cy="${cY-cr*.28}" r="${cr*.2}"  fill="#74c69d" opacity="0.55"/>
 
-    <!-- 뿌리분 라벨 -->
-    ${hasBall ? `
-    <line x1="${cx + ballRx}" y1="${ballCY}" x2="${rootLX - 2}" y2="${rootLY}" stroke="#6d4c41" stroke-width="1.2" stroke-dasharray="3,2"/>
-    <rect x="${rootLX}" y="${rootLY - 20}" width="${W - rootLX - 4}" height="38" fill="white" opacity="0.88" rx="6"/>
-    <text x="${rootLX + 6}" y="${rootLY - 5}" font-size="10" fill="#4e342e" font-weight="600" font-family="sans-serif">뿌리분</text>
-    <text x="${rootLX + 6}" y="${rootLY + 12}" font-size="12" fill="#6d4c41" font-weight="700" font-family="sans-serif">${fmtW(rootKg)}</text>
-    ` : `
-    <rect x="${rootLX}" y="${rootLY - 14}" width="${W - rootLX - 4}" height="24" fill="white" opacity="0.88" rx="6"/>
-    <text x="${rootLX + 6}" y="${rootLY + 4}" font-size="11" fill="#9e9e9e" font-family="sans-serif">나근 (뿌리분 없음)</text>
-    `}
+  <!-- 지상부 라벨 -->
+  <line x1="${cx+cr*.9}" y1="${cY}" x2="${lX-3}" y2="${cY}" stroke="#2d6a4f" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <rect x="${lX}" y="${cY-22}" width="${lW}" height="42" fill="white" rx="9" opacity="0.93" filter="url(#tShadow)"/>
+  <rect x="${lX}" y="${cY-22}" width="4" height="42" fill="#2d6a4f" rx="9 0 0 9"/>
+  <text x="${lX+10}" y="${cY-7}"  font-size="9"  fill="#1b5e20" font-weight="700" font-family="sans-serif">지상부</text>
+  <text x="${lX+10}" y="${cY+13}" font-size="12" fill="#2d6a4f" font-weight="700" font-family="sans-serif">${fmtW(aboveKg)}</text>
 
-    <!-- 합계 바 -->
-    <rect x="16" y="${H - 38}" width="${W - 32}" height="30" fill="#2d6a4f" rx="8" opacity="0.92"/>
-    <text x="${W/2}" y="${H - 17}" font-size="13" fill="white" font-weight="700"
-      text-anchor="middle" font-family="sans-serif">총 중량 ${fmtW(totalKg)}</text>
-  </svg>`;
+  ${hasBall ? `
+  <!-- 뿌리분 라벨 -->
+  <line x1="${cx+bRx*.92}" y1="${bY}" x2="${lX-3}" y2="${bY}" stroke="#6d4c41" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <rect x="${lX}" y="${bY-22}" width="${lW}" height="42" fill="white" rx="9" opacity="0.93" filter="url(#tShadow)"/>
+  <rect x="${lX}" y="${bY-22}" width="4" height="42" fill="#8d6e63" rx="9 0 0 9"/>
+  <text x="${lX+10}" y="${bY-7}"  font-size="9"  fill="#4e342e" font-weight="700" font-family="sans-serif">뿌리분</text>
+  <text x="${lX+10}" y="${bY+13}" font-size="12" fill="#6d4c41" font-weight="700" font-family="sans-serif">${fmtW(rootKg)}</text>
+  ` : `
+  <rect x="${lX}" y="${gY+10}" width="${lW}" height="28" fill="white" rx="9" opacity="0.88"/>
+  <text x="${lX+8}" y="${gY+28}" font-size="11" fill="#aaa" font-family="sans-serif">나근</text>
+  `}
+
+  <!-- 총 중량 바 -->
+  <rect x="12" y="${H-40}" width="${W-24}" height="32" fill="#1b5e20" rx="12" opacity="0.95"/>
+  <text x="${W/2}" y="${H-18}" font-size="14" fill="white" font-weight="700"
+    text-anchor="middle" font-family="sans-serif">총 중량  ${fmtW(totalKg)}</text>
+</svg>`;
 
   const wrap = document.getElementById('tree-svg-wrap');
   wrap.innerHTML = svg;
