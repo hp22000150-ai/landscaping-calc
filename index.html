@@ -516,7 +516,7 @@
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
-      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.617.2033</span>
+      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.617.2145</span>
     </div>
     <div style="text-align:right; flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
       <button class="share-header-btn" onclick="openShareModal()">📤 공유·설치</button>
@@ -887,7 +887,7 @@ function setTheme(name) {
   document.querySelectorAll('.theme-dot').forEach(d =>
     d.classList.toggle('active', d.dataset.theme === name)
   );
-  localStorage.setItem('wdr-theme', name);
+  try { localStorage.setItem('wdr-theme', name); } catch(e) {}
   document.getElementById('theme-popup').classList.remove('open');
 }
 
@@ -900,8 +900,12 @@ document.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('wdr-theme') || 'green';
+  let saved = 'green';
+  try { saved = localStorage.getItem('wdr-theme') || 'green'; } catch(e) {}
   setTheme(saved);
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 });
 
 function showTab(name, btn) {
@@ -1683,6 +1687,7 @@ function calcRebar() {
     const L = parseFloat(document.getElementById('rebar-l').value);
     if (!W || !L) { alert('가로, 세로를 입력해주세요'); return; }
     const effW = W - cover * 2, effL = L - cover * 2;
+    if (effW <= 0 || effL <= 0) { alert('피복두께가 슬래브 치수보다 큽니다'); return; }
     const cntX = Math.ceil(effL / pitchX) + 1;
     const cntY = Math.ceil(effW / pitchY) + 1;
     totalLen = cntX * effW + cntY * effL;
@@ -1771,21 +1776,22 @@ function calcLabor() {
   const per   = parseFloat(document.getElementById('labor-per').value);
   if (!total||!per||total<=0||per<=0) { alert('총 작업량과 1인 1일 작업량을 입력해주세요'); return; }
   const mandays = total / per;
-  document.getElementById('labor-result').classList.add('show');
-  document.getElementById('r-labor-total-days').textContent = mandays.toFixed(1) + ' 인·일';
   if (mode === 'day') {
     const w = parseFloat(document.getElementById('labor-workers').value);
     if (!w||w<=0) { alert('투입 인원을 입력해주세요'); return; }
     const days = Math.ceil(mandays / w);
-    document.getElementById('r-labor-days').textContent = days + ' 일';
-    document.getElementById('r-labor-note').textContent = w + '명 투입 시 약 ' + days + '일 소요';
+    document.getElementById('r-labor-total-days').textContent = mandays.toFixed(1) + ' 인·일';
+    document.getElementById('r-labor-days').textContent       = days + ' 일';
+    document.getElementById('r-labor-note').textContent       = w + '명 투입 시 약 ' + days + '일 소요';
   } else {
     const d = parseFloat(document.getElementById('labor-days').value);
     if (!d||d<=0) { alert('공기를 입력해주세요'); return; }
     const workers = Math.ceil(mandays / d);
-    document.getElementById('r-labor-workers').textContent = workers + ' 명';
-    document.getElementById('r-labor-note').textContent = d + '일 완료 시 하루 최소 ' + workers + '명 필요';
+    document.getElementById('r-labor-total-days').textContent = mandays.toFixed(1) + ' 인·일';
+    document.getElementById('r-labor-workers').textContent    = workers + ' 명';
+    document.getElementById('r-labor-note').textContent       = d + '일 완료 시 하루 최소 ' + workers + '명 필요';
   }
+  document.getElementById('labor-result').classList.add('show');
 }
 function resetLabor() {
   ['labor-total','labor-per','labor-workers','labor-days'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
@@ -1793,6 +1799,9 @@ function resetLabor() {
 }
 
 // ── 재료비 계산기 ──────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 const matItems = [];
 function addMatItem() {
   matItems.push({ name:'', price:'', qty:'', unit:'㎡' });
@@ -1810,7 +1819,7 @@ function renderMatItems() {
   }
   el.innerHTML = matItems.map((m, i) => `
     <div style="display:grid; grid-template-columns:1fr 86px 60px 52px 26px; gap:4px; margin-bottom:6px; align-items:center;">
-      <input type="text" placeholder="항목명" value="${m.name}" oninput="matItems[${i}].name=this.value"
+      <input type="text" placeholder="항목명" value="${escHtml(m.name)}" oninput="matItems[${i}].name=this.value"
         style="padding:8px 6px; border:1.5px solid var(--border); border-radius:6px; font-size:13px;">
       <input type="number" placeholder="단가" value="${m.price}" inputmode="numeric" oninput="matItems[${i}].price=this.value"
         style="padding:8px 6px; border:1.5px solid var(--border); border-radius:6px; font-size:13px;">
@@ -1830,7 +1839,7 @@ function calcMat() {
   matItems.forEach((m, i) => {
     const p = parseFloat(m.price)||0, q = parseFloat(m.qty)||0, amt = p*q;
     sub += amt;
-    html += `<div class="result-row"><span class="result-label">${m.name||'항목'+(i+1)} (${q}${m.unit})</span><span class="result-value" style="font-size:14px;">${Math.round(amt).toLocaleString()}원</span></div>`;
+    html += `<div class="result-row"><span class="result-label">${escHtml(m.name||'항목'+(i+1))} (${q}${m.unit})</span><span class="result-value" style="font-size:14px;">${Math.round(amt).toLocaleString()}원</span></div>`;
   });
   document.getElementById('mat-detail').innerHTML = html;
   document.getElementById('r-mat-sub').textContent   = Math.round(sub).toLocaleString() + ' 원';
@@ -1860,7 +1869,13 @@ function loadPhotoFile(input) {
   if (!file) return;
   input.value = '';
   const img = new Image();
+  const blobUrl = URL.createObjectURL(file);
+  img.onerror = () => {
+    URL.revokeObjectURL(blobUrl);
+    alert('이미지를 불러올 수 없습니다. 다른 파일을 선택해주세요.');
+  };
   img.onload = () => {
+    URL.revokeObjectURL(blobUrl);
     photo.img = img;
     photo.refPts = []; photo.pxPerMeter = 0;
     photo.curPts = []; photo.saved = []; photo.count = 0;
@@ -1885,7 +1900,7 @@ function loadPhotoFile(input) {
     }
     setPhotoMode('ref');
   };
-  img.src = URL.createObjectURL(file);
+  img.src = blobUrl;
 }
 
 function renderPhotoCanvas() {
