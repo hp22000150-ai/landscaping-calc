@@ -362,25 +362,35 @@
   }
   .photo-measure-row:last-child { border-bottom: none; }
 
-  .theme-dots-wrap {
-    display: flex;
-    gap: 7px;
-    margin-top: 8px;
-    justify-content: flex-end;
+  .theme-palette-btn {
+    background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.5);
+    border-radius: 8px; color: #fff; padding: 5px 9px; font-size: 16px;
+    cursor: pointer; line-height: 1; -webkit-tap-highlight-color: transparent;
+  }
+  .theme-popup {
+    display: none;
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 500;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.18);
+    padding: 14px 16px 12px;
+    min-width: 170px;
+  }
+  .theme-popup.open { display: block; }
+  .theme-popup-title {
+    font-size: 11px; color: #9ca3af; font-weight: 600;
+    letter-spacing: .4px; margin-bottom: 10px; text-align: center;
+  }
+  .theme-popup-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
   }
   .theme-dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
-    cursor: pointer;
-    transition: transform 0.2s, border-color 0.2s;
-    -webkit-tap-highlight-color: transparent;
-    padding: 0;
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2.5px solid rgba(0,0,0,.08);
+    cursor: pointer; transition: transform .15s, border-color .15s;
+    -webkit-tap-highlight-color: transparent; padding: 0;
   }
   .theme-dot.active {
-    border-color: white;
-    transform: scale(1.3);
+    border-color: #333; transform: scale(1.2);
   }
 
   /* ── 공유·설치 모달 ── */
@@ -479,12 +489,18 @@
     <div style="text-align:right; flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
       <button class="share-header-btn" onclick="openShareModal()">📤 공유·설치</button>
       <span style="font-size:10px; opacity:0.7; font-weight:500; letter-spacing:0.3px; line-height:1.5; display:block;">Created by<br>CONTENT FACTORY</span>
-      <div class="theme-dots-wrap">
-        <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
-        <button class="theme-dot"        data-theme="blue"   style="background:#0c4a6e" onclick="setTheme('blue')"   title="바다"></button>
-        <button class="theme-dot"        data-theme="rose"   style="background:#9d174d" onclick="setTheme('rose')"   title="벚꽃"></button>
-        <button class="theme-dot"        data-theme="earth"  style="background:#92400e" onclick="setTheme('earth')"  title="흙"></button>
-        <button class="theme-dot"        data-theme="slate"  style="background:#334155" onclick="setTheme('slate')"  title="슬레이트"></button>
+      <div style="position:relative;">
+        <button class="theme-palette-btn" onclick="toggleThemePopup(event)" title="테마 색상">🎨</button>
+        <div class="theme-popup" id="theme-popup">
+          <div class="theme-popup-title">테마 색상</div>
+          <div class="theme-popup-grid">
+            <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
+            <button class="theme-dot"        data-theme="blue"   style="background:#0c4a6e" onclick="setTheme('blue')"   title="바다"></button>
+            <button class="theme-dot"        data-theme="rose"   style="background:#9d174d" onclick="setTheme('rose')"   title="벚꽃"></button>
+            <button class="theme-dot"        data-theme="earth"  style="background:#92400e" onclick="setTheme('earth')"  title="흙"></button>
+            <button class="theme-dot"        data-theme="slate"  style="background:#334155" onclick="setTheme('slate')"  title="슬레이트"></button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -792,7 +808,16 @@ function setTheme(name) {
     d.classList.toggle('active', d.dataset.theme === name)
   );
   localStorage.setItem('wdr-theme', name);
+  document.getElementById('theme-popup').classList.remove('open');
 }
+
+function toggleThemePopup(e) {
+  e.stopPropagation();
+  document.getElementById('theme-popup').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('theme-popup').classList.remove('open');
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('wdr-theme') || 'green';
