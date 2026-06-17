@@ -1,6 +1,6 @@
 {
-  "name": "조경 현장 계산기",
-  "short_name": "조경계산기",
+  "name": "현장에서 바로 쓰는 계산기",
+  "short_name": "현장계산기",
   "description": "현장에서 바로 쓰는 조경 실용 계산기",
   "start_url": "/",
   "display": "standalone",
