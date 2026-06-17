@@ -407,13 +407,13 @@
 
 <nav class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tree', this)">수목 중량</button>
+  <button class="tab-btn" onclick="showTab('photo', this)">사진 측정</button>
   <button class="tab-btn" onclick="showTab('grass', this)">잔디 소요량</button>
   <button class="tab-btn" onclick="showTab('mulch', this)">멀칭 재료</button>
   <button class="tab-btn" onclick="showTab('plant', this)">식재 주수</button>
   <button class="tab-btn" onclick="showTab('area', this)">면적 계산</button>
   <button class="tab-btn" onclick="showTab('slope', this)">경사도</button>
   <button class="tab-btn" onclick="showTab('pave', this)">경계석·블록</button>
-  <button class="tab-btn" onclick="showTab('photo', this)">사진 줄자</button>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
   <button class="tab-btn" onclick="showTab('help', this)">도움말</button>
 </nav>
@@ -478,8 +478,7 @@
     <div class="card-title">🌳 수목 중량 계산기</div>
     <div class="mulch-info" style="font-size:11px; line-height:1.7;">
       📐 W = K × π × (B/2)² × H × U × (1+P)<br>
-      K=0.5, B=근원직경×0.8(m)<br>
-      출처: 조경설계요람 / 문석기 외 5인 (1998)
+      K=0.5, B=근원직경×0.8(m)
     </div>
 
     <label>근원직경 (cm)</label>
@@ -524,6 +523,7 @@
 
     <button class="calc-btn" onclick="calcTree()">계산하기</button>
     <button class="reset-btn" onclick="resetTree()">초기화</button>
+    <p class="price-note" style="margin-top:8px;">출처: 조경설계요람 / 문석기 외 5인 (1998)</p>
 
     <div id="tree-result" class="result-box">
       <div class="result-title">📊 계산 결과</div>
@@ -1065,12 +1065,16 @@ function resetPave() {
   document.getElementById('pave-result').classList.remove('show');
 }
 
-// ── 사진 줄자 ──────────────────────────────────────────
+// ── 사진 측정 ──────────────────────────────────────────
 const photo = {
   img: null, mode: 'ref',
   refPts: [], pxPerMeter: 0,
   curPts: [], saved: [], count: 0,
   canvasListened: false,
+  hoverPt: null,
+  drag: null,
+  pointerStart: null,
+  moved: false,
 };
 
 function loadPhotoFile(input) {
@@ -1091,8 +1095,13 @@ function loadPhotoFile(input) {
     renderPhotoCanvas();
     if (!photo.canvasListened) {
       const c = document.getElementById('photo-canvas');
-      c.addEventListener('click',    onPhotoClick);
-      c.addEventListener('touchend', onPhotoClick, { passive: false });
+      c.addEventListener('touchstart', onPhotoTouchStart, { passive: false });
+      c.addEventListener('touchmove',  onPhotoTouchMove,  { passive: false });
+      c.addEventListener('touchend',   onPhotoTouchEnd,   { passive: false });
+      c.addEventListener('mousedown',  onPhotoMouseDown);
+      c.addEventListener('mousemove',  onPhotoMouseMove);
+      c.addEventListener('mouseup',    onPhotoMouseUp);
+      c.addEventListener('mouseleave', () => { photo.hoverPt = null; redrawPhoto(); });
       window.addEventListener('resize', () => { if (photo.img) renderPhotoCanvas(); });
       photo.canvasListened = true;
     }
@@ -1134,6 +1143,24 @@ function redrawPhoto() {
     photoLine(ctx, photo.curPts[0], photo.curPts[1], col, '');
   if (photo.mode === 'area' && photo.curPts.length >= 2)
     photoPoly(ctx, photo.curPts, col, '');
+
+  // 실시간 선 미리보기
+  if (photo.hoverPt) {
+    let previewFrom = null;
+    if (photo.mode === 'ref'  && photo.refPts.length === 1) previewFrom = photo.refPts[0];
+    if (photo.mode === 'dist' && photo.curPts.length === 1) previewFrom = photo.curPts[0];
+    if (photo.mode === 'area' && photo.curPts.length >= 1)  previewFrom = photo.curPts[photo.curPts.length - 1];
+    if (previewFrom) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(previewFrom.x, previewFrom.y);
+      ctx.lineTo(photo.hoverPt.x, photo.hoverPt.y);
+      ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.55;
+      ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.restore();
+    }
+    drawMagnifier(ctx, canvas, photo.hoverPt);
+  }
 }
 
 function photoDot(ctx, p, col) {
@@ -1176,16 +1203,28 @@ function getPhotoPoint(e) {
   const rect = canvas.getBoundingClientRect();
   const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
   let cx, cy;
-  if (e.changedTouches && e.changedTouches.length) {
+  if (e.touches && e.touches.length > 0) {
+    cx = e.touches[0].clientX; cy = e.touches[0].clientY;
+  } else if (e.changedTouches && e.changedTouches.length > 0) {
     cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY;
   } else { cx = e.clientX; cy = e.clientY; }
   return { x: (cx - rect.left)*sx, y: (cy - rect.top)*sy };
 }
 
-function onPhotoClick(e) {
-  e.preventDefault();
-  if (!photo.img) return;
-  const pt = getPhotoPoint(e);
+function findNearPoint(pt) {
+  const canvas = document.getElementById('photo-canvas');
+  const rect = canvas.getBoundingClientRect();
+  const threshold = 28 * (canvas.width / rect.width);
+  const check = (arr, src) => {
+    for (let i = 0; i < arr.length; i++) {
+      if (Math.hypot(arr[i].x - pt.x, arr[i].y - pt.y) < threshold) return { src, idx: i };
+    }
+    return null;
+  };
+  return check(photo.refPts, 'ref') || check(photo.curPts, 'cur');
+}
+
+function placePhotoPoint(pt) {
   if (photo.mode === 'ref') {
     photo.refPts.push(pt);
     if (photo.refPts.length > 2) photo.refPts = [pt];
@@ -1195,7 +1234,98 @@ function onPhotoClick(e) {
   } else if (photo.mode === 'area') {
     photo.curPts.push(pt);
   }
+}
+
+function finalizeDrag() {
+  if (photo.drag && photo.drag.src === 'ref' && photo.pxPerMeter > 0) {
+    photo.pxPerMeter = 0;
+    const s = document.getElementById('photo-ref-status');
+    s.style.display = 'block';
+    s.textContent = '⚠ 기준점 이동됨 — 길이를 다시 입력하고 설정하세요';
+    setPhotoMode('ref');
+  }
+}
+
+function onPhotoTouchStart(e) {
+  if (!photo.img) return;
+  e.preventDefault();
+  const pt = getPhotoPoint(e);
+  photo.hoverPt = pt; photo.pointerStart = pt; photo.moved = false;
+  photo.drag = findNearPoint(pt);
   redrawPhoto();
+}
+
+function onPhotoTouchMove(e) {
+  if (!photo.img) return;
+  e.preventDefault();
+  const pt = getPhotoPoint(e);
+  photo.hoverPt = pt;
+  if (photo.pointerStart && Math.hypot(pt.x - photo.pointerStart.x, pt.y - photo.pointerStart.y) > 8) photo.moved = true;
+  if (photo.drag && photo.moved) {
+    const arr = photo.drag.src === 'ref' ? photo.refPts : photo.curPts;
+    arr[photo.drag.idx] = pt;
+  }
+  redrawPhoto();
+}
+
+function onPhotoTouchEnd(e) {
+  if (!photo.img) return;
+  e.preventDefault();
+  if (photo.drag && photo.moved) { finalizeDrag(); }
+  else if (!photo.moved)         { placePhotoPoint(getPhotoPoint(e)); }
+  photo.drag = null; photo.hoverPt = null; photo.pointerStart = null; photo.moved = false;
+  redrawPhoto();
+}
+
+function onPhotoMouseDown(e) {
+  if (!photo.img) return;
+  photo.pointerStart = getPhotoPoint(e); photo.moved = false;
+  photo.drag = findNearPoint(photo.pointerStart);
+}
+
+function onPhotoMouseMove(e) {
+  if (!photo.img) return;
+  const pt = getPhotoPoint(e);
+  photo.hoverPt = pt;
+  if (photo.pointerStart) {
+    if (Math.hypot(pt.x - photo.pointerStart.x, pt.y - photo.pointerStart.y) > 5) photo.moved = true;
+    if (photo.drag && photo.moved) {
+      const arr = photo.drag.src === 'ref' ? photo.refPts : photo.curPts;
+      arr[photo.drag.idx] = pt;
+    }
+  }
+  redrawPhoto();
+}
+
+function onPhotoMouseUp(e) {
+  if (!photo.img) return;
+  if (photo.drag && photo.moved) { finalizeDrag(); }
+  else if (!photo.moved)         { placePhotoPoint(getPhotoPoint(e)); }
+  photo.drag = null; photo.pointerStart = null; photo.moved = false;
+  redrawPhoto();
+}
+
+function drawMagnifier(ctx, canvas, pt) {
+  const magR = Math.max(48, Math.round(canvas.width * 0.15));
+  const zoom = 3;
+  let magX = Math.max(magR + 6, Math.min(canvas.width - magR - 6, pt.x));
+  let magY = pt.y - magR - 24;
+  if (magY < magR + 6) magY = pt.y + magR + 24;
+  const srcX = pt.x - magR / zoom, srcY = pt.y - magR / zoom;
+  const srcW = (magR * 2) / zoom, srcH = (magR * 2) / zoom;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(magX, magY, magR + 3, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(magX, magY, magR, 0, Math.PI * 2); ctx.clip();
+  ctx.drawImage(canvas, srcX, srcY, srcW, srcH, magX - magR, magY - magR, magR * 2, magR * 2);
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(magX, magY, magR, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
+  const ch = 13;
+  ctx.beginPath();
+  ctx.moveTo(magX - ch, magY); ctx.lineTo(magX + ch, magY);
+  ctx.moveTo(magX, magY - ch); ctx.lineTo(magX, magY + ch);
+  ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.5; ctx.stroke();
 }
 
 function setPhotoMode(mode) {
@@ -1322,7 +1452,7 @@ function photoSave() {
     canvas.toBlob(blob => {
       const file = new File([blob], 'photo-measure.jpg', { type: 'image/jpeg' });
       if (navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: '사진 줄자 측정 결과' }).catch(() => photoDownload(dataUrl));
+        navigator.share({ files: [file], title: '사진 측정 결과' }).catch(() => photoDownload(dataUrl));
         return;
       }
       photoDownload(dataUrl);
@@ -1604,10 +1734,10 @@ function photoDownload(dataUrl) {
   </div>
 </div>
 
-<!-- 사진 줄자 탭 -->
+<!-- 사진 측정 탭 -->
 <div id="tab-photo" class="tab-content">
   <div class="card">
-    <div class="card-title">📷 사진 줄자</div>
+    <div class="card-title">📷 사진 측정</div>
     <div class="mulch-info">💡 줄자·A4용지·사람처럼 길이를 아는 물체가 화면에 보이도록 찍으면 다른 부분의 치수도 측정할 수 있습니다</div>
 
     <!-- 업로드 버튼 2개 -->
@@ -1802,18 +1932,20 @@ function photoDownload(dataUrl) {
     <p class="price-note" style="margin-top:10px;">※ 여유율: 경계석 3~5%, 보도블록 5~10% (절단·파손 고려)</p>
   </div>
 
-  <!-- 8. 사진 줄자 -->
+  <!-- 8. 사진 측정 -->
   <div class="card">
-    <div class="card-title">📷 사진 줄자</div>
+    <div class="card-title">📷 사진 측정</div>
     <div class="mulch-info" style="margin-bottom:12px;">
       기준이 되는 물체를 화면에 포함시켜 찍으면 같은 평면의 다른 치수를 측정할 수 있습니다
     </div>
     <table class="price-table">
       <tr><th>순서</th><th>방법</th></tr>
       <tr><td>① 촬영</td><td>길이를 아는 물체와 측정 대상이 함께 나오도록 찍기</td></tr>
-      <tr><td>② 기준 설정</td><td>기준 물체의 양 끝 클릭 → 실제 길이 입력 → 설정</td></tr>
-      <tr><td>③ 거리 측정</td><td>시작점·끝점 클릭 → 자동 계산</td></tr>
-      <tr><td>④ 면적 측정</td><td>꼭짓점 순서대로 클릭 (3점 이상) → 완료 버튼</td></tr>
+      <tr><td>② 기준 설정</td><td>기준 물체의 양 끝 터치 → 실제 길이 입력 → 설정</td></tr>
+      <tr><td>③ 거리 측정</td><td>시작점·끝점 터치 → 자동 계산</td></tr>
+      <tr><td>④ 면적 측정</td><td>꼭짓점 순서대로 터치 (3점 이상) → 완료 버튼</td></tr>
+      <tr><td>점 수정</td><td>찍은 점 위를 꾹 누르고 드래그해서 위치 조정</td></tr>
+      <tr><td>돋보기</td><td>화면을 터치하면 손가락 위에 확대경 표시 → 정확한 위치 확인</td></tr>
     </table>
     <table class="price-table" style="margin-top:10px;">
       <tr><th>기준 물체 예시</th><th>실제 크기</th></tr>
@@ -1886,7 +2018,7 @@ function photoDownload(dataUrl) {
 
 <footer style="text-align:center; padding:20px 16px 32px; font-size:12px; color:#9ca3af; line-height:1.8;">
   <div style="margin-bottom:4px; font-weight:600; color:#6b7280;">🌿 조경 현장 계산기</div>
-  <div>v0.617.19 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
+  <div>v0.617.22 &nbsp;·&nbsp; Created by CONTENT FACTORY</div>
   <div style="margin-top:4px;">※ 본 계산기는 참고용이며 실제 현장 조건에 따라 달라질 수 있습니다.</div>
 </footer>
 
