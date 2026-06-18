@@ -561,7 +561,7 @@
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
-      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.12</span>
+      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.13</span>
     </div>
     <div style="flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
       <button class="share-header-btn" onclick="openHistoryModal()" style="background:var(--green-mid); color:#fff;">📋 계산 이력</button>
@@ -1187,13 +1187,43 @@
   <div class="card">
     <div class="card-title">🔍 수종 검색</div>
     <div class="mulch-info">수종명 (또는 분류·특성 키워드) 입력 → 규격·생육 정보 조회</div>
-    <input type="text" id="plant-search" placeholder="예) 느티나무, 관목, 그늘, 내한" oninput="searchPlants()" style="margin-top:10px;">
-    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('교목')">교목</button>
-      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('관목')">관목</button>
-      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('지피')">지피·잔디</button>
-      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('덩굴')">덩굴</button>
-      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('')">전체</button>
+    <input type="text" id="plant-search" placeholder="수종명·키워드 (예: 느티나무, 내염, 봄꽃)" oninput="applyPlantFilters()" style="margin-top:10px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+      <div class="select-wrap">
+        <select id="plant-filter-cat" onchange="applyPlantFilters()">
+          <option value="">분류 전체</option>
+          <option value="낙엽교목">낙엽교목</option>
+          <option value="상록교목">상록교목</option>
+          <option value="낙엽관목">낙엽관목</option>
+          <option value="상록관목">상록관목</option>
+          <option value="지피">지피·잔디</option>
+          <option value="덩굴">덩굴</option>
+        </select>
+      </div>
+      <div class="select-wrap">
+        <select id="plant-filter-env" onchange="applyPlantFilters()">
+          <option value="">환경 전체</option>
+          <option value="양수">양수</option>
+          <option value="반음">반음</option>
+          <option value="음수">음수</option>
+        </select>
+      </div>
+      <div class="select-wrap">
+        <select id="plant-filter-growth" onchange="applyPlantFilters()">
+          <option value="">생장속도 전체</option>
+          <option value="빠름">빠름 (연 30cm↑)</option>
+          <option value="보통">보통</option>
+          <option value="느림">느림 (연 10cm↓)</option>
+        </select>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px; padding:0 4px;">
+        <label style="display:flex; align-items:center; gap:5px; font-size:13px; cursor:pointer; margin:0; white-space:nowrap;">
+          <input type="checkbox" id="plant-filter-salt" onchange="applyPlantFilters()" style="width:16px; height:16px; accent-color:var(--green-light);"> 내조성
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; font-size:13px; cursor:pointer; margin:0; white-space:nowrap;">
+          <input type="checkbox" id="plant-filter-smog" onchange="applyPlantFilters()" style="width:16px; height:16px; accent-color:var(--green-light);"> 내공해
+        </label>
+      </div>
     </div>
     <div id="plant-result-list" style="margin-top:12px;"></div>
   </div>
@@ -1601,85 +1631,164 @@ function resetChecklist() {
 }
 
 // ── 식물 DB ──────────────────────────────────────────────
+// n:국명, c:분류, h:수고, w:수관폭, r:근원/흉고직경범위, rDef:계산기연동용R(cm),
+// env:양음, growth:생장속도, salt:내조성, smog:내공해, ornament:관상포인트, tag:키워드
 const PLANT_DB = [
-  {n:'느티나무', c:'낙엽교목', h:'3.0~6.0', w:'1.5~3.5', r:'R8~20', env:'양수', tag:'내한·가로수·공원·내공해'},
-  {n:'왕벚나무', c:'낙엽교목', h:'3.5~5.0', w:'1.5~2.5', r:'R8~15', env:'양수', tag:'봄꽃·관상·가로수'},
-  {n:'이팝나무', c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15', env:'양수', tag:'봄꽃·가로수·내한'},
-  {n:'회화나무', c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'R10~20', env:'양수', tag:'가로수·내공해·내건'},
-  {n:'은행나무', c:'낙엽교목', h:'3.5~6.0', w:'1.0~2.0', r:'B6~15', env:'양수', tag:'가로수·내공해·단풍'},
-  {n:'단풍나무', c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R5~8', env:'반음', tag:'단풍·정원·관상'},
-  {n:'목련', c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R6~10', env:'양수', tag:'봄꽃·향기·정원'},
-  {n:'산수유', c:'낙엽교목', h:'2.0~3.5', w:'1.5~2.5', r:'R6~12', env:'양수', tag:'봄꽃·열매·정원'},
-  {n:'자귀나무', c:'낙엽교목', h:'2.5~4.0', w:'2.0~3.0', r:'R8~15', env:'양수', tag:'여름꽃·내건·정원'},
-  {n:'소나무', c:'상록교목', h:'2.0~4.0', w:'1.0~2.0', r:'R6~15', env:'양수', tag:'내건·상징목·정원'},
-  {n:'향나무', c:'상록교목', h:'1.5~2.5', w:'0.5~0.8', r:'R4~8', env:'양수', tag:'조형·정원·경계'},
-  {n:'스트로브잣나무', c:'상록교목', h:'2.0~3.5', w:'1.0~2.0', r:'R5~12', env:'양수', tag:'내한·북방계·배경'},
-  {n:'편백나무', c:'상록교목', h:'2.0~4.0', w:'0.6~1.2', r:'R5~12', env:'반음', tag:'피톤치드·수직형·내음'},
-  {n:'사철나무', c:'상록관목', h:'0.4~1.0', w:'0.3~0.8', r:'-', env:'반음', tag:'경계·생울타리·내음·내공해'},
-  {n:'먼나무', c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10', env:'양수', tag:'남부수종·열매·정원'},
-  {n:'동백나무', c:'상록교목', h:'1.5~3.0', w:'0.8~1.5', r:'-', env:'반음', tag:'겨울꽃·남부·그늘'},
-  {n:'후박나무', c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10', env:'양수', tag:'남부·내조성·해안'},
-  {n:'철쭉', c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', env:'반음', tag:'봄꽃·군식·산성토'},
-  {n:'산철쭉', c:'낙엽관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', env:'반음', tag:'봄꽃·군식·자생'},
-  {n:'영산홍', c:'상록관목', h:'0.3~0.4', w:'0.3~0.4', r:'-', env:'반음', tag:'봄꽃·군식·경계'},
-  {n:'개나리', c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', env:'양수', tag:'봄꽃·비탈면·경계'},
-  {n:'조팝나무', c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', env:'양수', tag:'봄꽃·군식·경계'},
-  {n:'회양목', c:'상록관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', env:'반음', tag:'조형·경계·내음'},
-  {n:'수수꽃다리', c:'낙엽관목', h:'1.0~1.5', w:'0.6~1.0', r:'-', env:'양수', tag:'향기꽃·정원·봄'},
-  {n:'황매화', c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', env:'반음', tag:'봄꽃·내음·정원'},
-  {n:'무궁화', c:'낙엽관목', h:'1.0~1.5', w:'0.6~1.0', r:'-', env:'양수', tag:'국화·여름꽃·경계'},
-  {n:'낙상홍', c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', env:'양수', tag:'겨울열매·관상·정원'},
-  {n:'쥐똥나무', c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', env:'양수', tag:'생울타리·내공해·내건'},
-  {n:'꽝꽝나무', c:'상록관목', h:'0.4~0.8', w:'0.4~0.8', r:'-', env:'반음', tag:'생울타리·내염·해안'},
-  {n:'피라칸사', c:'상록관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', env:'양수', tag:'가을열매·가시·경계'},
-  {n:'맥문동', c:'지피', h:'0.2~0.3', w:'-', r:'-', env:'반음', tag:'그늘·경계·내음'},
-  {n:'옥잠화', c:'지피', h:'0.3~0.5', w:'-', r:'-', env:'음수', tag:'그늘·흰꽃·정원'},
-  {n:'수호초', c:'지피', h:'0.1~0.2', w:'-', r:'-', env:'음수', tag:'그늘·상록·내음'},
-  {n:'한국잔디', c:'잔디', h:'-', w:'-', r:'-', env:'양수', tag:'내건·내열·사면'},
-  {n:'들잔디(금잔디)', c:'잔디', h:'-', w:'-', r:'-', env:'양수', tag:'사면·내건·자생'},
-  {n:'등나무', c:'덩굴', h:'-', w:'-', r:'-', env:'양수', tag:'퍼걸러·봄꽃·향기'},
-  {n:'능소화', c:'덩굴', h:'-', w:'-', r:'-', env:'양수', tag:'여름꽃·담장·관상'},
-  {n:'담쟁이덩굴', c:'덩굴', h:'-', w:'-', r:'-', env:'반음', tag:'벽면녹화·자생·내음'},
-  {n:'인동덩굴', c:'덩굴', h:'-', w:'-', r:'-', env:'양수', tag:'향기꽃·내한·생울타리'},
+  // ── 낙엽교목 ──
+  {n:'느티나무',      c:'낙엽교목', h:'3.0~6.0', w:'1.5~3.5', r:'R8~20',  rDef:10, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'단풍·수형',    tag:'가로수·공원·내한·내공해'},
+  {n:'왕벚나무',      c:'낙엽교목', h:'3.5~5.0', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·가로수·관상'},
+  {n:'이팝나무',      c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃·수형',    tag:'봄꽃·가로수·내한·내공해'},
+  {n:'회화나무',      c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'R10~20', rDef:12, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'수형·여름꽃',  tag:'가로수·내공해·내건'},
+  {n:'은행나무',      c:'낙엽교목', h:'3.5~6.0', w:'1.0~2.0', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'단풍',         tag:'가로수·내공해·단풍'},
+  {n:'단풍나무',      c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R5~8',   rDef:6,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'단풍',         tag:'단풍·정원·관상'},
+  {n:'홍단풍',        c:'낙엽교목', h:'1.5~2.5', w:'0.8~1.2', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'잎색·단풍',    tag:'정원·포인트·관상'},
+  {n:'목련',          c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R6~10',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·향기·정원'},
+  {n:'자목련',        c:'낙엽교목', h:'2.0~3.0', w:'0.8~1.5', r:'R5~8',   rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·자주색·정원'},
+  {n:'산수유',        c:'낙엽교목', h:'2.0~3.5', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·열매·정원'},
+  {n:'자귀나무',      c:'낙엽교목', h:'2.5~4.0', w:'2.0~3.0', r:'R8~15',  rDef:10, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'여름꽃·수형',  tag:'여름꽃·내건·정원'},
+  {n:'층층나무',      c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.5', r:'R8~15',  rDef:10, env:'반음', growth:'보통', salt:false, smog:false, ornament:'수형·열매',    tag:'자생·공원·내음'},
+  {n:'계수나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'R8~15',  rDef:10, env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·향기',    tag:'단풍·향기·공원'},
+  {n:'튤립나무',      c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'B6~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'여름꽃·단풍',  tag:'가로수·공원·내공해'},
+  {n:'메타세쿼이아',  c:'낙엽교목', h:'4.0~6.0', w:'1.0~1.5', r:'B6~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형·단풍',    tag:'가로수·수직형·빠른성장'},
+  {n:'낙우송',        c:'낙엽교목', h:'4.0~6.0', w:'1.5~2.5', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'단풍·기근',    tag:'수변·습지·단풍·내염'},
+  {n:'벚나무',        c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·가로수·관상'},
+  {n:'배롱나무',      c:'낙엽교목', h:'2.0~3.0', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃·수피',  tag:'여름꽃·내염·도심'},
+  {n:'모감주나무',    c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃·열매',  tag:'여름꽃·내염·해안'},
+  {n:'팽나무',        c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.5', r:'R10~20', rDef:12, env:'양수', growth:'느림', salt:true,  smog:true,  ornament:'수형',         tag:'내염·해안·노거수·내공해'},
+  {n:'상수리나무',    c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·열매',    tag:'자생·내건·산림'},
+  {n:'수양버들',      c:'낙엽교목', h:'3.0~5.0', w:'2.0~4.0', r:'B6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'수변·수형·빠른성장'},
+  {n:'칠엽수(마로니에)',c:'낙엽교목',h:'3.5~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃·열매',    tag:'봄꽃·유럽풍·공원·내공해'},
+  {n:'산딸나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·자생·정원'},
+  {n:'자작나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.0~1.5', r:'B5~10',  rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'흰수피·수형',  tag:'수피·수직형·내한'},
+  {n:'때죽나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·흰꽃·자생'},
+  // ── 상록교목 ──
+  {n:'소나무',        c:'상록교목', h:'2.0~4.0', w:'1.0~2.0', r:'R6~15',  rDef:8,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'수형',         tag:'내건·상징목·조형'},
+  {n:'향나무',        c:'상록교목', h:'1.5~2.5', w:'0.5~0.8', r:'R4~8',   rDef:5,  env:'양수', growth:'느림', salt:true,  smog:true,  ornament:'수형·향기',    tag:'조형·내염·내공해'},
+  {n:'가이즈카향나무', c:'상록교목', h:'2.0~3.5', w:'0.6~1.0', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'수형',         tag:'수직형·내염·내공해·경계'},
+  {n:'스트로브잣나무', c:'상록교목', h:'2.0~3.5', w:'1.0~2.0', r:'R5~12',  rDef:6,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'내한·북방계·배경'},
+  {n:'편백나무',      c:'상록교목', h:'2.0~4.0', w:'0.6~1.2', r:'R5~12',  rDef:6,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'수형·향기',    tag:'피톤치드·수직형·내음'},
+  {n:'구상나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.8', r:'R5~10',  rDef:6,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'수형',         tag:'자생·내한·고산'},
+  {n:'히말라야시더',  c:'상록교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'대형수목·공원·배경'},
+  {n:'독일가문비',    c:'상록교목', h:'3.0~5.0', w:'1.0~1.5', r:'B5~10',  rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'수직형·내한·배경'},
+  {n:'동백나무',      c:'상록교목', h:'1.5~3.0', w:'0.8~1.5', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:true,  smog:false, ornament:'겨울꽃',       tag:'겨울꽃·남부·내염'},
+  {n:'후박나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'수형',         tag:'남부·내염·해안'},
+  {n:'먼나무',        c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매·수형',    tag:'남부·열매·내염'},
+  {n:'태산목(양옥란)', c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'여름꽃·잎',    tag:'남부·대형꽃·정원'},
+  {n:'굴거리나무',    c:'상록교목', h:'2.0~3.0', w:'1.0~1.5', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'잎·수형',      tag:'남부·그늘·내음'},
+  // ── 낙엽관목 ──
+  {n:'철쭉',          c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·산성토·자생'},
+  {n:'산철쭉',        c:'낙엽관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·자생'},
+  {n:'개나리',        c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'봄꽃',       tag:'봄꽃·비탈면·내공해'},
+  {n:'조팝나무',      c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃',       tag:'봄꽃·군식·내공해'},
+  {n:'수수꽃다리(라일락)',c:'낙엽관목',h:'1.0~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기', tag:'향기꽃·정원·봄'},
+  {n:'황매화',        c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·내음·정원'},
+  {n:'무궁화',        c:'낙엽관목', h:'1.0~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃',     tag:'국화·여름꽃·내염·내공해'},
+  {n:'낙상홍',        c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'겨울열매',   tag:'겨울열매·관상·정원'},
+  {n:'쥐똥나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'열매',       tag:'생울타리·내염·내공해'},
+  {n:'화살나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·수피',  tag:'단풍·경계·코르크날개'},
+  {n:'명자나무',      c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',  tag:'봄꽃·가시·경계'},
+  {n:'박태기나무',    c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·자홍색·정원'},
+  {n:'말발도리',      c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'흰꽃·봄·자생'},
+  {n:'병꽃나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.6~1.0', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'자생·내음·봄'},
+  {n:'꽃댕강나무',    c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름~가을꽃',tag:'내염·내공해·오래꽃피는'},
+  {n:'미선나무',      c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'자생·천연기념물·봄'},
+  // ── 상록관목 ──
+  {n:'영산홍',        c:'상록관목', h:'0.3~0.4', w:'0.3~0.4', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·경계'},
+  {n:'회양목',        c:'상록관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:true,  ornament:'수형',       tag:'조형·경계·내음·내공해'},
+  {n:'사철나무',      c:'상록관목', h:'0.4~1.0', w:'0.3~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:true,  smog:true,  ornament:'수형',       tag:'생울타리·내염·내공해'},
+  {n:'꽝꽝나무',      c:'상록관목', h:'0.4~0.8', w:'0.4~0.8', r:'-', rDef:0, env:'반음', growth:'느림', salt:true,  smog:false, ornament:'수형',       tag:'생울타리·내염·해안'},
+  {n:'피라칸사',      c:'상록관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'열매',       tag:'가을열매·가시·경계'},
+  {n:'남천',          c:'상록관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'열매·단풍',  tag:'겨울열매·단풍·정원'},
+  {n:'눈향나무',      c:'상록관목', h:'0.3~0.5', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'느림', salt:true,  smog:false, ornament:'수형',       tag:'포복형·내염·사면'},
+  {n:'돈나무',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매·향기',  tag:'남부·내염·해안'},
+  {n:'아왜나무',      c:'상록관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매',       tag:'남부·내염·방풍'},
+  {n:'차나무',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'가을꽃',     tag:'차·가을꽃·그늘'},
+  // ── 지피·잔디 ──
+  {n:'맥문동',        c:'지피',  h:'0.2~0.3', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:true,  ornament:'여름꽃·잎',  tag:'그늘·경계·내음·내공해'},
+  {n:'옥잠화',        c:'지피',  h:'0.3~0.5', w:'-', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:false, ornament:'꽃·잎',      tag:'그늘·흰꽃·음지'},
+  {n:'수호초',        c:'지피',  h:'0.1~0.2', w:'-', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:false, ornament:'잎',         tag:'그늘·상록·음지·내음'},
+  {n:'한국잔디',      c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'-',          tag:'내건·내열·사면·자생'},
+  {n:'들잔디(금잔디)', c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'-',          tag:'사면·내건·내염·자생'},
+  {n:'켄터키블루그래스',c:'잔디', h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'-',          tag:'서양잔디·서늘한기후·봄가을'},
+  {n:'톨페스큐',      c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'-',          tag:'서양잔디·내건·내염·내공해'},
+  // ── 덩굴 ──
+  {n:'등나무',        c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'봄꽃·향기', tag:'퍼걸러·봄꽃·향기'},
+  {n:'능소화',        c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'여름꽃',    tag:'여름꽃·담장·내공해'},
+  {n:'담쟁이덩굴',    c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'빠름', salt:true,  smog:true,  ornament:'단풍',      tag:'벽면녹화·내염·내공해'},
+  {n:'인동덩굴',      c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'꽃·향기',   tag:'향기꽃·내한·생울타리'},
+  {n:'으름덩굴',      c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'꽃·열매',   tag:'자생·열매·퍼걸러'},
 ];
+
+function applyPlantFilters() {
+  const q      = (document.getElementById('plant-search').value || '').trim().toLowerCase();
+  const cat    = document.getElementById('plant-filter-cat').value;
+  const env    = document.getElementById('plant-filter-env').value;
+  const growth = document.getElementById('plant-filter-growth').value;
+  const salt   = document.getElementById('plant-filter-salt').checked;
+  const smog   = document.getElementById('plant-filter-smog').checked;
+  let res = PLANT_DB;
+  if (q)      res = res.filter(p => p.n.includes(q) || p.c.includes(q) || p.env.includes(q) || p.tag.includes(q) || p.ornament.includes(q));
+  if (cat)    res = res.filter(p => p.c.includes(cat));
+  if (env)    res = res.filter(p => p.env === env);
+  if (growth) res = res.filter(p => p.growth === growth);
+  if (salt)   res = res.filter(p => p.salt);
+  if (smog)   res = res.filter(p => p.smog);
+  renderPlantList(res);
+}
+function searchPlants()       { applyPlantFilters(); }
+function filterPlants(cat)    { document.getElementById('plant-filter-cat').value = cat; applyPlantFilters(); }
+
+function linkToCalc(type, rDef, name) {
+  const btn = document.querySelector('.tab-btn[onclick*="\'tree\'"]');
+  if (btn) showTab('tree', btn);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => {
+    const el = document.getElementById(type === 'pit' ? 'pit-r' : 'tree-r');
+    if (!el) return;
+    el.value = rDef;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.focus();
+  }, 200);
+}
+
 function renderPlantList(list) {
   const wrap = document.getElementById('plant-result-list');
   if (!list.length) {
-    wrap.innerHTML = '<div style="text-align:center; color:var(--text-sub); padding:20px; font-size:14px;">검색 결과가 없습니다</div>';
+    wrap.innerHTML = '<div style="text-align:center;color:var(--text-sub);padding:24px;font-size:14px;">검색 결과가 없습니다</div>';
     return;
   }
-  let html = '';
+  const gColor = {빠름:'#15803d', 보통:'#92400e', 느림:'#b91c1c'};
+  let html = '<div style="font-size:12px;color:var(--text-sub);margin-bottom:8px;">' + list.length + '종 검색됨</div>';
   list.forEach(p => {
-    html += '<div style="border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; background:white;">';
-    html += '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">';
-    html += '<span style="font-size:15px; font-weight:700; color:var(--text);">' + p.n + '</span>';
-    html += '<span style="font-size:11px; background:var(--green-bg); color:var(--green-dark); padding:2px 8px; border-radius:20px;">' + p.c + '</span>';
+    html += '<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;background:white;">';
+    // 이름줄
+    html += '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:5px;">';
+    html += '<span style="font-size:15px;font-weight:700;color:var(--text);">' + p.n + '</span>';
+    html += '<span style="font-size:11px;background:var(--green-bg);color:var(--green-dark);padding:2px 8px;border-radius:20px;">' + p.c + '</span>';
+    if (p.growth) html += '<span style="font-size:11px;color:' + (gColor[p.growth]||'#333') + ';font-weight:600;">생장 ' + p.growth + '</span>';
+    if (p.salt)   html += '<span style="font-size:10px;background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;">내조</span>';
+    if (p.smog)   html += '<span style="font-size:10px;background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:10px;">내공해</span>';
     html += '</div>';
-    html += '<div style="font-size:12px; color:var(--text-sub); margin-top:4px;">';
-    if (p.h !== '-') html += '🌿 H ' + p.h + 'm  ';
-    if (p.w !== '-') html += 'W ' + p.w + 'm  ';
-    if (p.r !== '-') html += p.r.startsWith('R')||p.r.startsWith('B') ? p.r + 'cm  ' : '';
-    html += p.env;
+    // 규격줄
+    html += '<div style="font-size:12px;color:var(--text-sub);margin-top:5px;display:flex;flex-wrap:wrap;gap:8px;">';
+    if (p.h !== '-') html += '<span>🌿 H ' + p.h + 'm</span>';
+    if (p.w !== '-') html += '<span>W ' + p.w + 'm</span>';
+    if (p.r !== '-') html += '<span>' + p.r + 'cm</span>';
+    html += '<span>' + p.env + '</span>';
+    if (p.ornament && p.ornament !== '-') html += '<span style="color:var(--green-dark);">✨ ' + p.ornament + '</span>';
     html += '</div>';
-    html += '<div style="font-size:11px; color:var(--text-sub); margin-top:4px; opacity:0.8;">#' + p.tag.replace(/·/g, '  #') + '</div>';
+    // 태그줄
+    html += '<div style="font-size:11px;color:var(--text-sub);margin-top:4px;opacity:0.75;">#' + p.tag.replace(/·/g, '  #') + '</div>';
+    // 계산기 연동 버튼
+    if (p.rDef > 0) {
+      html += '<div style="display:flex;gap:6px;margin-top:8px;">';
+      html += '<button onclick="linkToCalc(\'weight\',' + p.rDef + ',\'' + p.n.replace(/'/g,"\\'") + '\')" style="font-size:11px;padding:4px 10px;border:1px solid var(--green-light);border-radius:6px;background:white;color:var(--green);cursor:pointer;font-weight:600;">🌳 중량 계산</button>';
+      html += '<button onclick="linkToCalc(\'pit\',' + p.rDef + ',\'' + p.n.replace(/'/g,"\\'") + '\')" style="font-size:11px;padding:4px 10px;border:1px solid var(--green-light);border-radius:6px;background:white;color:var(--green);cursor:pointer;font-weight:600;">⛏ 구덩이 계산</button>';
+      html += '</div>';
+    }
     html += '</div>';
   });
   wrap.innerHTML = html;
-}
-function searchPlants() {
-  const q = document.getElementById('plant-search').value.trim().toLowerCase();
-  if (!q) { renderPlantList(PLANT_DB); return; }
-  const res = PLANT_DB.filter(p =>
-    p.n.includes(q) || p.c.toLowerCase().includes(q) ||
-    p.env.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q)
-  );
-  renderPlantList(res);
-}
-function filterPlants(cat) {
-  document.getElementById('plant-search').value = cat;
-  if (!cat) { renderPlantList(PLANT_DB); return; }
-  const res = PLANT_DB.filter(p => p.c.includes(cat));
-  renderPlantList(res);
 }
 
 // ── 계산 이력 ──────────────────────────────────────────
@@ -1797,7 +1906,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 초기 상태 렌더링
   renderAvgRows();
   loadChecklist();
-  renderPlantList(PLANT_DB);
+  applyPlantFilters();
 
   // 세션 저장 이벤트
   document.querySelectorAll('input[id]:not([type=radio]):not([type=file]):not([type=checkbox]), select[id]')
