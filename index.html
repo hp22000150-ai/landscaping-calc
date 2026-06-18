@@ -2067,11 +2067,11 @@ function calcTree() {
   const totalWeight = aboveWeight + belowWeight;
 
   let equipment = '';
-  if (totalWeight < 200)        equipment = '<span class="equipment-tag">인력 작업 가능</span>';
-  else if (totalWeight < 500)   equipment = '<span class="equipment-tag">3톤 굴삭기</span>';
-  else if (totalWeight < 1500)  equipment = '<span class="equipment-tag">3~5톤 크레인</span>';
-  else if (totalWeight < 5000)  equipment = '<span class="equipment-tag">10~25톤 크레인</span>';
-  else                          equipment = '<span class="equipment-tag">25톤 이상 크레인</span>';
+  if      (R <= 7)  equipment = '<span class="equipment-tag">인력 작업 가능</span>';
+  else if (R <= 10) equipment = '<span class="equipment-tag">2인 인력 작업</span>';
+  else if (R <= 20) equipment = '<span class="equipment-tag">3~5톤 크레인</span>';
+  else if (R <= 30) equipment = '<span class="equipment-tag">10~25톤 크레인</span>';
+  else              equipment = '<span class="equipment-tag">25톤 이상 크레인</span>';
 
   document.getElementById('tree-result').classList.add('show');
   document.getElementById('r-dbh-calc').textContent    = (rcd * 0.8).toFixed(1) + ' cm';
