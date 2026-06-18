@@ -553,9 +553,30 @@
     -webkit-tap-highlight-color: transparent;
   }
   .result-copy-btn:active { background: var(--green-pale); }
+  #scroll-top-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--green);
+    color: white;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    z-index: 800;
+  }
+  #scroll-top-btn.visible { opacity: 1; pointer-events: auto; }
 </style>
 </head>
 <body>
+<button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="맨 위로">↑</button>
 
 <header>
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -1896,6 +1917,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
+
+  // 맨 위로 버튼
+  const scrollBtn = document.getElementById('scroll-top-btn');
+  window.addEventListener('scroll', () => {
+    scrollBtn.classList.toggle('visible', window.scrollY > 300);
+  }, { passive: true });
 
   // 세션 복원
   ssRestore();
