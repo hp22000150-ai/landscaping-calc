@@ -508,6 +508,18 @@
     cursor: pointer; display: flex; align-items: center; gap: 5px;
     font-weight: 600; white-space: nowrap;
   }
+  input[type="date"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--text);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="date"]:focus { border-color: var(--green-light); }
   .result-copy-btn {
     float: right;
     background: none;
@@ -530,7 +542,7 @@
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
-      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.617.2145</span>
+      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.618.20</span>
     </div>
     <div style="text-align:right; flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
       <button class="share-header-btn" onclick="openShareModal()">📤 공유·설치</button>
@@ -758,6 +770,61 @@
       <div class="result-note" id="r-stake-note"></div>
     </div>
   </div>
+
+  <!-- 식재 구덩이 · 객토량 -->
+  <div class="card">
+    <div class="card-title">⛏ 식재 구덩이 · 객토량 <button class="help-btn" onclick="showHelp('pit')">?</button></div>
+    <div class="mulch-info">근원직경 기준 — 구덩이 직경 = 뿌리분(R×4) × 1.5, 깊이 = 뿌리분 높이 × 1.2</div>
+
+    <label>근원직경 R (cm)</label>
+    <input type="number" id="pit-r" placeholder="예: 12" inputmode="decimal" step="0.5">
+
+    <label>수목 수량 (주)</label>
+    <input type="number" id="pit-count" placeholder="예: 5" inputmode="numeric">
+
+    <label>객토 비율</label>
+    <div class="radio-group">
+      <label><input type="radio" name="pit-topsoil" value="30"><span>30%</span></label>
+      <label><input type="radio" name="pit-topsoil" value="50" checked><span>50%</span></label>
+      <label><input type="radio" name="pit-topsoil" value="100"><span>전량</span></label>
+    </div>
+
+    <label>부엽토 혼합 비율</label>
+    <div class="radio-group">
+      <label><input type="radio" name="pit-compost" value="0"><span>없음</span></label>
+      <label><input type="radio" name="pit-compost" value="20" checked><span>20%</span></label>
+      <label><input type="radio" name="pit-compost" value="30"><span>30%</span></label>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcPit()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetPit()" style="flex:0 0 80px;">초기화</button>
+    </div>
+    <div id="pit-result" class="result-box">
+      <div class="result-title">📊 구덩이 · 객토 계산 결과</div>
+      <div class="result-row">
+        <span class="result-label">구덩이 규격 (직경 × 깊이)</span>
+        <span class="result-value" id="r-pit-size">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">1주당 굴착량</span>
+        <span class="result-value" id="r-pit-one">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">총 굴착량</span>
+        <span class="result-value big" id="r-pit-total">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">객토 소요량</span>
+        <span class="result-value" id="r-pit-topsoil">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">부엽토 소요량</span>
+        <span class="result-value" id="r-pit-compost">-</span>
+      </div>
+      <div class="result-note" id="r-pit-note"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 멀칭 재료 탭 -->
@@ -886,6 +953,47 @@
     </table>
     <p class="price-note">※ 시중 참고치. 지역·규격·시공 조건에 따라 달라집니다.</p>
   </div>
+
+  <div class="card">
+    <div class="section-label">주요 조경수 표준 규격 <span style="font-weight:400; opacity:0.75;">· 조경설계기준 참고</span></div>
+    <p class="price-note" style="margin-bottom:8px;">H=수고(m) · W=수관폭(m) · R=근원직경(cm) · B=흉고직경(cm)</p>
+    <table class="price-table">
+      <tr><th>수종</th><th>H × W</th><th>R / B</th></tr>
+      <tr><td>느티나무</td><td>3.0 × 1.5</td><td>R 8</td></tr>
+      <tr><td>느티나무</td><td>4.5 × 2.5</td><td>R 12</td></tr>
+      <tr><td>느티나무</td><td>6.0 × 3.5</td><td>R 20</td></tr>
+      <tr><td>벚나무</td><td>3.0 × 1.5</td><td>R 8</td></tr>
+      <tr><td>벚나무</td><td>4.0 × 2.0</td><td>R 10</td></tr>
+      <tr><td>소나무</td><td>2.0 × 1.0</td><td>R 6</td></tr>
+      <tr><td>소나무</td><td>3.0 × 1.5</td><td>R 10</td></tr>
+      <tr><td>소나무</td><td>4.0 × 2.0</td><td>R 15</td></tr>
+      <tr><td>은행나무</td><td>3.5 × 1.0</td><td>B 6</td></tr>
+      <tr><td>은행나무</td><td>5.0 × 1.5</td><td>B 10</td></tr>
+      <tr><td>단풍나무</td><td>2.5 × 1.0</td><td>R 5</td></tr>
+      <tr><td>단풍나무</td><td>3.5 × 1.5</td><td>R 8</td></tr>
+      <tr><td>왕벚나무</td><td>3.5 × 1.5</td><td>B 8</td></tr>
+      <tr><td>회화나무</td><td>4.0 × 2.0</td><td>R 10</td></tr>
+      <tr><td>목련</td><td>2.5 × 1.0</td><td>R 6</td></tr>
+      <tr><td>목련</td><td>3.5 × 1.5</td><td>R 10</td></tr>
+      <tr><td>향나무</td><td>1.5 × 0.5</td><td>R 4</td></tr>
+      <tr><td>향나무</td><td>2.5 × 0.8</td><td>R 7</td></tr>
+      <tr><td>스트로브잣나무</td><td>2.0 × 1.0</td><td>R 5</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:12px;">
+      <tr><th>관목류</th><th>H × W</th><th>비고</th></tr>
+      <tr><td>철쭉</td><td>0.4 × 0.4</td><td>3지 이상</td></tr>
+      <tr><td>철쭉</td><td>0.6 × 0.6</td><td>5지 이상</td></tr>
+      <tr><td>산철쭉</td><td>0.3 × 0.3</td><td>3지 이상</td></tr>
+      <tr><td>영산홍</td><td>0.3 × 0.3</td><td>3지 이상</td></tr>
+      <tr><td>회양목</td><td>0.3 × 0.3</td><td>수관 양호</td></tr>
+      <tr><td>회양목</td><td>0.5 × 0.5</td><td>수관 양호</td></tr>
+      <tr><td>개나리</td><td>0.6 × 0.5</td><td>3지 이상</td></tr>
+      <tr><td>조팝나무</td><td>0.4 × 0.4</td><td>3지 이상</td></tr>
+      <tr><td>사철나무</td><td>0.4 × 0.4</td><td>수관 양호</td></tr>
+      <tr><td>수수꽃다리(라일락)</td><td>1.0 × 0.6</td><td>3지 이상</td></tr>
+    </table>
+    <p class="price-note">※ 조경설계기준·표준시방서 참고치. 실제 규격은 현장·설계도서 기준 적용.</p>
+  </div>
 </div>
 
 <script>
@@ -917,6 +1025,55 @@ document.addEventListener('click', () => {
   document.getElementById('theme-popup').classList.remove('open');
 });
 
+// ── 세션 입력값 유지 ──────────────────────────────────────
+const SS = 'wdr2-';
+function ssSave(el) {
+  try {
+    if (el.type === 'radio') {
+      if (el.checked) sessionStorage.setItem(SS + 'r-' + el.name, el.value);
+    } else {
+      sessionStorage.setItem(SS + el.id, el.value);
+    }
+  } catch(e) {}
+}
+function ssRestore() {
+  try {
+    document.querySelectorAll('input[id]:not([type=radio]):not([type=file]):not([type=checkbox]), select[id]')
+      .forEach(el => {
+        const v = sessionStorage.getItem(SS + el.id);
+        if (v !== null) el.value = v;
+      });
+    const rNames = new Set();
+    document.querySelectorAll('input[type=radio]').forEach(r => rNames.add(r.name));
+    rNames.forEach(name => {
+      const v = sessionStorage.getItem(SS + 'r-' + name);
+      if (v !== null) {
+        const r = document.querySelector('input[type=radio][name="' + name + '"][value="' + v + '"]');
+        if (r) r.checked = true;
+      }
+    });
+    // matItems 복원
+    const ms = sessionStorage.getItem(SS + 'matItems');
+    if (ms) {
+      const arr = JSON.parse(ms);
+      if (Array.isArray(arr) && arr.length) { matItems.length = 0; arr.forEach(i => matItems.push(i)); renderMatItems(); }
+    }
+  } catch(e) {}
+  // 동적 표시 상태 복원
+  try {
+    const ball = document.querySelector('input[name="tree-ball"]:checked');
+    if (ball) document.getElementById('root-method-wrap').style.display = ball.value === 'yes' ? 'block' : 'none';
+    const stripType = document.querySelector('input[name="grass-type"]:checked');
+    if (stripType) document.getElementById('strip-options').style.display = stripType.value === 'strip' ? 'block' : 'none';
+    updatePaveInputs(); updateLaborMode(); updateEarthInputs();
+    updateConInputs(); updateRebarInputs(); updateTriInputs(); updateAreaInputs();
+    updateRainI(); updateRainC();
+  } catch(e) {}
+}
+function ssSaveMatItems() {
+  try { sessionStorage.setItem(SS + 'matItems', JSON.stringify(matItems)); } catch(e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   let saved = 'green';
   try { saved = localStorage.getItem('wdr-theme') || 'green'; } catch(e) {}
@@ -924,6 +1081,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
+
+  // 세션 복원
+  ssRestore();
+
+  // 세션 저장 이벤트
+  document.querySelectorAll('input[id]:not([type=radio]):not([type=file]):not([type=checkbox]), select[id]')
+    .forEach(el => {
+      el.addEventListener('change', () => ssSave(el));
+      if (el.tagName === 'INPUT') el.addEventListener('input', () => ssSave(el));
+    });
+  document.querySelectorAll('input[type=radio]').forEach(el => el.addEventListener('change', () => ssSave(el)));
 
   // 모든 결과 박스에 복사 버튼 주입
   document.querySelectorAll('.result-box .result-title').forEach(titleEl => {
@@ -1890,12 +2058,14 @@ const matItems = [];
 function addMatItem() {
   matItems.push({ name:'', price:'', qty:'', unit:'㎡' });
   renderMatItems();
-}
-function updateMatTotal() {
-  if (document.getElementById('mat-result').classList.contains('show')) calcMat();
+  ssSaveMatItems();
 }
 function removeMatItem(idx) {
-  matItems.splice(idx, 1); renderMatItems();
+  matItems.splice(idx, 1); renderMatItems(); ssSaveMatItems();
+}
+function updateMatTotal() {
+  ssSaveMatItems();
+  if (document.getElementById('mat-result').classList.contains('show')) calcMat();
 }
 function renderMatItems() {
   const el = document.getElementById('mat-items');
@@ -2348,6 +2518,125 @@ function photoDownload(dataUrl) {
   a.click();
 }
 
+// ── 강우 배수 합리식 ──────────────────────────────────────
+function updateRainI() {
+  const v = document.getElementById('rain-i-preset').value;
+  document.getElementById('rain-i-custom').style.display = v === 'custom' ? 'block' : 'none';
+}
+function updateRainC() {
+  const v = document.getElementById('rain-c-preset').value;
+  document.getElementById('rain-c-custom').style.display = v === 'custom' ? 'block' : 'none';
+}
+function calcRain() {
+  let area = parseFloat(document.getElementById('rain-area').value);
+  const aUnit   = document.getElementById('rain-area-unit').value;
+  const iPreset = document.getElementById('rain-i-preset').value;
+  const cPreset = document.getElementById('rain-c-preset').value;
+  if (!area || area <= 0) { alert('유역 면적을 입력해주세요'); return; }
+  if (aUnit === 'm2') area = area / 10000;
+  let I;
+  if (iPreset === 'custom') {
+    I = parseFloat(document.getElementById('rain-i').value);
+    if (!I || I <= 0) { alert('강우강도를 입력해주세요'); return; }
+  } else { I = parseFloat(iPreset); }
+  let C;
+  if (cPreset === 'custom') {
+    C = parseFloat(document.getElementById('rain-c').value);
+    if (isNaN(C) || C <= 0 || C > 1) { alert('유출계수를 0~1 사이로 입력해주세요'); return; }
+  } else { C = parseFloat(cPreset); }
+  const Qm3s = C * I * area / 360;
+  const Qls  = Qm3s * 1000;
+  const inlets = Math.ceil(Qls / 14);
+  document.getElementById('rain-result').classList.add('show');
+  document.getElementById('r-rain-q').textContent     = Qls.toFixed(2) + ' L/s';
+  document.getElementById('r-rain-q2').textContent    = Qm3s.toFixed(4) + ' m³/s  (' + (Qm3s*60).toFixed(3) + ' m³/min)';
+  document.getElementById('r-rain-inlet').textContent = inlets + '개  (300×300mm형, 14 L/s/개 기준)';
+  document.getElementById('r-rain-note').textContent  =
+    'C=' + C + '  I=' + I + 'mm/h  A=' + area.toFixed(4) + 'ha\n' +
+    'Q = (1/360)×C×I×A\n※ 합리식은 소규모 유역(100ha 이하)에 적합\n※ 강우강도는 지역·빈도별 IDF 곡선으로 결정';
+}
+function resetRain() {
+  document.getElementById('rain-area').value       = '';
+  document.getElementById('rain-area-unit').value  = 'ha';
+  document.getElementById('rain-i-preset').value   = '80';
+  document.getElementById('rain-c-preset').value   = '0.35';
+  document.getElementById('rain-i-custom').style.display = 'none';
+  document.getElementById('rain-c-custom').style.display = 'none';
+  document.getElementById('rain-result').classList.remove('show');
+}
+
+// ── 식재 구덩이 · 객토량 ──────────────────────────────────
+function calcPit() {
+  const R     = parseFloat(document.getElementById('pit-r').value);
+  const count = parseFloat(document.getElementById('pit-count').value);
+  const topsoilPct  = parseFloat(document.querySelector('input[name="pit-topsoil"]:checked').value);
+  const compostPct  = parseFloat(document.querySelector('input[name="pit-compost"]:checked').value);
+  if (!R || R <= 0)         { alert('근원직경을 입력해주세요'); return; }
+  if (!count || count <= 0) { alert('수목 수량을 입력해주세요'); return; }
+  // 뿌리분 직경 D = R×4 (cm→m)
+  const ballD  = R * 4 / 100;
+  // 구덩이 직경 = 뿌리분 × 1.5, 깊이 = 뿌리분 높이(≈D×0.5) × 1.2
+  const pitD   = ballD * 1.5;
+  const pitH   = ballD * 0.5 * 1.2;
+  const volOne = Math.PI * Math.pow(pitD / 2, 2) * pitH;
+  const volTotal   = volOne * count;
+  const volTopsoil = volTotal * topsoilPct / 100;
+  const volCompost = volTotal * compostPct / 100;
+  document.getElementById('pit-result').classList.add('show');
+  document.getElementById('r-pit-size').textContent    = 'φ' + (pitD*100).toFixed(0) + 'cm × 깊이 ' + (pitH*100).toFixed(0) + 'cm';
+  document.getElementById('r-pit-one').textContent     = volOne.toFixed(3) + ' ㎥';
+  document.getElementById('r-pit-total').textContent   = volTotal.toFixed(3) + ' ㎥ (' + count + '주)';
+  document.getElementById('r-pit-topsoil').textContent = volTopsoil.toFixed(3) + ' ㎥  (' + topsoilPct + '%)';
+  document.getElementById('r-pit-compost').textContent = compostPct > 0
+    ? volCompost.toFixed(3) + ' ㎥  (' + compostPct + '%)'
+    : '해당없음';
+  document.getElementById('r-pit-note').textContent =
+    '뿌리분 직경 ' + (ballD*100).toFixed(0) + 'cm (R×4)\n' +
+    '구덩이 = 뿌리분×1.5 / 깊이 = 뿌리분높이×1.2\n※ 부엽토는 객토량 대비 비율로 계산';
+}
+function resetPit() {
+  document.getElementById('pit-r').value     = '';
+  document.getElementById('pit-count').value = '';
+  document.querySelector('input[name="pit-topsoil"][value="50"]').checked  = true;
+  document.querySelector('input[name="pit-compost"][value="20"]').checked  = true;
+  document.getElementById('pit-result').classList.remove('show');
+}
+
+// ── 공사 D-day ──────────────────────────────────────────
+function calcDday() {
+  const startVal = document.getElementById('dday-start').value;
+  const endVal   = document.getElementById('dday-end').value;
+  if (!startVal) { alert('착공일을 입력해주세요'); return; }
+  if (!endVal)   { alert('준공일을 입력해주세요'); return; }
+  const start = new Date(startVal);
+  const end   = new Date(endVal);
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (end <= start) { alert('준공일은 착공일 이후여야 합니다'); return; }
+  const MS = 24*60*60*1000;
+  const total   = Math.round((end   - start) / MS);
+  const elapsed = Math.round((today - start) / MS);
+  const remain  = Math.round((end   - today) / MS);
+  const pct     = Math.min(100, Math.max(0, elapsed / total * 100));
+  const filled  = Math.round(pct / 5);
+  const bar     = '█'.repeat(filled) + '░'.repeat(20 - filled);
+  document.getElementById('dday-result').classList.add('show');
+  document.getElementById('r-dday-total').textContent   = total + '일';
+  document.getElementById('r-dday-elapsed').textContent = elapsed < 0 ? '착공 전 (' + Math.abs(elapsed) + '일 후 착공)' : elapsed + '일';
+  document.getElementById('r-dday-remain').textContent  =
+    remain < 0 ? '준공 D+' + Math.abs(remain) + ' (기간 초과)' :
+    remain === 0 ? 'D-0 (오늘이 준공일)' : 'D-' + remain;
+  document.getElementById('r-dday-pct').textContent     = pct.toFixed(1) + '%';
+  document.getElementById('r-dday-note').textContent    =
+    bar + '  ' + pct.toFixed(0) + '%\n' + startVal + '  ~  ' + endVal +
+    (remain < 0 ? '\n⚠ 준공 기한 ' + Math.abs(remain) + '일 초과' :
+     remain === 0 ? '\n오늘이 준공일입니다' : '');
+}
+function resetDday() {
+  document.getElementById('dday-start').value = '';
+  document.getElementById('dday-end').value   = '';
+  document.getElementById('dday-result').classList.remove('show');
+}
+
 // ── 도움말 팝업 ──────────────────────────────────────────
 function showHelp(key) {
   const src = document.getElementById('hc-' + key);
@@ -2775,6 +3064,73 @@ async function installPWA() {
       <div class="result-note" id="r-drain-note"></div>
     </div>
   </div>
+
+  <!-- 강우 배수 합리식 -->
+  <div class="card">
+    <div class="card-title">🌧 강우 배수 계산 (합리식) <button class="help-btn" onclick="showHelp('rain')">?</button></div>
+    <div class="mulch-info">Q = (1/360) × C × I × A — 첨두유량 산정 (소규모 유역 100ha 이하 적용)</div>
+
+    <label>유역 면적 A</label>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <input type="number" id="rain-area" placeholder="면적 입력" inputmode="decimal" style="flex:1">
+      <div class="select-wrap" style="width:88px; flex-shrink:0;">
+        <select id="rain-area-unit">
+          <option value="ha">ha</option>
+          <option value="m2">m²</option>
+        </select>
+      </div>
+    </div>
+
+    <label>강우강도 I</label>
+    <div class="select-wrap">
+      <select id="rain-i-preset" onchange="updateRainI()">
+        <option value="80">10년 빈도 — 80 mm/h</option>
+        <option value="110">30년 빈도 — 110 mm/h</option>
+        <option value="130">50년 빈도 — 130 mm/h</option>
+        <option value="160">100년 빈도 — 160 mm/h</option>
+        <option value="custom">직접 입력</option>
+      </select>
+    </div>
+    <div id="rain-i-custom" style="display:none; margin-top:8px;">
+      <input type="number" id="rain-i" placeholder="강우강도 (mm/h)" inputmode="decimal" step="1">
+    </div>
+
+    <label>유출계수 C</label>
+    <div class="select-wrap">
+      <select id="rain-c-preset" onchange="updateRainC()">
+        <option value="0.90">포장면 (아스팔트·콘크리트) — C=0.90</option>
+        <option value="0.70">반포장 (블록·자갈) — C=0.70</option>
+        <option value="0.35" selected>잔디·공원 (완경사) — C=0.35</option>
+        <option value="0.45">잔디 (급경사) — C=0.45</option>
+        <option value="0.35">산지·수림지 — C=0.35</option>
+        <option value="custom">직접 입력</option>
+      </select>
+    </div>
+    <div id="rain-c-custom" style="display:none; margin-top:8px;">
+      <input type="number" id="rain-c" placeholder="유출계수 (0~1)" inputmode="decimal" step="0.01" min="0" max="1">
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcRain()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetRain()" style="flex:0 0 80px;">초기화</button>
+    </div>
+    <div id="rain-result" class="result-box">
+      <div class="result-title">📊 강우 유출 계산 결과</div>
+      <div class="result-row">
+        <span class="result-label">첨두유량 Q</span>
+        <span class="result-value big" id="r-rain-q">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">단위 환산</span>
+        <span class="result-value" id="r-rain-q2">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">300형 빗물받이 (참고)</span>
+        <span class="result-value" id="r-rain-inlet">-</span>
+      </div>
+      <div class="result-note" id="r-rain-note"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 경계석·보도블록 탭 -->
@@ -3156,6 +3512,42 @@ async function installPWA() {
         <span class="result-label">합계 (VAT 포함)</span>
         <span class="result-value big" id="r-mat-total">-</span>
       </div>
+    </div>
+  </div>
+
+  <!-- 공사 D-day 계산기 -->
+  <div class="card">
+    <div class="card-title">📅 공사 D-day 계산기</div>
+    <div class="mulch-info">착공일·준공일을 입력하면 잔여 일수와 이론 공정률을 계산합니다</div>
+
+    <label>착공일</label>
+    <input type="date" id="dday-start">
+    <label>준공일</label>
+    <input type="date" id="dday-end">
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcDday()" style="flex:1;">계산하기</button>
+      <button class="reset-btn" onclick="resetDday()" style="flex:0 0 80px;">초기화</button>
+    </div>
+    <div id="dday-result" class="result-box">
+      <div class="result-title">📊 공사 일정</div>
+      <div class="result-row">
+        <span class="result-label">총 공기</span>
+        <span class="result-value" id="r-dday-total">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">경과 일수</span>
+        <span class="result-value" id="r-dday-elapsed">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">잔여 일수</span>
+        <span class="result-value big" id="r-dday-remain">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">이론 공정률</span>
+        <span class="result-value" id="r-dday-pct">-</span>
+      </div>
+      <div class="result-note" id="r-dday-note"></div>
     </div>
   </div>
 </div>
