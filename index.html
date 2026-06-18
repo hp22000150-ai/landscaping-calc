@@ -60,6 +60,7 @@
 
   .tab-nav {
     display: flex;
+    align-items: center;
     background: var(--green);
     padding: 0 8px 10px;
     gap: 6px;
@@ -67,6 +68,24 @@
     scrollbar-width: none;
   }
   .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-group-label {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    padding: 0 2px;
+    pointer-events: none;
+    user-select: none;
+  }
+  .tab-group-sep {
+    flex-shrink: 0;
+    width: 1px;
+    height: 18px;
+    background: rgba(255,255,255,0.2);
+    margin: 0 4px;
+  }
 
   .tab-btn {
     flex-shrink: 0;
@@ -542,7 +561,7 @@
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
-      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.10</span>
+      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.11</span>
     </div>
     <div style="text-align:right; flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
       <button class="share-header-btn" onclick="openHistoryModal()" style="background:var(--green-mid); color:#fff;">📋 계산 이력</button>
@@ -565,19 +584,26 @@
 </header>
 
 <nav class="tab-nav">
+  <span class="tab-group-label">🌿 조경</span>
   <button class="tab-btn active" onclick="showTab('tree', this)">수목 중량</button>
   <button class="tab-btn" onclick="showTab('grass', this)">잔디 소요량</button>
   <button class="tab-btn" onclick="showTab('mulch', this)">멀칭 재료</button>
   <button class="tab-btn" onclick="showTab('plant', this)">식재 주수</button>
+  <button class="tab-btn" onclick="showTab('irrig', this)">관수·포장</button>
+  <button class="tab-btn" onclick="showTab('plantdb', this)">식물 DB</button>
+  <div class="tab-group-sep"></div>
+  <span class="tab-group-label">🏗 토목</span>
   <button class="tab-btn" onclick="showTab('area', this)">면적&amp;길이</button>
   <button class="tab-btn" onclick="showTab('slope', this)">경사도</button>
   <button class="tab-btn" onclick="showTab('civil', this)">토공·콘크리트</button>
   <button class="tab-btn" onclick="showTab('pave', this)">경계석·블록</button>
+  <div class="tab-group-sep"></div>
+  <span class="tab-group-label">📋 현장</span>
   <button class="tab-btn" onclick="showTab('manage', this)">현장 관리</button>
   <button class="tab-btn" onclick="showTab('photo', this)">사진 측정</button>
+  <div class="tab-group-sep"></div>
+  <span class="tab-group-label">💰 참고</span>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
-  <button class="tab-btn" onclick="showTab('irrig', this)">관수·포장</button>
-  <button class="tab-btn" onclick="showTab('plantdb', this)">식물 DB</button>
 </nav>
 
 <!-- 잔디 소요량 탭 -->
