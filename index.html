@@ -561,23 +561,25 @@
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
-      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.11</span>
+      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.12</span>
     </div>
-    <div style="text-align:right; flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+    <div style="flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
       <button class="share-header-btn" onclick="openHistoryModal()" style="background:var(--green-mid); color:#fff;">📋 계산 이력</button>
-      <button class="share-header-btn" onclick="openShareModal()">📤 공유·설치</button>
-      <div style="position:relative;">
-        <button class="theme-palette-btn" onclick="toggleThemePopup(event)" title="테마 색상">🎨</button>
-        <div class="theme-popup" id="theme-popup">
-          <div class="theme-popup-title">테마 색상</div>
-          <div class="theme-popup-grid">
-            <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
-            <button class="theme-dot"        data-theme="blue"   style="background:#0c4a6e" onclick="setTheme('blue')"   title="바다"></button>
-            <button class="theme-dot"        data-theme="rose"   style="background:#9d174d" onclick="setTheme('rose')"   title="벚꽃"></button>
-            <button class="theme-dot"        data-theme="earth"  style="background:#92400e" onclick="setTheme('earth')"  title="흙"></button>
-            <button class="theme-dot"        data-theme="slate"  style="background:#334155" onclick="setTheme('slate')"  title="슬레이트"></button>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <div style="position:relative;">
+          <button class="theme-palette-btn" onclick="toggleThemePopup(event)" title="테마 색상">🎨</button>
+          <div class="theme-popup" id="theme-popup">
+            <div class="theme-popup-title">테마 색상</div>
+            <div class="theme-popup-grid">
+              <button class="theme-dot active" data-theme="green"  style="background:#2d6a4f" onclick="setTheme('green')"  title="초록숲"></button>
+              <button class="theme-dot"        data-theme="blue"   style="background:#0c4a6e" onclick="setTheme('blue')"   title="바다"></button>
+              <button class="theme-dot"        data-theme="rose"   style="background:#9d174d" onclick="setTheme('rose')"   title="벚꽃"></button>
+              <button class="theme-dot"        data-theme="earth"  style="background:#92400e" onclick="setTheme('earth')"  title="흙"></button>
+              <button class="theme-dot"        data-theme="slate"  style="background:#334155" onclick="setTheme('slate')"  title="슬레이트"></button>
+            </div>
           </div>
         </div>
+        <button class="share-header-btn" onclick="openShareModal()">📤 공유·설치</button>
       </div>
     </div>
   </div>
