@@ -508,6 +508,20 @@
     cursor: pointer; display: flex; align-items: center; gap: 5px;
     font-weight: 600; white-space: nowrap;
   }
+  .result-copy-btn {
+    float: right;
+    background: none;
+    border: 1.5px solid var(--green-light);
+    border-radius: 6px;
+    color: var(--green);
+    font-size: 11px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .result-copy-btn:active { background: var(--green-pale); }
 </style>
 </head>
 <body>
@@ -599,6 +613,10 @@
       <div class="result-row">
         <span class="result-label">필요 수량</span>
         <span class="result-value big" id="r-qty">-</span>
+      </div>
+      <div class="result-row" id="r-grass-truck-row" style="display:none;">
+        <span class="result-label">5톤 트럭 소요 (참고)</span>
+        <span class="result-value" id="r-grass-truck">-</span>
       </div>
       <div class="result-note" id="r-note">-</div>
     </div>
@@ -906,7 +924,41 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
+
+  // 모든 결과 박스에 복사 버튼 주입
+  document.querySelectorAll('.result-box .result-title').forEach(titleEl => {
+    const btn = document.createElement('button');
+    btn.className = 'result-copy-btn';
+    btn.textContent = '📋 복사';
+    btn.onclick = function() {
+      const box = this.closest('.result-box');
+      const lines = [];
+      box.querySelectorAll('.result-row').forEach(row => {
+        if (row.style.display === 'none') return;
+        const lbl = row.querySelector('.result-label');
+        const val = row.querySelector('.result-value');
+        if (lbl && val) lines.push(lbl.textContent.trim() + ': ' + val.textContent.trim());
+      });
+      const note = box.querySelector('.result-note');
+      if (note && note.textContent.trim()) lines.push('\n' + note.textContent.trim());
+      const text = lines.join('\n');
+      const self = this;
+      const done = () => { self.textContent = '✓ 복사됨'; setTimeout(() => { self.textContent = '📋 복사'; }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      } else { fallbackCopy(text, done); }
+    };
+    titleEl.appendChild(btn);
+  });
 });
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
 
 function showTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -931,27 +983,26 @@ function calcGrass() {
   if (!area || area <= 0) { alert('면적을 입력해주세요'); return; }
   if (unit === 'pyeong') area = area * 3.3058;
 
-  let qty = 0, typeName = '', unitName = '장', truckQty = 0, coverNote = '';
+  let qty = 0, typeName = '', unitName = '장', truckPerLoad = 0, coverNote = '';
 
   if (type === 'flat18') {
     qty = Math.ceil(area / 0.0324 * 1.02);
     typeName = '평떼 (18×18cm)';
-    truckQty = 30000;
+    truckPerLoad = 30000;
     coverNote = '전면 식재 (커버율 100%)';
   } else if (type === 'flat30') {
     qty = Math.ceil(area / 0.09 * 1.02);
     typeName = '평떼 (30×30cm)';
-    truckQty = 12000;
+    truckPerLoad = 12000;
     coverNote = '전면 식재 (커버율 100%)';
   } else if (type === 'roll') {
     qty = Math.ceil(area / 0.24 * 1.02);
     typeName = '롤잔디 (40×60cm)';
     unitName = '롤';
-    truckQty = 0;
     coverNote = '전면 식재 (커버율 100%)';
   } else if (type === 'strip') {
     const method = document.querySelector('input[name="strip-method"]:checked').value;
-    const baseQty = area / 0.0324; // 평떼(18×18) 기준 수량
+    const baseQty = area / 0.0324;
     if (method === 'half') {
       qty = Math.ceil(baseQty / 2 * 1.02);
       typeName = '줄떼 (1/2)';
@@ -969,14 +1020,25 @@ function calcGrass() {
   document.getElementById('r-type').textContent = typeName;
   document.getElementById('r-qty').textContent = qty.toLocaleString() + ' ' + unitName;
 
+  const truckRow = document.getElementById('r-grass-truck-row');
+  if (truckPerLoad > 0) {
+    const trucks = Math.ceil(qty / truckPerLoad);
+    document.getElementById('r-grass-truck').textContent =
+      trucks + '대 (' + truckPerLoad.toLocaleString() + unitName + '/대 기준)';
+    truckRow.style.display = '';
+  } else {
+    truckRow.style.display = 'none';
+  }
+
   document.getElementById('r-note').textContent = coverNote + '\n여유율 2% 포함\n현장에서 간격 조절로 ±5% 범위 조정 가능';
 }
 
 function resetGrass() {
   document.getElementById('grass-area').value = '';
+  document.getElementById('grass-unit').value = 'sqm';
   document.getElementById('grass-result').classList.remove('show');
   document.querySelector('input[name="grass-type"][value="flat18"]').checked = true;
-document.querySelector('input[name="strip-method"][value="half"]').checked = true;
+  document.querySelector('input[name="strip-method"][value="half"]').checked = true;
   document.getElementById('strip-options').style.display = 'none';
 }
 
@@ -1557,7 +1619,13 @@ function calcPave() {
 }
 function resetPave() {
   document.getElementById('edge-length').value = '';
+  document.getElementById('edge-size').value   = '0.30';
   document.getElementById('block-area').value  = '';
+  document.getElementById('block-unit').value  = 'sqm';
+  document.getElementById('block-size').value  = '0.09';
+  document.querySelector('input[name="pave-type"][value="edge"]').checked   = true;
+  document.querySelector('input[name="pave-margin"][value="3"]').checked    = true;
+  updatePaveInputs();
   document.getElementById('pave-result').classList.remove('show');
 }
 
@@ -1587,7 +1655,9 @@ function calcDrain() {
     '✓ 적정 유속 (0.6 ~ 3.0 m/s)';
 }
 function resetDrain() {
-  document.getElementById('drain-slope').value = '';
+  document.getElementById('drain-d').value    = '200';
+  document.getElementById('drain-mat').value  = '0.013';
+  document.getElementById('drain-slope').value  = '';
   document.getElementById('drain-length').value = '';
   document.getElementById('drain-result').classList.remove('show');
 }
@@ -1595,24 +1665,37 @@ function resetDrain() {
 // ── 토량 계산 ──────────────────────────────────────────
 function updateEarthInputs() {
   const s = document.getElementById('earth-shape').value;
-  document.getElementById('earth-rect-inputs').style.display   = s === 'rect'   ? 'block' : 'none';
-  document.getElementById('earth-circle-inputs').style.display = s === 'circle' ? 'block' : 'none';
+  document.getElementById('earth-rect-inputs').style.display      = s === 'rect'      ? 'block' : 'none';
+  document.getElementById('earth-circle-inputs').style.display    = s === 'circle'    ? 'block' : 'none';
+  document.getElementById('earth-trapezoid-inputs').style.display = s === 'trapezoid' ? 'block' : 'none';
+  document.getElementById('earth-depth-row').style.display        = s !== 'trapezoid' ? 'block' : 'none';
 }
 function calcEarth() {
   const shape = document.getElementById('earth-shape').value;
-  const depth = parseFloat(document.getElementById('earth-depth').value);
   const Lv    = parseFloat(document.getElementById('earth-lval').value);
   const cap   = parseFloat(document.getElementById('earth-truck').value);
-  let vol;
+  let vol, shapeNote;
   if (shape === 'rect') {
     const w = parseFloat(document.getElementById('earth-w').value);
     const l = parseFloat(document.getElementById('earth-l').value);
+    const depth = parseFloat(document.getElementById('earth-depth').value);
     if (!w || !l || !depth) { alert('가로, 세로, 깊이를 입력해주세요'); return; }
     vol = w * l * depth;
-  } else {
+    shapeNote = w + 'm × ' + l + 'm × ' + depth + 'm';
+  } else if (shape === 'circle') {
     const d = parseFloat(document.getElementById('earth-dia').value);
+    const depth = parseFloat(document.getElementById('earth-depth').value);
     if (!d || !depth) { alert('직경과 깊이를 입력해주세요'); return; }
     vol = Math.PI * (d/2) * (d/2) * depth;
+    shapeNote = 'φ' + d + 'm × 깊이 ' + depth + 'm';
+  } else {
+    const tw1 = parseFloat(document.getElementById('earth-tw1').value);
+    const tw2 = parseFloat(document.getElementById('earth-tw2').value);
+    const th  = parseFloat(document.getElementById('earth-th').value);
+    const tl  = parseFloat(document.getElementById('earth-tl').value);
+    if (!tw1 || !tw2 || !th || !tl) { alert('상부 폭, 하부 폭, 단면 높이, 연장을 입력해주세요'); return; }
+    vol = (tw1 + tw2) / 2 * th * tl;
+    shapeNote = '(W₁' + tw1 + '+W₂' + tw2 + ')÷2 × H' + th + 'm × L' + tl + 'm';
   }
   const loose = vol * Lv;
   const trucks = Math.ceil(loose / cap);
@@ -1620,10 +1703,11 @@ function calcEarth() {
   document.getElementById('r-earth-nat').textContent   = vol.toFixed(2) + ' ㎥';
   document.getElementById('r-earth-loose').textContent = loose.toFixed(2) + ' ㎥';
   document.getElementById('r-earth-truck').textContent = trucks + ' 대';
-  document.getElementById('r-earth-note').textContent  = '운반토량 = 자연상태 × L(' + Lv + ')  /  ' + cap + ' ㎥/대 기준';
+  document.getElementById('r-earth-note').textContent  = shapeNote + '\n운반토량 = 자연상태 × L(' + Lv + ')  /  ' + cap + ' ㎥/대 기준';
 }
 function resetEarth() {
-  ['earth-w','earth-l','earth-dia','earth-depth'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  ['earth-w','earth-l','earth-dia','earth-depth','earth-tw1','earth-tw2','earth-th','earth-tl']
+    .forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
   document.getElementById('earth-result').classList.remove('show');
 }
 
@@ -1807,6 +1891,9 @@ function addMatItem() {
   matItems.push({ name:'', price:'', qty:'', unit:'㎡' });
   renderMatItems();
 }
+function updateMatTotal() {
+  if (document.getElementById('mat-result').classList.contains('show')) calcMat();
+}
 function removeMatItem(idx) {
   matItems.splice(idx, 1); renderMatItems();
 }
@@ -1819,13 +1906,13 @@ function renderMatItems() {
   }
   el.innerHTML = matItems.map((m, i) => `
     <div style="display:grid; grid-template-columns:1fr 86px 60px 52px 26px; gap:4px; margin-bottom:6px; align-items:center;">
-      <input type="text" placeholder="항목명" value="${escHtml(m.name)}" oninput="matItems[${i}].name=this.value"
+      <input type="text" placeholder="항목명" value="${escHtml(m.name)}" oninput="matItems[${i}].name=this.value; updateMatTotal()"
         style="padding:8px 6px; border:1.5px solid var(--border); border-radius:6px; font-size:13px;">
-      <input type="number" placeholder="단가" value="${m.price}" inputmode="numeric" oninput="matItems[${i}].price=this.value"
+      <input type="number" placeholder="단가" value="${m.price}" inputmode="numeric" oninput="matItems[${i}].price=this.value; updateMatTotal()"
         style="padding:8px 6px; border:1.5px solid var(--border); border-radius:6px; font-size:13px;">
-      <input type="number" placeholder="수량" value="${m.qty}" inputmode="decimal" oninput="matItems[${i}].qty=this.value"
+      <input type="number" placeholder="수량" value="${m.qty}" inputmode="decimal" oninput="matItems[${i}].qty=this.value; updateMatTotal()"
         style="padding:8px 4px; border:1.5px solid var(--border); border-radius:6px; font-size:13px;">
-      <select oninput="matItems[${i}].unit=this.value"
+      <select oninput="matItems[${i}].unit=this.value; updateMatTotal()"
         style="padding:8px 2px; border:1.5px solid var(--border); border-radius:6px; font-size:12px; background:white; appearance:none; text-align:center;">
         ${units.map(u=>`<option${m.unit===u?' selected':''}>${u}</option>`).join('')}
       </select>
@@ -2776,6 +2863,7 @@ async function installPWA() {
       <select id="earth-shape" onchange="updateEarthInputs()">
         <option value="rect">직사각형 (터파기)</option>
         <option value="circle">원형 (맨홀 · 원형기초)</option>
+        <option value="trapezoid">사다리꼴 (비탈면 절성토)</option>
       </select>
     </div>
     <div id="earth-rect-inputs">
@@ -2788,8 +2876,21 @@ async function installPWA() {
       <label style="margin-top:14px;">직경 (m)</label>
       <input type="number" id="earth-dia" placeholder="굴착 직경" inputmode="decimal" step="0.01">
     </div>
-    <label>굴착 깊이 (m)</label>
-    <input type="number" id="earth-depth" placeholder="깊이" inputmode="decimal" step="0.01">
+    <div id="earth-trapezoid-inputs" style="display:none;">
+      <div class="mulch-info" style="margin-top:10px; margin-bottom:0;">단면 (W₁+W₂)/2 × H × 연장 L</div>
+      <label style="margin-top:10px;">상부 폭 W₁ (m)</label>
+      <input type="number" id="earth-tw1" placeholder="비탈 위쪽 너비" inputmode="decimal" step="0.1">
+      <label>하부 폭 W₂ (m)</label>
+      <input type="number" id="earth-tw2" placeholder="비탈 아래쪽 너비" inputmode="decimal" step="0.1">
+      <label>단면 높이 H (m)</label>
+      <input type="number" id="earth-th" placeholder="비탈 높이(깊이)" inputmode="decimal" step="0.1">
+      <label>연장 L (m)</label>
+      <input type="number" id="earth-tl" placeholder="구간 길이" inputmode="decimal" step="0.5">
+    </div>
+    <div id="earth-depth-row">
+      <label>굴착 깊이 (m)</label>
+      <input type="number" id="earth-depth" placeholder="깊이" inputmode="decimal" step="0.01">
+    </div>
     <label>흙 종류 (팽창 L값)</label>
     <div class="select-wrap">
       <select id="earth-lval">
