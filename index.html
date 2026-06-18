@@ -542,9 +542,10 @@
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
-      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.618.20</span>
+      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.10</span>
     </div>
     <div style="text-align:right; flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+      <button class="share-header-btn" onclick="openHistoryModal()" style="background:var(--green-mid); color:#fff;">📋 계산 이력</button>
       <button class="share-header-btn" onclick="openShareModal()">📤 공유·설치</button>
       <div style="position:relative;">
         <button class="theme-palette-btn" onclick="toggleThemePopup(event)" title="테마 색상">🎨</button>
@@ -575,6 +576,8 @@
   <button class="tab-btn" onclick="showTab('manage', this)">현장 관리</button>
   <button class="tab-btn" onclick="showTab('photo', this)">사진 측정</button>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
+  <button class="tab-btn" onclick="showTab('irrig', this)">관수·포장</button>
+  <button class="tab-btn" onclick="showTab('plantdb', this)">식물 DB</button>
 </nav>
 
 <!-- 잔디 소요량 탭 -->
@@ -994,6 +997,234 @@
     </table>
     <p class="price-note">※ 조경설계기준·표준시방서 참고치. 실제 규격은 현장·설계도서 기준 적용.</p>
   </div>
+
+  <!-- 노임단가 참고표 -->
+  <div class="card">
+    <div class="card-title">👷 2025 시중 노임단가 참고표</div>
+    <div class="mulch-info">※ 대한건설협회 공표 기준 참고치 (2025년 상반기). 실제 적용 시 최신 공표값을 확인하세요.</div>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th colspan="2">조경 직종</th></tr>
+      <tr><td>조경공</td><td>￦232,000 / 일</td></tr>
+      <tr><td>조경조장</td><td>￦254,000 / 일</td></tr>
+      <tr><td>보통인부</td><td>￦168,000 / 일</td></tr>
+      <tr><td>특별인부</td><td>￦197,000 / 일</td></tr>
+      <tr><td>잡공 (조경)</td><td>￦160,000 / 일</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th colspan="2">토목·건설 직종</th></tr>
+      <tr><td>토목공</td><td>￦242,000 / 일</td></tr>
+      <tr><td>철근공</td><td>￦258,000 / 일</td></tr>
+      <tr><td>거푸집목공</td><td>￦252,000 / 일</td></tr>
+      <tr><td>콘크리트공</td><td>￦224,000 / 일</td></tr>
+      <tr><td>포장공</td><td>￦228,000 / 일</td></tr>
+      <tr><td>측량사</td><td>￦281,000 / 일</td></tr>
+      <tr><td>굴삭기 운전원</td><td>￦274,000 / 일</td></tr>
+      <tr><td>항타기 운전원</td><td>￦283,000 / 일</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:8px;">※ 출처: 대한건설협회 시중노임단가. 지역·현장 조건에 따라 차이가 있을 수 있습니다.</p>
+  </div>
+</div>
+
+<!-- ── 관수·포장 탭 ── -->
+<div id="tab-irrig" class="tab-content">
+
+  <!-- 관수 시스템 계산기 -->
+  <div class="card">
+    <div class="card-title">💧 관수 시스템 계산기</div>
+
+    <label>시공 면적 (㎡)</label>
+    <input type="number" id="irrig-area" placeholder="관수 구역 면적" inputmode="decimal" step="1">
+
+    <label style="margin-top:14px;">스프링클러 종류</label>
+    <div class="select-wrap">
+      <select id="irrig-type" onchange="updateIrrigType()">
+        <option value="popup-s">팝업 소형 (반경 2.5m, 0.5 L/min)</option>
+        <option value="popup-m">팝업 중형 (반경 4.0m, 1.2 L/min)</option>
+        <option value="rotor">로터리형 (반경 7.5m, 3.5 L/min)</option>
+        <option value="drip">점적관수 (방울이)</option>
+      </select>
+    </div>
+
+    <div id="irrig-drip-inputs" style="display:none; margin-top:10px;">
+      <label>방울이 간격 (cm)</label>
+      <input type="number" id="irrig-drip-row" placeholder="열 간격, 예) 30" inputmode="decimal" step="5" value="30">
+      <label style="margin-top:10px;">열 간격 (cm)</label>
+      <input type="number" id="irrig-drip-col" placeholder="방울이 간격, 예) 30" inputmode="decimal" step="5" value="30">
+    </div>
+
+    <label style="margin-top:14px;">배치 방식</label>
+    <div class="radio-group">
+      <label><input type="radio" name="irrig-layout" value="square" checked><span>정방형</span></label>
+      <label><input type="radio" name="irrig-layout" value="tri"><span>삼각형 (효율↑)</span></label>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcIrrig()">계산</button>
+      <button class="reset-btn" onclick="resetIrrig()">초기화</button>
+    </div>
+
+    <div class="result-box" id="irrig-result">
+      <div class="result-title">💧 관수 계산 결과</div>
+      <div class="result-row"><span class="result-label">헤드 수량</span><span class="result-value big" id="r-irrig-heads">-</span></div>
+      <div class="result-row"><span class="result-label">구역 수 (Zone)</span><span class="result-value" id="r-irrig-zones">-</span></div>
+      <div class="result-row"><span class="result-label">총 유량</span><span class="result-value" id="r-irrig-flow">-</span></div>
+      <div class="result-row"><span class="result-label">주관 길이 추정</span><span class="result-value" id="r-irrig-pipe">-</span></div>
+      <div class="result-note" id="r-irrig-note"></div>
+    </div>
+  </div>
+
+  <!-- 포장 재료량 계산기 -->
+  <div class="card">
+    <div class="card-title">🛣 포장 재료량 계산기</div>
+
+    <label>포장 면적 (㎡)</label>
+    <input type="number" id="pave2-area" placeholder="시공 면적" inputmode="decimal" step="1">
+
+    <label style="margin-top:14px;">포장 종류</label>
+    <div class="select-wrap">
+      <select id="pave2-type" onchange="updatePave2Type()">
+        <option value="asphalt">아스팔트 포장</option>
+        <option value="concrete">콘크리트 포장</option>
+        <option value="block">인터로킹 블록 포장</option>
+      </select>
+    </div>
+
+    <div id="pave2-asphalt-inputs">
+      <div class="mulch-info" style="margin-top:10px; margin-bottom:0;">표층·중간층·기층 각 두께 입력 (cm)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:10px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">표층 (cm)</div>
+          <input type="number" id="pave2-as-top" value="5" inputmode="decimal" step="1">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">기층 (cm)</div>
+          <input type="number" id="pave2-as-base" value="7" inputmode="decimal" step="1">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">보조기층 (cm)</div>
+          <input type="number" id="pave2-as-sub" value="15" inputmode="decimal" step="5">
+        </div>
+      </div>
+    </div>
+
+    <div id="pave2-concrete-inputs" style="display:none;">
+      <div class="mulch-info" style="margin-top:10px; margin-bottom:0;">슬래브·보조기층 두께 입력 (cm)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">콘크리트 슬래브 (cm)</div>
+          <input type="number" id="pave2-con-slab" value="20" inputmode="decimal" step="1">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">보조기층 (cm)</div>
+          <input type="number" id="pave2-con-sub" value="15" inputmode="decimal" step="5">
+        </div>
+      </div>
+    </div>
+
+    <div id="pave2-block-inputs" style="display:none;">
+      <div class="mulch-info" style="margin-top:10px; margin-bottom:0;">블록·모래층·보조기층 두께 입력 (cm)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:10px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">블록 두께 (cm)</div>
+          <input type="number" id="pave2-blk-thick" value="8" inputmode="decimal" step="1">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">모래층 (cm)</div>
+          <input type="number" id="pave2-blk-sand" value="5" inputmode="decimal" step="1">
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-sub); margin-bottom:4px;">보조기층 (cm)</div>
+          <input type="number" id="pave2-blk-sub" value="15" inputmode="decimal" step="5">
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:20px;">
+      <button class="calc-btn" onclick="calcPave2()">계산</button>
+      <button class="reset-btn" onclick="resetPave2()">초기화</button>
+    </div>
+
+    <div class="result-box" id="pave2-result">
+      <div class="result-title">🛣 포장 재료량 결과</div>
+      <div id="r-pave2-rows"></div>
+      <div class="result-note" id="r-pave2-note"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 식물 DB 탭 ── -->
+<div id="tab-plantdb" class="tab-content">
+
+  <!-- 식물 검색 -->
+  <div class="card">
+    <div class="card-title">🔍 수종 검색</div>
+    <div class="mulch-info">수종명 (또는 분류·특성 키워드) 입력 → 규격·생육 정보 조회</div>
+    <input type="text" id="plant-search" placeholder="예) 느티나무, 관목, 그늘, 내한" oninput="searchPlants()" style="margin-top:10px;">
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('교목')">교목</button>
+      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('관목')">관목</button>
+      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('지피')">지피·잔디</button>
+      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('덩굴')">덩굴</button>
+      <button class="reset-btn" style="padding:6px 10px; font-size:12px;" onclick="filterPlants('')">전체</button>
+    </div>
+    <div id="plant-result-list" style="margin-top:12px;"></div>
+  </div>
+
+  <!-- 식재 시기 달력 -->
+  <div class="card">
+    <div class="card-title">📅 수종별 식재 적기</div>
+    <div class="mulch-info">🟢 최적  🟡 가능 (관수·차광 필요)  ⬜ 주의 또는 비권장</div>
+    <div style="overflow-x:auto; margin-top:10px;">
+      <table class="price-table" style="min-width:520px;">
+        <tr>
+          <th>수종 분류</th>
+          <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+          <th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th>
+        </tr>
+        <tr>
+          <td><b>낙엽교목</b></td>
+          <td>🟡</td><td>🟡</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>🟡</td>
+        </tr>
+        <tr>
+          <td><b>상록교목</b></td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+        </tr>
+        <tr>
+          <td><b>낙엽관목</b></td>
+          <td>🟡</td><td>🟡</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>🟡</td>
+        </tr>
+        <tr>
+          <td><b>상록관목</b></td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+        </tr>
+        <tr>
+          <td><b>한국잔디</b></td>
+          <td>⬜</td><td>⬜</td><td>⬜</td><td>🟡</td><td>🟢</td><td>🟢</td>
+          <td>🟡</td><td>🟡</td><td>🟢</td><td>🟡</td><td>⬜</td><td>⬜</td>
+        </tr>
+        <tr>
+          <td><b>서양잔디</b></td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+          <td>⬜</td><td>🟡</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+        </tr>
+        <tr>
+          <td><b>지피류</b></td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟡</td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+        </tr>
+        <tr>
+          <td><b>덩굴류</b></td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+          <td>⬜</td><td>⬜</td><td>🟢</td><td>🟢</td><td>🟡</td><td>⬜</td>
+        </tr>
+      </table>
+    </div>
+    <p class="price-note" style="margin-top:8px;">※ 기후·지역에 따라 차이가 있음. 한랭지(고산·북부)는 봄 식재 권장, 난대지(남해안·제주)는 동계 식재 가능.</p>
+  </div>
 </div>
 
 <script>
@@ -1024,6 +1255,457 @@ function toggleThemePopup(e) {
 document.addEventListener('click', () => {
   document.getElementById('theme-popup').classList.remove('open');
 });
+
+// ── 관수 시스템 ──────────────────────────────────────────
+const IRRIG_SPECS = {
+  'popup-s': { r:2.5, flow:0.5,  label:'팝업 소형' },
+  'popup-m': { r:4.0, flow:1.2,  label:'팝업 중형' },
+  'rotor':   { r:7.5, flow:3.5,  label:'로터리형' },
+};
+function updateIrrigType() {
+  const v = document.getElementById('irrig-type').value;
+  document.getElementById('irrig-drip-inputs').style.display = v === 'drip' ? 'block' : 'none';
+}
+function calcIrrig() {
+  const area    = parseFloat(document.getElementById('irrig-area').value);
+  const type    = document.getElementById('irrig-type').value;
+  const layout  = document.querySelector('input[name="irrig-layout"]:checked').value;
+  if (!area || area <= 0) { alert('시공 면적을 입력하세요'); return; }
+
+  let heads, totalFlow, note;
+  if (type === 'drip') {
+    const rowSpacing = parseFloat(document.getElementById('irrig-drip-row').value) / 100;
+    const colSpacing = parseFloat(document.getElementById('irrig-drip-col').value) / 100;
+    if (!rowSpacing || !colSpacing) { alert('방울이·열 간격을 입력하세요'); return; }
+    heads = Math.ceil(area / (rowSpacing * colSpacing));
+    totalFlow = heads * 2 / 60;
+    const rows = Math.ceil(Math.sqrt(area) / rowSpacing);
+    note = '방울이 간격 ' + (rowSpacing*100).toFixed(0) + 'cm × 열 간격 ' + (colSpacing*100).toFixed(0) + 'cm\n유량 2 L/h/개 기준';
+    document.getElementById('irrig-result').classList.add('show');
+    document.getElementById('r-irrig-heads').textContent = heads.toLocaleString() + '개';
+    document.getElementById('r-irrig-zones').textContent = Math.ceil(totalFlow / 15) + '구역  (15 L/min/구역 기준)';
+    document.getElementById('r-irrig-flow').textContent  = (heads * 2).toFixed(0) + ' L/h  (' + totalFlow.toFixed(2) + ' L/min)';
+    document.getElementById('r-irrig-pipe').textContent  = (Math.sqrt(area) * 1.3).toFixed(0) + ' m (주관 추정)';
+    document.getElementById('r-irrig-note').textContent  = note;
+    addHistory('관수 시스템', '점적관수 ' + heads + '개, ' + Math.ceil(totalFlow/15) + '구역');
+    return;
+  }
+  const spec    = IRRIG_SPECS[type];
+  const spacing = layout === 'tri' ? spec.r * 1.15 : spec.r;
+  const efficiency = layout === 'tri' ? 0.866 : 1.0;
+  heads = Math.ceil(area / (spacing * spacing * efficiency));
+  heads = Math.ceil(heads * 1.05);
+  totalFlow = heads * spec.flow;
+  const headsPerZone = Math.floor(15 / spec.flow);
+  const zones = Math.ceil(heads / headsPerZone);
+  document.getElementById('irrig-result').classList.add('show');
+  document.getElementById('r-irrig-heads').textContent = heads + '개';
+  document.getElementById('r-irrig-zones').textContent = zones + '구역  (' + headsPerZone + '개/구역 기준)';
+  document.getElementById('r-irrig-flow').textContent  = totalFlow.toFixed(1) + ' L/min  (구역당 ' + (headsPerZone * spec.flow).toFixed(1) + ' L/min)';
+  document.getElementById('r-irrig-pipe').textContent  = (Math.sqrt(area) * 1.4).toFixed(0) + ' m (주관 추정)';
+  document.getElementById('r-irrig-note').textContent  =
+    spec.label + ' | 살수반경 ' + spec.r + 'm | 헤드 간격 ' + spacing.toFixed(1) + 'm\n' +
+    (layout === 'tri' ? '삼각형 배치 (효율 15%↑)' : '정방형 배치') + ' | 5% 여유 포함';
+  addHistory('관수 시스템', spec.label + ' ' + heads + '개, ' + zones + '구역');
+}
+function resetIrrig() {
+  document.getElementById('irrig-area').value = '';
+  document.getElementById('irrig-type').value = 'popup-s';
+  document.getElementById('irrig-drip-inputs').style.display = 'none';
+  document.querySelector('input[name="irrig-layout"][value="square"]').checked = true;
+  document.getElementById('irrig-result').classList.remove('show');
+}
+
+// ── 포장 재료량 ──────────────────────────────────────────
+function updatePave2Type() {
+  const v = document.getElementById('pave2-type').value;
+  document.getElementById('pave2-asphalt-inputs').style.display  = v === 'asphalt'  ? 'block' : 'none';
+  document.getElementById('pave2-concrete-inputs').style.display = v === 'concrete' ? 'block' : 'none';
+  document.getElementById('pave2-block-inputs').style.display    = v === 'block'    ? 'block' : 'none';
+}
+function calcPave2() {
+  const area = parseFloat(document.getElementById('pave2-area').value);
+  const type = document.getElementById('pave2-type').value;
+  if (!area || area <= 0) { alert('포장 면적을 입력하세요'); return; }
+
+  const rows = [];
+  let note = '';
+
+  if (type === 'asphalt') {
+    const tTop  = parseFloat(document.getElementById('pave2-as-top').value)  / 100;
+    const tBase = parseFloat(document.getElementById('pave2-as-base').value) / 100;
+    const tSub  = parseFloat(document.getElementById('pave2-as-sub').value)  / 100;
+    const dens  = 2.35;
+    rows.push(['표층 아스팔트 콘크리트', (area * tTop).toFixed(2) + ' m³', (area * tTop * dens).toFixed(2) + ' t']);
+    rows.push(['기층 아스팔트 콘크리트', (area * tBase).toFixed(2) + ' m³', (area * tBase * dens).toFixed(2) + ' t']);
+    rows.push(['보조기층 쇄석', (area * tSub).toFixed(2) + ' m³', (area * tSub * 1.8).toFixed(2) + ' t']);
+    const totalAC = (area * tTop + area * tBase) * dens;
+    note = '아스팔트 콘크리트 합계: ' + totalAC.toFixed(2) + ' t\n밀도 AC=2.35 t/m³, 쇄석=1.8 t/m³ 기준';
+  } else if (type === 'concrete') {
+    const tSlab = parseFloat(document.getElementById('pave2-con-slab').value) / 100;
+    const tSub  = parseFloat(document.getElementById('pave2-con-sub').value)  / 100;
+    const volCon = area * tSlab;
+    rows.push(['콘크리트 슬래브', volCon.toFixed(2) + ' m³', Math.ceil(volCon / 6) + ' 대  (6 m³/대)']);
+    rows.push(['보조기층 쇄석', (area * tSub).toFixed(2) + ' m³', (area * tSub * 1.8).toFixed(2) + ' t']);
+    note = '레미콘 6 m³/대, 10% 여유 포함 → ' + Math.ceil(volCon * 1.1 / 6) + '대 권장';
+  } else {
+    const blkArea = area * 1.03;
+    const tSand = parseFloat(document.getElementById('pave2-blk-sand').value)  / 100;
+    const tSub  = parseFloat(document.getElementById('pave2-blk-sub').value)   / 100;
+    rows.push(['인터로킹 블록', blkArea.toFixed(2) + ' m²  (3% 여유)', '-']);
+    rows.push(['모래 기층', (area * tSand).toFixed(2) + ' m³', (area * tSand * 1.6).toFixed(2) + ' t']);
+    rows.push(['보조기층 쇄석', (area * tSub).toFixed(2) + ' m³', (area * tSub * 1.8).toFixed(2) + ' t']);
+    note = '모래 밀도 1.6 t/m³, 쇄석 1.8 t/m³ 기준';
+  }
+
+  let html = '<table class="price-table"><tr><th>항목</th><th>수량</th><th>비고</th></tr>';
+  rows.forEach(r => { html += '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; });
+  html += '</table>';
+  document.getElementById('r-pave2-rows').innerHTML = html;
+  document.getElementById('r-pave2-note').textContent = note;
+  document.getElementById('pave2-result').classList.add('show');
+  addHistory('포장 재료량', area + ' m² ' + {'asphalt':'아스팔트','concrete':'콘크리트','block':'블록'}[type]);
+}
+function resetPave2() {
+  document.getElementById('pave2-area').value = '';
+  document.getElementById('pave2-type').value = 'asphalt';
+  updatePave2Type();
+  document.getElementById('pave2-result').classList.remove('show');
+}
+
+// ── 절성토 평균단면적법 ──────────────────────────────────
+const avgRows = [];
+function renderAvgRows() {
+  const wrap = document.getElementById('avg-section-rows');
+  if (!avgRows.length) {
+    wrap.innerHTML = '<div style="text-align:center; color:var(--text-sub); font-size:13px; padding:12px 0;">측점을 2개 이상 추가하세요</div>';
+    return;
+  }
+  let html = '<div style="display:grid; grid-template-columns:auto 1fr 1fr; gap:6px 8px; align-items:center;">';
+  html += '<div style="font-size:11px; color:var(--text-sub);">측점</div>';
+  html += '<div style="font-size:11px; color:var(--text-sub);">단면적 (m²)</div>';
+  html += '<div style="font-size:11px; color:var(--text-sub);">구간 거리 (m)</div>';
+  avgRows.forEach((row, i) => {
+    html += '<div style="font-size:12px; font-weight:600; color:var(--text-sub);">P' + (i+1) + '</div>';
+    html += '<input type="number" value="' + (row.area||'') + '" placeholder="단면적" inputmode="decimal" step="0.1" oninput="avgRows[' + i + '].area=parseFloat(this.value)||0">';
+    html += '<input type="number" value="' + (row.dist||'') + '" placeholder="' + (i < avgRows.length-1 ? '다음까지 거리' : '(마지막)') + '" inputmode="decimal" step="1" ' + (i===avgRows.length-1?'disabled style="opacity:0.4"':'') + ' oninput="avgRows[' + i + '].dist=parseFloat(this.value)||0">';
+  });
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+function addAvgRow() {
+  avgRows.push({ area: 0, dist: 0 });
+  renderAvgRows();
+}
+function removeAvgRow() {
+  if (avgRows.length > 0) avgRows.pop();
+  renderAvgRows();
+}
+function calcAvgSection() {
+  if (avgRows.length < 2) { alert('측점을 2개 이상 추가하세요'); return; }
+  let tableHtml = '<table class="price-table"><tr><th>구간</th><th>A₁ (m²)</th><th>A₂ (m²)</th><th>거리 (m)</th><th>토량 (m³)</th></tr>';
+  let total = 0;
+  for (let i = 0; i < avgRows.length - 1; i++) {
+    const a1 = avgRows[i].area, a2 = avgRows[i+1].area, L = avgRows[i].dist;
+    if (!L || L <= 0) { alert('P' + (i+1) + ' 구간 거리를 입력하세요'); return; }
+    const vol = (a1 + a2) / 2 * L;
+    total += vol;
+    tableHtml += '<tr><td>P' + (i+1) + '→P' + (i+2) + '</td><td>' + a1.toFixed(2) + '</td><td>' + a2.toFixed(2) + '</td><td>' + L.toFixed(1) + '</td><td>' + vol.toFixed(2) + '</td></tr>';
+  }
+  tableHtml += '</table>';
+  document.getElementById('r-avg-table').innerHTML = tableHtml;
+  document.getElementById('r-avg-total').textContent = total.toFixed(3) + ' m³';
+  document.getElementById('r-avg-note').textContent = '평균단면적법: V = (A₁+A₂)/2 × L\n총 구간: ' + (avgRows.length-1) + '개';
+  document.getElementById('avg-section-result').classList.add('show');
+  addHistory('절성토 평균단면적법', '총 ' + total.toFixed(2) + ' m³ (' + (avgRows.length-1) + '구간)');
+}
+function resetAvgSection() {
+  avgRows.length = 0;
+  renderAvgRows();
+  document.getElementById('avg-section-result').classList.remove('show');
+}
+
+// ── 옹벽 간이 검토 ──────────────────────────────────────
+function calcWall() {
+  const H      = parseFloat(document.getElementById('wall-h').value);
+  const B      = parseFloat(document.getElementById('wall-b').value);
+  const a      = parseFloat(document.getElementById('wall-a').value);
+  const phi    = parseFloat(document.getElementById('wall-phi').value);
+  const gamma  = parseFloat(document.getElementById('wall-gamma').value);
+  const gammac = parseFloat(document.getElementById('wall-gammac').value);
+  if (!H||!B||!a||!phi||!gamma) { alert('모든 값을 입력하세요'); return; }
+  if (a >= B) { alert('상단 폭(a)은 기초 폭(B)보다 작아야 합니다'); return; }
+
+  const phiR = phi * Math.PI / 180;
+  const Ka   = Math.pow(Math.tan(Math.PI/4 - phiR/2), 2);
+  const Pa   = 0.5 * Ka * gamma * H * H;
+  const W    = gammac * (a + B) / 2 * H;
+  const xCg  = B * (B + 2*a) / (3 * (a + B));
+  const Mr   = W * xCg;
+  const Mo   = Pa * H / 3;
+  const Fr   = W * Math.tan(phiR);
+  const fsOvt   = Mr / Mo;
+  const fsSlide = Fr / Pa;
+  const e    = B/2 - (Mr - Mo) / W;
+
+  const slideEl = document.getElementById('r-wall-slide');
+  const ovtEl   = document.getElementById('r-wall-overturning');
+  slideEl.textContent = fsSlide.toFixed(2) + (fsSlide >= 1.5 ? ' ✅' : ' ❌');
+  slideEl.style.color = fsSlide >= 1.5 ? 'var(--green-light)' : '#ef4444';
+  ovtEl.textContent   = fsOvt.toFixed(2)   + (fsOvt   >= 2.0 ? ' ✅' : ' ❌');
+  ovtEl.style.color   = fsOvt   >= 2.0 ? 'var(--green-light)' : '#ef4444';
+  document.getElementById('r-wall-ecc').textContent  = e.toFixed(3) + ' m  (B/6 = ' + (B/6).toFixed(3) + ' m' + (Math.abs(e) <= B/6 ? ' ✅' : ' ❌') + ')';
+  document.getElementById('r-wall-pa').textContent   = Pa.toFixed(2) + ' kN/m';
+  document.getElementById('r-wall-w').textContent    = W.toFixed(2)  + ' kN/m';
+  document.getElementById('r-wall-note').textContent =
+    'Ka=' + Ka.toFixed(3) + '  φ=' + phi + '°  γ=' + gamma + ' kN/m³\n' +
+    '중력식 옹벽 (사다리꼴 단면, 앞면 수직 가정)\n⚠ 예비 검토용. 정식 설계 시 전문가 확인 필요';
+  document.getElementById('wall-result').classList.add('show');
+  addHistory('옹벽 검토', 'H=' + H + 'm  활동FS=' + fsSlide.toFixed(2) + '  전도FS=' + fsOvt.toFixed(2));
+}
+function resetWall() {
+  ['wall-h','wall-b','wall-a'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('wall-phi').value   = '30';
+  document.getElementById('wall-gamma').value = '18';
+  document.getElementById('wall-gammac').value= '24';
+  document.getElementById('wall-result').classList.remove('show');
+}
+
+// ── 좌표·방위각 계산 ──────────────────────────────────────
+function ddToDMS(dd) {
+  const deg = Math.floor(dd);
+  const mf  = (dd - deg) * 60;
+  const min = Math.floor(mf);
+  const sec = ((mf - min) * 60).toFixed(1);
+  return deg + '°' + String(min).padStart(2,'0') + '′' + String(sec).padStart(4,'0') + '″';
+}
+function calcCoord() {
+  const ax = parseFloat(document.getElementById('coord-ax').value);
+  const ay = parseFloat(document.getElementById('coord-ay').value);
+  const bx = parseFloat(document.getElementById('coord-bx').value);
+  const by = parseFloat(document.getElementById('coord-by').value);
+  const ox = parseFloat(document.getElementById('coord-ox').value);
+  const oy = parseFloat(document.getElementById('coord-oy').value);
+  const cdist   = parseFloat(document.getElementById('coord-dist').value);
+  const bearing = parseFloat(document.getElementById('coord-bearing').value);
+
+  document.getElementById('coord-result').classList.add('show');
+
+  if (!isNaN(ax) && !isNaN(ay) && !isNaN(bx) && !isNaN(by)) {
+    const dx = bx - ax, dy = by - ay;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    let azimuth = Math.atan2(dx, dy) * 180 / Math.PI;
+    if (azimuth < 0) azimuth += 360;
+    const back = (azimuth + 180) % 360;
+    document.getElementById('r-coord-dist').textContent    = dist.toFixed(3) + ' m';
+    document.getElementById('r-coord-bearing').textContent = azimuth.toFixed(4) + '°  (' + ddToDMS(azimuth) + ')';
+    document.getElementById('r-coord-back').textContent    = back.toFixed(4) + '°  (' + ddToDMS(back) + ')';
+    document.getElementById('r-coord-dx').textContent      = dx.toFixed(3) + ' m';
+    document.getElementById('r-coord-dy').textContent      = dy.toFixed(3) + ' m';
+    addHistory('좌표·방위각', 'A→B 거리 ' + dist.toFixed(3) + 'm  방위각 ' + azimuth.toFixed(2) + '°');
+  } else {
+    ['r-coord-dist','r-coord-bearing','r-coord-back','r-coord-dx','r-coord-dy'].forEach(id => document.getElementById(id).textContent = '-');
+  }
+
+  if (!isNaN(ox) && !isNaN(oy) && !isNaN(cdist) && !isNaN(bearing)) {
+    const bearRad = bearing * Math.PI / 180;
+    const nx = ox + cdist * Math.sin(bearRad);
+    const ny = oy + cdist * Math.cos(bearRad);
+    document.getElementById('r-coord-nx').textContent = nx.toFixed(3);
+    document.getElementById('r-coord-ny').textContent = ny.toFixed(3);
+    document.getElementById('r-coord-note').textContent = '방위각 ' + bearing + '° 방향으로 ' + cdist + 'm → (' + nx.toFixed(3) + ', ' + ny.toFixed(3) + ')';
+  } else {
+    document.getElementById('r-coord-nx').textContent = '-';
+    document.getElementById('r-coord-ny').textContent = '-';
+  }
+}
+function resetCoord() {
+  ['coord-ax','coord-ay','coord-bx','coord-by','coord-ox','coord-oy','coord-dist','coord-bearing'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('coord-result').classList.remove('show');
+}
+
+// ── 현장 체크리스트 ──────────────────────────────────────
+const CHECKLISTS = {
+  tree: { title:'수목 식재', items:['굴착 위치·규격 확인', '배수층 처리 (자갈 10cm)', '객토·부엽토 혼합 확인', '수목 방향 설정 (수형 확인)', '지주목 설치', '결속·완충재 확인', '복토 후 밟아 다짐', '멀칭 처리 (두께 5~10cm)', '충분한 관수 실시', '수세 (접목·병해충) 확인'] },
+  grass: { title:'잔디 시공', items:['토양 정지 작업', '이물질 제거', '토양 pH 확인 (5.5~6.5)', '시공 면적 측량', '잔디 눈 방향 확인', '모접기 없이 밀착 시공', '줄눈 엇갈림 확인', '롤러 다짐', '배토 (모래 2~3mm)', '충분한 관수', '활착 전 보행 통제'] },
+  concrete: { title:'콘크리트 타설', items:['거푸집 청소·이음 확인', '철근 배근·피복 두께 확인', '레미콘 슬럼프 확인 (12±2.5cm)', '타설 순서 계획', '바이브레이터 간격 (50cm 이내)', '이어치기 위치 확인', '물·시멘트비 준수', '타설 후 양생 (7일 이상)', '이음부 처리', '거푸집 탈형 시기 확인'] },
+  inspect: { title:'준공 검수', items:['설계도서 대비 위치 확인', '수목 규격 확인 (H·W·R)', '수목 활착 상태 확인', '지주목 설치 상태', '잔디 활착·균일도', '포장 균열·침하 확인', '배수 시설 작동 확인', '관수 시설 작동', '시설물 도색·마감', '청소 상태', '준공 사진 촬영'] },
+};
+function loadChecklist() {
+  const type = document.querySelector('input[name="checklist-type"]:checked').value;
+  const cl   = CHECKLISTS[type];
+  let saved  = [];
+  try { saved = JSON.parse(localStorage.getItem('wdr-cl-' + type) || '[]'); } catch(e) {}
+  const items = cl.items;
+  let html = '';
+  items.forEach((item, i) => {
+    const checked = saved[i] ? 'checked' : '';
+    html += '<label style="display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer;">' +
+      '<input type="checkbox" ' + checked + ' onchange="saveChecklistItem(\'' + type + '\',' + i + ',this.checked)" style="margin-top:2px; width:18px; height:18px; accent-color:var(--green-light); flex-shrink:0;">' +
+      '<span style="font-size:14px; line-height:1.4; ' + (saved[i] ? 'text-decoration:line-through; color:var(--text-sub);' : '') + '">' + item + '</span></label>';
+  });
+  document.getElementById('checklist-items').innerHTML = html;
+  updateChecklistProgress(type);
+  document.getElementById('checklist-progress').style.display = 'block';
+}
+function saveChecklistItem(type, idx, checked) {
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem('wdr-cl-' + type) || '[]'); } catch(e) {}
+  saved[idx] = checked;
+  try { localStorage.setItem('wdr-cl-' + type, JSON.stringify(saved)); } catch(e) {}
+  loadChecklist();
+}
+function updateChecklistProgress(type) {
+  const cl    = CHECKLISTS[type];
+  let saved   = [];
+  try { saved = JSON.parse(localStorage.getItem('wdr-cl-' + type) || '[]'); } catch(e) {}
+  const done  = cl.items.filter((_, i) => saved[i]).length;
+  const total = cl.items.length;
+  const pct   = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('checklist-progress-label').textContent = done + ' / ' + total + ' 완료';
+  document.getElementById('checklist-pct').textContent            = pct + '%';
+  document.getElementById('checklist-bar').style.width            = pct + '%';
+}
+function resetChecklist() {
+  const type = document.querySelector('input[name="checklist-type"]:checked').value;
+  try { localStorage.removeItem('wdr-cl-' + type); } catch(e) {}
+  loadChecklist();
+}
+
+// ── 식물 DB ──────────────────────────────────────────────
+const PLANT_DB = [
+  {n:'느티나무', c:'낙엽교목', h:'3.0~6.0', w:'1.5~3.5', r:'R8~20', env:'양수', tag:'내한·가로수·공원·내공해'},
+  {n:'왕벚나무', c:'낙엽교목', h:'3.5~5.0', w:'1.5~2.5', r:'R8~15', env:'양수', tag:'봄꽃·관상·가로수'},
+  {n:'이팝나무', c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15', env:'양수', tag:'봄꽃·가로수·내한'},
+  {n:'회화나무', c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'R10~20', env:'양수', tag:'가로수·내공해·내건'},
+  {n:'은행나무', c:'낙엽교목', h:'3.5~6.0', w:'1.0~2.0', r:'B6~15', env:'양수', tag:'가로수·내공해·단풍'},
+  {n:'단풍나무', c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R5~8', env:'반음', tag:'단풍·정원·관상'},
+  {n:'목련', c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R6~10', env:'양수', tag:'봄꽃·향기·정원'},
+  {n:'산수유', c:'낙엽교목', h:'2.0~3.5', w:'1.5~2.5', r:'R6~12', env:'양수', tag:'봄꽃·열매·정원'},
+  {n:'자귀나무', c:'낙엽교목', h:'2.5~4.0', w:'2.0~3.0', r:'R8~15', env:'양수', tag:'여름꽃·내건·정원'},
+  {n:'소나무', c:'상록교목', h:'2.0~4.0', w:'1.0~2.0', r:'R6~15', env:'양수', tag:'내건·상징목·정원'},
+  {n:'향나무', c:'상록교목', h:'1.5~2.5', w:'0.5~0.8', r:'R4~8', env:'양수', tag:'조형·정원·경계'},
+  {n:'스트로브잣나무', c:'상록교목', h:'2.0~3.5', w:'1.0~2.0', r:'R5~12', env:'양수', tag:'내한·북방계·배경'},
+  {n:'편백나무', c:'상록교목', h:'2.0~4.0', w:'0.6~1.2', r:'R5~12', env:'반음', tag:'피톤치드·수직형·내음'},
+  {n:'사철나무', c:'상록관목', h:'0.4~1.0', w:'0.3~0.8', r:'-', env:'반음', tag:'경계·생울타리·내음·내공해'},
+  {n:'먼나무', c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10', env:'양수', tag:'남부수종·열매·정원'},
+  {n:'동백나무', c:'상록교목', h:'1.5~3.0', w:'0.8~1.5', r:'-', env:'반음', tag:'겨울꽃·남부·그늘'},
+  {n:'후박나무', c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10', env:'양수', tag:'남부·내조성·해안'},
+  {n:'철쭉', c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', env:'반음', tag:'봄꽃·군식·산성토'},
+  {n:'산철쭉', c:'낙엽관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', env:'반음', tag:'봄꽃·군식·자생'},
+  {n:'영산홍', c:'상록관목', h:'0.3~0.4', w:'0.3~0.4', r:'-', env:'반음', tag:'봄꽃·군식·경계'},
+  {n:'개나리', c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', env:'양수', tag:'봄꽃·비탈면·경계'},
+  {n:'조팝나무', c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', env:'양수', tag:'봄꽃·군식·경계'},
+  {n:'회양목', c:'상록관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', env:'반음', tag:'조형·경계·내음'},
+  {n:'수수꽃다리', c:'낙엽관목', h:'1.0~1.5', w:'0.6~1.0', r:'-', env:'양수', tag:'향기꽃·정원·봄'},
+  {n:'황매화', c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', env:'반음', tag:'봄꽃·내음·정원'},
+  {n:'무궁화', c:'낙엽관목', h:'1.0~1.5', w:'0.6~1.0', r:'-', env:'양수', tag:'국화·여름꽃·경계'},
+  {n:'낙상홍', c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', env:'양수', tag:'겨울열매·관상·정원'},
+  {n:'쥐똥나무', c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', env:'양수', tag:'생울타리·내공해·내건'},
+  {n:'꽝꽝나무', c:'상록관목', h:'0.4~0.8', w:'0.4~0.8', r:'-', env:'반음', tag:'생울타리·내염·해안'},
+  {n:'피라칸사', c:'상록관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', env:'양수', tag:'가을열매·가시·경계'},
+  {n:'맥문동', c:'지피', h:'0.2~0.3', w:'-', r:'-', env:'반음', tag:'그늘·경계·내음'},
+  {n:'옥잠화', c:'지피', h:'0.3~0.5', w:'-', r:'-', env:'음수', tag:'그늘·흰꽃·정원'},
+  {n:'수호초', c:'지피', h:'0.1~0.2', w:'-', r:'-', env:'음수', tag:'그늘·상록·내음'},
+  {n:'한국잔디', c:'잔디', h:'-', w:'-', r:'-', env:'양수', tag:'내건·내열·사면'},
+  {n:'들잔디(금잔디)', c:'잔디', h:'-', w:'-', r:'-', env:'양수', tag:'사면·내건·자생'},
+  {n:'등나무', c:'덩굴', h:'-', w:'-', r:'-', env:'양수', tag:'퍼걸러·봄꽃·향기'},
+  {n:'능소화', c:'덩굴', h:'-', w:'-', r:'-', env:'양수', tag:'여름꽃·담장·관상'},
+  {n:'담쟁이덩굴', c:'덩굴', h:'-', w:'-', r:'-', env:'반음', tag:'벽면녹화·자생·내음'},
+  {n:'인동덩굴', c:'덩굴', h:'-', w:'-', r:'-', env:'양수', tag:'향기꽃·내한·생울타리'},
+];
+function renderPlantList(list) {
+  const wrap = document.getElementById('plant-result-list');
+  if (!list.length) {
+    wrap.innerHTML = '<div style="text-align:center; color:var(--text-sub); padding:20px; font-size:14px;">검색 결과가 없습니다</div>';
+    return;
+  }
+  let html = '';
+  list.forEach(p => {
+    html += '<div style="border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px; background:white;">';
+    html += '<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">';
+    html += '<span style="font-size:15px; font-weight:700; color:var(--text);">' + p.n + '</span>';
+    html += '<span style="font-size:11px; background:var(--green-bg); color:var(--green-dark); padding:2px 8px; border-radius:20px;">' + p.c + '</span>';
+    html += '</div>';
+    html += '<div style="font-size:12px; color:var(--text-sub); margin-top:4px;">';
+    if (p.h !== '-') html += '🌿 H ' + p.h + 'm  ';
+    if (p.w !== '-') html += 'W ' + p.w + 'm  ';
+    if (p.r !== '-') html += p.r.startsWith('R')||p.r.startsWith('B') ? p.r + 'cm  ' : '';
+    html += p.env;
+    html += '</div>';
+    html += '<div style="font-size:11px; color:var(--text-sub); margin-top:4px; opacity:0.8;">#' + p.tag.replace(/·/g, '  #') + '</div>';
+    html += '</div>';
+  });
+  wrap.innerHTML = html;
+}
+function searchPlants() {
+  const q = document.getElementById('plant-search').value.trim().toLowerCase();
+  if (!q) { renderPlantList(PLANT_DB); return; }
+  const res = PLANT_DB.filter(p =>
+    p.n.includes(q) || p.c.toLowerCase().includes(q) ||
+    p.env.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q)
+  );
+  renderPlantList(res);
+}
+function filterPlants(cat) {
+  document.getElementById('plant-search').value = cat;
+  if (!cat) { renderPlantList(PLANT_DB); return; }
+  const res = PLANT_DB.filter(p => p.c.includes(cat));
+  renderPlantList(res);
+}
+
+// ── 계산 이력 ──────────────────────────────────────────
+const HISTORY_KEY = 'wdr-history';
+function addHistory(tab, summary) {
+  try {
+    const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    h.unshift({ tab, summary, time: new Date().toLocaleString('ko-KR') });
+    if (h.length > 30) h.pop();
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  } catch(e) {}
+}
+function openHistoryModal() {
+  const modal = document.getElementById('history-modal');
+  modal.style.display = 'flex';
+  renderHistoryList();
+}
+function closeHistoryModal() {
+  document.getElementById('history-modal').style.display = 'none';
+}
+function renderHistoryList() {
+  const wrap = document.getElementById('history-list');
+  let h = [];
+  try { h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  if (!h.length) {
+    wrap.innerHTML = '<div style="text-align:center; color:var(--text-sub); padding:24px; font-size:14px;">저장된 이력이 없습니다<br><span style="font-size:12px; opacity:0.7;">각 탭에서 계산하면 자동으로 기록됩니다</span></div>';
+    return;
+  }
+  let html = '';
+  h.forEach((item, i) => {
+    html += '<div style="border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">';
+    html += '<div style="flex:1; min-width:0;">';
+    html += '<div style="font-size:12px; font-weight:600; color:var(--green-dark);">' + item.tab + '</div>';
+    html += '<div style="font-size:13px; color:var(--text); margin-top:2px; word-break:break-word;">' + item.summary + '</div>';
+    html += '<div style="font-size:11px; color:var(--text-sub); margin-top:3px; opacity:0.7;">' + item.time + '</div>';
+    html += '</div>';
+    html += '<button onclick="deleteHistory(' + i + ')" style="font-size:16px; border:none; background:none; cursor:pointer; color:var(--text-sub); flex-shrink:0; padding:0 2px;">×</button>';
+    html += '</div>';
+  });
+  wrap.innerHTML = html;
+}
+function deleteHistory(idx) {
+  try {
+    const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    h.splice(idx, 1);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  } catch(e) {}
+  renderHistoryList();
+}
+function clearAllHistory() {
+  if (!confirm('이력을 모두 삭제할까요?')) return;
+  try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
+  renderHistoryList();
+}
 
 // ── 세션 입력값 유지 ──────────────────────────────────────
 const SS = 'wdr2-';
@@ -1067,7 +1749,7 @@ function ssRestore() {
     if (stripType) document.getElementById('strip-options').style.display = stripType.value === 'strip' ? 'block' : 'none';
     updatePaveInputs(); updateLaborMode(); updateEarthInputs();
     updateConInputs(); updateRebarInputs(); updateTriInputs(); updateAreaInputs();
-    updateRainI(); updateRainC();
+    updateRainI(); updateRainC(); updateIrrigType(); updatePave2Type();
   } catch(e) {}
 }
 function ssSaveMatItems() {
@@ -1084,6 +1766,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 세션 복원
   ssRestore();
+  // 초기 상태 렌더링
+  renderAvgRows();
+  loadChecklist();
+  renderPlantList(PLANT_DB);
 
   // 세션 저장 이벤트
   document.querySelectorAll('input[id]:not([type=radio]):not([type=file]):not([type=checkbox]), select[id]')
@@ -2951,6 +3637,67 @@ async function installPWA() {
       <div class="result-note" id="r-tri-note"></div>
     </div>
   </div>
+
+  <!-- 좌표·방위각 계산기 -->
+  <div class="card">
+    <div class="card-title">🧭 좌표·방위각 계산기</div>
+    <div class="mulch-info">두 점의 좌표를 입력하면 거리·방위각을 계산합니다 (평면직각좌표계 기준)</div>
+
+    <div class="mulch-info" style="margin-top:8px; font-weight:600;">▶ 두 점 간 거리·방위각</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+      <div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:4px;">A점 X (Easting)</div>
+        <input type="number" id="coord-ax" placeholder="예) 12345.678" inputmode="decimal" step="0.001">
+      </div>
+      <div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:4px;">A점 Y (Northing)</div>
+        <input type="number" id="coord-ay" placeholder="예) 23456.789" inputmode="decimal" step="0.001">
+      </div>
+      <div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:4px;">B점 X (Easting)</div>
+        <input type="number" id="coord-bx" placeholder="예) 12400.000" inputmode="decimal" step="0.001">
+      </div>
+      <div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:4px;">B점 Y (Northing)</div>
+        <input type="number" id="coord-by" placeholder="예) 23500.000" inputmode="decimal" step="0.001">
+      </div>
+    </div>
+
+    <div class="mulch-info" style="margin-top:14px; font-weight:600;">▶ 좌표 계산 (기지점 → 미지점)</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:8px;">
+      <div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:4px;">기지점 X</div>
+        <input type="number" id="coord-ox" placeholder="X" inputmode="decimal" step="0.001">
+      </div>
+      <div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:4px;">기지점 Y</div>
+        <input type="number" id="coord-oy" placeholder="Y" inputmode="decimal" step="0.001">
+      </div>
+      <div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:4px;">거리 (m)</div>
+        <input type="number" id="coord-dist" placeholder="거리" inputmode="decimal" step="0.001">
+      </div>
+    </div>
+    <label style="margin-top:8px;">방위각 (도°분′초″ 또는 도.소수)</label>
+    <input type="number" id="coord-bearing" placeholder="예) 45.3025 (45°30′25″)" inputmode="decimal" step="0.0001">
+
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="calc-btn" onclick="calcCoord()">계산</button>
+      <button class="reset-btn" onclick="resetCoord()">초기화</button>
+    </div>
+
+    <div class="result-box" id="coord-result">
+      <div class="result-title">🧭 좌표 계산 결과</div>
+      <div class="result-row"><span class="result-label">A→B 거리</span><span class="result-value big" id="r-coord-dist">-</span></div>
+      <div class="result-row"><span class="result-label">방위각 (A→B)</span><span class="result-value" id="r-coord-bearing">-</span></div>
+      <div class="result-row"><span class="result-label">역방위각 (B→A)</span><span class="result-value" id="r-coord-back">-</span></div>
+      <div class="result-row"><span class="result-label">ΔX (Easting 차)</span><span class="result-value" id="r-coord-dx">-</span></div>
+      <div class="result-row"><span class="result-label">ΔY (Northing 차)</span><span class="result-value" id="r-coord-dy">-</span></div>
+      <div class="result-row" style="border-top:1px solid var(--border); margin-top:6px; padding-top:6px;"><span class="result-label">미지점 X</span><span class="result-value big" id="r-coord-nx">-</span></div>
+      <div class="result-row"><span class="result-label">미지점 Y</span><span class="result-value big" id="r-coord-ny">-</span></div>
+      <div class="result-note" id="r-coord-note"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 경사도 탭 -->
@@ -3431,6 +4178,78 @@ async function installPWA() {
       <div class="result-note" id="r-rebar-note"></div>
     </div>
   </div>
+
+  <!-- 절성토 평균단면적법 -->
+  <div class="card">
+    <div class="card-title">📊 절성토 평균단면적법</div>
+    <div class="mulch-info">각 측점의 단면적(㎡)과 구간 거리(m)를 입력하면 구간별·누적 토량을 산정합니다</div>
+
+    <div id="avg-section-rows" style="margin-top:12px;"></div>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="reset-btn" onclick="addAvgRow()" style="flex:1;">+ 측점 추가</button>
+      <button class="reset-btn" onclick="removeAvgRow()" style="flex:0 0 auto; padding:10px 14px;">− 삭제</button>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:14px;">
+      <button class="calc-btn" onclick="calcAvgSection()">계산</button>
+      <button class="reset-btn" onclick="resetAvgSection()">초기화</button>
+    </div>
+
+    <div class="result-box" id="avg-section-result">
+      <div class="result-title">📊 절성토 산정 결과</div>
+      <div id="r-avg-table" style="overflow-x:auto;"></div>
+      <div class="result-row" style="margin-top:8px;"><span class="result-label">총 토량</span><span class="result-value big" id="r-avg-total">-</span></div>
+      <div class="result-note" id="r-avg-note"></div>
+    </div>
+  </div>
+
+  <!-- 옹벽 간이 검토 -->
+  <div class="card">
+    <div class="card-title">🧱 중력식 옹벽 간이 검토</div>
+    <div class="mulch-info">⚠ 예비 검토용 간이 계산입니다. 정식 설계는 전문가의 구조 검토가 필요합니다.</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+      <div>
+        <label style="margin-top:0;">옹벽 높이 H (m)</label>
+        <input type="number" id="wall-h" placeholder="예) 2.0" inputmode="decimal" step="0.1">
+      </div>
+      <div>
+        <label style="margin-top:0;">기초 폭 B (m)</label>
+        <input type="number" id="wall-b" placeholder="예) 1.6" inputmode="decimal" step="0.1">
+      </div>
+      <div>
+        <label style="margin-top:0;">상단 폭 a (m)</label>
+        <input type="number" id="wall-a" placeholder="예) 0.5" inputmode="decimal" step="0.1">
+      </div>
+      <div>
+        <label style="margin-top:0;">흙 마찰각 φ (°)</label>
+        <input type="number" id="wall-phi" placeholder="예) 30" value="30" inputmode="decimal" step="1">
+      </div>
+      <div>
+        <label style="margin-top:0;">흙 단위중량 γ (kN/m³)</label>
+        <input type="number" id="wall-gamma" placeholder="예) 18" value="18" inputmode="decimal" step="0.5">
+      </div>
+      <div>
+        <label style="margin-top:0;">콘크리트 γc (kN/m³)</label>
+        <input type="number" id="wall-gammac" placeholder="24" value="24" inputmode="decimal" step="0.5">
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:14px;">
+      <button class="calc-btn" onclick="calcWall()">검토</button>
+      <button class="reset-btn" onclick="resetWall()">초기화</button>
+    </div>
+
+    <div class="result-box" id="wall-result">
+      <div class="result-title">🧱 옹벽 안정 검토 결과</div>
+      <div class="result-row"><span class="result-label">활동 안전율 (≥1.5)</span><span class="result-value big" id="r-wall-slide">-</span></div>
+      <div class="result-row"><span class="result-label">전도 안전율 (≥2.0)</span><span class="result-value big" id="r-wall-overturning">-</span></div>
+      <div class="result-row"><span class="result-label">편심거리 e (≤B/6)</span><span class="result-value" id="r-wall-ecc">-</span></div>
+      <div class="result-row"><span class="result-label">수동토압 Pa</span><span class="result-value" id="r-wall-pa">-</span></div>
+      <div class="result-row"><span class="result-label">옹벽 자중 W</span><span class="result-value" id="r-wall-w">-</span></div>
+      <div class="result-note" id="r-wall-note"></div>
+    </div>
+  </div>
 </div>
 
 <!-- 현장 관리 탭 -->
@@ -3549,6 +4368,34 @@ async function installPWA() {
       </div>
       <div class="result-note" id="r-dday-note"></div>
     </div>
+  </div>
+
+  <!-- 현장 체크리스트 -->
+  <div class="card">
+    <div class="card-title">✅ 현장 체크리스트</div>
+    <div class="mulch-info">공종별 점검 항목을 체크하고 현장 진행 상황을 관리합니다 (저장 자동)</div>
+
+    <label style="margin-top:14px;">체크리스트 종류</label>
+    <div class="radio-group">
+      <label><input type="radio" name="checklist-type" value="tree" checked onchange="loadChecklist()"><span>수목 식재</span></label>
+      <label><input type="radio" name="checklist-type" value="grass" onchange="loadChecklist()"><span>잔디 시공</span></label>
+      <label><input type="radio" name="checklist-type" value="concrete" onchange="loadChecklist()"><span>콘크리트 타설</span></label>
+      <label><input type="radio" name="checklist-type" value="inspect" onchange="loadChecklist()"><span>준공 검수</span></label>
+    </div>
+
+    <div id="checklist-progress" style="margin-top:12px; display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span style="font-size:13px; font-weight:600; color:var(--text);" id="checklist-progress-label">0 / 0 완료</span>
+        <span style="font-size:12px; color:var(--text-sub);" id="checklist-pct">0%</span>
+      </div>
+      <div style="height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+        <div id="checklist-bar" style="height:100%; background:var(--green-light); border-radius:4px; transition:width 0.3s; width:0%"></div>
+      </div>
+    </div>
+
+    <div id="checklist-items" style="margin-top:12px;"></div>
+
+    <button class="reset-btn" onclick="resetChecklist()" style="margin-top:12px; width:100%;">이 체크리스트 초기화</button>
   </div>
 </div>
 
@@ -3971,6 +4818,20 @@ async function installPWA() {
       <button class="help-modal-close" onclick="closeHelpModal()">✕</button>
     </div>
     <div class="help-modal-body" id="help-modal-body"></div>
+  </div>
+</div>
+
+<!-- ── 계산 이력 모달 ── -->
+<div id="history-modal" onclick="if(event.target===this)closeHistoryModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:white; border-radius:16px; width:100%; max-width:480px; max-height:80vh; display:flex; flex-direction:column; overflow:hidden;">
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border);">
+      <div style="font-size:17px; font-weight:700; color:var(--text);">📋 계산 이력</div>
+      <div style="display:flex; gap:8px;">
+        <button onclick="clearAllHistory()" style="font-size:12px; padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:white; color:var(--text-sub); cursor:pointer;">전체 삭제</button>
+        <button onclick="closeHistoryModal()" style="font-size:20px; line-height:1; border:none; background:none; cursor:pointer; color:var(--text-sub);">×</button>
+      </div>
+    </div>
+    <div id="history-list" style="overflow-y:auto; flex:1; padding:12px;"></div>
   </div>
 </div>
 
