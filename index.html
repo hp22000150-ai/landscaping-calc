@@ -582,7 +582,7 @@
   <div style="display:flex; justify-content:space-between; align-items:flex-start;">
     <div>
       <h1>🌿 현장에서 바로 쓰는 계산기</h1>
-      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.619.13</span>
+      <span style="font-size:11px; opacity:0.65; font-weight:500; letter-spacing:0.3px;">v0.621.0</span>
     </div>
     <div style="flex-shrink:0; padding-left:12px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
       <button class="share-header-btn" onclick="openHistoryModal()" style="background:var(--green-mid); color:#fff;">📋 계산 이력</button>
@@ -645,6 +645,12 @@
       </div>
     </div>
 
+    <label>교목 수량 <span style="font-size:11px;font-weight:400;opacity:.65;">(1주당 0.785㎡ 차감)</span></label>
+    <input type="number" id="grass-trees" placeholder="예: 10" inputmode="numeric" min="0" value="0">
+
+    <label>관목 수량 <span style="font-size:11px;font-weight:400;opacity:.65;">(25주당 1㎡ 차감)</span></label>
+    <input type="number" id="grass-shrubs" placeholder="예: 50" inputmode="numeric" min="0" value="0">
+
     <label>잔디 종류</label>
     <div class="radio-group">
       <label><input type="radio" name="grass-type" value="flat18" checked><span>평떼<br>18×18</span></label>
@@ -667,8 +673,16 @@
     <div id="grass-result" class="result-box">
       <div class="result-title">📊 계산 결과</div>
       <div class="result-row">
-        <span class="result-label">시공 면적</span>
+        <span class="result-label">시공 면적 (전체)</span>
         <span class="result-value" id="r-area">-</span>
+      </div>
+      <div class="result-row" id="r-grass-sub-row" style="display:none;">
+        <span class="result-label">교목·관목 차감</span>
+        <span class="result-value" id="r-grass-sub">-</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">잔디 식재 면적</span>
+        <span class="result-value" id="r-grass-net">-</span>
       </div>
       <div class="result-row">
         <span class="result-label">잔디 종류</span>
@@ -691,29 +705,30 @@
 <div id="tab-tree" class="tab-content active">
   <div class="card">
     <div class="card-title">🌳 수목 중량 계산기 <button class="help-btn" onclick="showHelp('tree')">?</button></div>
-    <label>근원직경 (cm)</label>
-    <input type="number" id="tree-rcd" placeholder="예: 15" inputmode="decimal">
+    <label>흉고직경 D (cm) <span style="font-size:11px;font-weight:400;opacity:.65;">— 근원직경 R이 있으면 D = R × 0.8</span></label>
+    <input type="number" id="tree-d" placeholder="예: 24" inputmode="decimal">
 
     <label>수고 (m)</label>
     <input type="number" id="tree-height" placeholder="예: 4.0" inputmode="decimal" step="0.1">
 
-    <label>수목 구분 (단위체적중량 U)</label>
+    <label>생채중량 W0 (수종별)</label>
     <div class="select-wrap">
       <select id="tree-u-class">
-        <option value="1340">참나무류, 상수리나무, 회양목 등 — 1,340 kg/㎥</option>
-        <option value="1320" selected>느티나무, 벚나무, 목련, 참느릅나무 등 — 1,300~1,340 kg/㎥</option>
-        <option value="1275">은행나무, 단풍나무, 향나무, 곰솔 등 — 1,250~1,300 kg/㎥</option>
-        <option value="1230">소나무, 편백, 침엽수, 플라타너스 등 — 1,210~1,250 kg/㎥</option>
-        <option value="1190">가문비나무, 녹나무, 왜금송 등 — 1,170~1,210 kg/㎥</option>
-        <option value="1170">굴피나무, 화백 등 — 1,170 kg/㎥ 이하</option>
-        <option value="1200">기타 / 평균치 — 1,200 kg/㎥</option>
+        <option value="1340">1,340 kg/㎥ — 참나무류·상수리나무·회양목 등</option>
+        <option value="1320" selected>1,300 kg/㎥ — 느티나무·벚나무·목련·참느릅나무 등</option>
+        <option value="1275">1,250 kg/㎥ — 은행나무·단풍나무·향나무·곰솔 등</option>
+        <option value="1230">1,210 kg/㎥ — 소나무·편백·침엽수·플라타너스 등</option>
+        <option value="1190">1,170 kg/㎥ — 가문비나무·녹나무·왜금송 등</option>
+        <option value="1170">1,170 kg/㎥ 이하 — 굴피나무·화백 등</option>
+        <option value="1200">1,200 kg/㎥ — 기타 / 평균</option>
       </select>
     </div>
 
-    <label>식재 형태</label>
+    <label>활증률 P (지엽에 따른)</label>
     <div class="radio-group">
-      <label><input type="radio" name="tree-plant" value="1.0" checked><span>고립목<br>(독립수, P=1.0)</span></label>
-      <label><input type="radio" name="tree-plant" value="0.3"><span>임목<br>(군식, P=0.3)</span></label>
+      <label><input type="radio" name="tree-plant" value="0.3" checked><span>고립목<br>(P=0.3)</span></label>
+      <label><input type="radio" name="tree-plant" value="0.2"><span>단순군식<br>(P=0.2)</span></label>
+      <label><input type="radio" name="tree-plant" value="0.15"><span>혼합군식<br>(P=0.15)</span></label>
     </div>
 
     <label>분 유무</label>
@@ -725,18 +740,19 @@
     <div id="root-method-wrap">
       <label>뿌리분 형태</label>
       <div class="radio-group">
-        <label><input type="radio" name="tree-root-method" value="0.3927"><span>접시분</span></label>
-        <label><input type="radio" name="tree-root-method" value="0.4581" checked><span>보통분</span></label>
-        <label><input type="radio" name="tree-root-method" value="0.5236"><span>조개분</span></label>
+        <label><input type="radio" name="tree-root-method" value="clam"><span>조개분<br>(πr³)</span></label>
+        <label><input type="radio" name="tree-root-method" value="normal" checked><span>보통분<br>(3.6r³)</span></label>
+        <label><input type="radio" name="tree-root-method" value="plate"><span>접시분<br>(4r³)</span></label>
       </div>
     </div>
 
     <button class="calc-btn" onclick="calcTree()">계산하기</button>
     <button class="reset-btn" onclick="resetTree()">초기화</button>
     <div class="mulch-info" style="font-size:11px; line-height:1.7; margin-top:10px;">
-      📐 W = K × π × (B/2)² × H × U × (1+P)<br>
-      K=0.5, B=근원직경×0.8(m)<br>
-      출처: 조경설계요람 / 문석기 외 5인 (1998)
+      📐 W1 = 0.5 × π × (D/2)² × H × W0 × (1+P)<br>
+      W2 = V × K  (조개분 πr³ / 보통분 3.6r³ / 접시분 4r³)<br>
+      r = 뿌리분 반지름, K = 1,300 kg/㎥<br>
+      출처: 2013 한국조경학회 설계기준
     </div>
 
     <div id="tree-svg-wrap" style="display:none;"></div>
@@ -744,7 +760,7 @@
     <div id="tree-result" class="result-box">
       <div class="result-title">📊 계산 결과</div>
       <div class="result-row">
-        <span class="result-label">흉고직경 B (근원직경×0.8)</span>
+        <span class="result-label">흉고직경 D (입력값)</span>
         <span class="result-value" id="r-dbh-calc">-</span>
       </div>
       <div class="result-row">
@@ -752,7 +768,7 @@
         <span class="result-value" id="r-above">-</span>
       </div>
       <div class="result-row">
-        <span class="result-label">뿌리분 직경 (근원직경×4)</span>
+        <span class="result-label">뿌리분 직경 (D×5 추정)</span>
         <span class="result-value" id="r-ball-d">-</span>
       </div>
       <div class="result-row">
@@ -1990,33 +2006,40 @@ document.querySelectorAll('input[name="grass-type"]').forEach(r => {
 
 function calcGrass() {
   let area = parseFloat(document.getElementById('grass-area').value);
-  const unit = document.getElementById('grass-unit').value;
-  const type = document.querySelector('input[name="grass-type"]:checked').value;
-
+  const unit    = document.getElementById('grass-unit').value;
+  const type    = document.querySelector('input[name="grass-type"]:checked').value;
+  const trees   = parseFloat(document.getElementById('grass-trees').value)  || 0;
+  const shrubs  = parseFloat(document.getElementById('grass-shrubs').value) || 0;
 
   if (!area || area <= 0) { alert('면적을 입력해주세요'); return; }
   if (unit === 'pyeong') area = area * 3.3058;
 
+  // 교목·관목 차감: 교목×0.785㎡ + 관목÷25㎡
+  const subTree   = trees  * 0.785;
+  const subShrub  = shrubs / 25;
+  const subTotal  = subTree + subShrub;
+  const netArea   = Math.max(area - subTotal, 0);
+
   let qty = 0, typeName = '', unitName = '장', truckPerLoad = 0, coverNote = '';
 
   if (type === 'flat18') {
-    qty = Math.ceil(area / 0.0324 * 1.02);
+    qty = Math.ceil(netArea / 0.0324 * 1.02);
     typeName = '평떼 (18×18cm)';
     truckPerLoad = 30000;
     coverNote = '전면 식재 (커버율 100%)';
   } else if (type === 'flat30') {
-    qty = Math.ceil(area / 0.09 * 1.02);
+    qty = Math.ceil(netArea / 0.09 * 1.02);
     typeName = '평떼 (30×30cm)';
     truckPerLoad = 12000;
     coverNote = '전면 식재 (커버율 100%)';
   } else if (type === 'roll') {
-    qty = Math.ceil(area / 0.24 * 1.02);
+    qty = Math.ceil(netArea / 0.24 * 1.02);
     typeName = '롤잔디 (40×60cm)';
     unitName = '롤';
     coverNote = '전면 식재 (커버율 100%)';
   } else if (type === 'strip') {
     const method = document.querySelector('input[name="strip-method"]:checked').value;
-    const baseQty = area / 0.0324;
+    const baseQty = netArea / 0.0324;
     if (method === 'half') {
       qty = Math.ceil(baseQty / 2 * 1.02);
       typeName = '줄떼 (1/2)';
@@ -2031,6 +2054,18 @@ function calcGrass() {
   const result = document.getElementById('grass-result');
   result.classList.add('show');
   document.getElementById('r-area').textContent = area.toFixed(1) + ' ㎡ (' + (area/3.3058).toFixed(1) + '평)';
+
+  const subRow = document.getElementById('r-grass-sub-row');
+  if (subTotal > 0) {
+    subRow.style.display = '';
+    let subNote = '';
+    if (trees  > 0) subNote += '교목 ' + trees  + '주×0.785㎡=' + subTree.toFixed(2)  + '㎡';
+    if (shrubs > 0) subNote += (subNote ? '  ' : '') + '관목 ' + shrubs + '주÷25=' + subShrub.toFixed(2) + '㎡';
+    document.getElementById('r-grass-sub').textContent = '− ' + subTotal.toFixed(2) + ' ㎡  (' + subNote + ')';
+  } else {
+    subRow.style.display = 'none';
+  }
+  document.getElementById('r-grass-net').textContent = netArea.toFixed(2) + ' ㎡';
   document.getElementById('r-type').textContent = typeName;
   document.getElementById('r-qty').textContent = qty.toLocaleString() + ' ' + unitName;
 
@@ -2048,8 +2083,10 @@ function calcGrass() {
 }
 
 function resetGrass() {
-  document.getElementById('grass-area').value = '';
-  document.getElementById('grass-unit').value = 'sqm';
+  document.getElementById('grass-area').value   = '';
+  document.getElementById('grass-trees').value  = '0';
+  document.getElementById('grass-shrubs').value = '0';
+  document.getElementById('grass-unit').value   = 'sqm';
   document.getElementById('grass-result').classList.remove('show');
   document.querySelector('input[name="grass-type"][value="flat18"]').checked = true;
   document.querySelector('input[name="strip-method"][value="half"]').checked = true;
@@ -2064,58 +2101,59 @@ document.querySelectorAll('input[name="tree-ball"]').forEach(r => {
 });
 
 function calcTree() {
-  const rcd = parseFloat(document.getElementById('tree-rcd').value);
+  const d   = parseFloat(document.getElementById('tree-d').value);
   const h   = parseFloat(document.getElementById('tree-height').value);
-  const U   = parseFloat(document.getElementById('tree-u-class').value);
+  const W0  = parseFloat(document.getElementById('tree-u-class').value);
   const P   = parseFloat(document.querySelector('input[name="tree-plant"]:checked').value);
   const hasBall    = document.querySelector('input[name="tree-ball"]:checked').value === 'yes';
   const rootMethod = document.querySelector('input[name="tree-root-method"]:checked').value;
 
-  if (!rcd || rcd <= 0) { alert('근원직경을 입력해주세요'); return; }
-  if (!h   || h   <= 0) { alert('수고를 입력해주세요');   return; }
+  if (!d || d <= 0) { alert('흉고직경을 입력해주세요'); return; }
+  if (!h || h <= 0) { alert('수고를 입력해주세요');     return; }
 
-  // 흉고직경 B = 근원직경 × 0.8 (cm→m)
-  const B = rcd * 0.8 / 100;
+  // 지상부 중량: W1 = 0.5 × π × (D/2)² × H × W0 × (1+P)
+  const D = d / 100;  // cm → m
+  const aboveWeight = 0.5 * Math.PI * Math.pow(D / 2, 2) * h * W0 * (1 + P);
 
-  // 지상부 중량: W = K × π × (B/2)² × H × U × (1+P), K=0.5
-  const aboveWeight = 0.5 * Math.PI * Math.pow(B / 2, 2) * h * U * (1 + P);
-
-  // 뿌리부 중량 — 직접 체적 계산 (조경설계기준)
+  // 뿌리부 중량: 근원직경 R ≈ D/0.8, 뿌리분 직경 = R×4, r = 뿌리분 반지름(m)
   let belowWeight = 0, ballD = 0, ballVol = 0, ballTypeName = '';
   if (hasBall) {
-    const volCoeff = parseFloat(document.querySelector('input[name="tree-root-method"]:checked').value);
-    const typeMap  = { '0.3927': '접시분', '0.4581': '보통분', '0.5236': '조개분' };
-    ballTypeName   = typeMap[String(volCoeff)];
-    ballD          = rcd * 4 / 100;            // 뿌리분 직경 D (m) = 근원직경 × 4
-    ballVol        = volCoeff * Math.pow(ballD, 3);
-    belowWeight    = ballVol * 1300;
+    const R_est = d / 0.8;                 // 근원직경 추정 (cm)
+    ballD       = R_est * 4;               // 뿌리분 직경 (cm)
+    const r     = ballD / 2 / 100;         // 뿌리분 반지름 (m)
+    const volMap  = { clam: Math.PI, normal: 3.6, plate: 4 };
+    const nameMap = { clam: '조개분', normal: '보통분', plate: '접시분' };
+    ballVol      = volMap[rootMethod] * Math.pow(r, 3);
+    ballTypeName = nameMap[rootMethod];
+    belowWeight  = ballVol * 1300;
   }
 
   const totalWeight = aboveWeight + belowWeight;
+  const R_est = d / 0.8;  // 장비 추천용 근원직경 추정
 
   let equipment = '';
-  if      (R <= 7)  equipment = '<span class="equipment-tag">인력 작업 가능</span>';
-  else if (R <= 10) equipment = '<span class="equipment-tag">2인 인력 작업</span>';
-  else if (R <= 17) equipment = '<span class="equipment-tag">3톤 굴삭기</span>';
-  else if (R <= 25) equipment = '<span class="equipment-tag">5톤 굴삭기 (3BH)</span>';
-  else if (R <= 35) equipment = '<span class="equipment-tag">06W 굴삭기</span>';
-  else              equipment = '<span class="equipment-tag">크레인 필요</span>';
+  if      (R_est <= 7)  equipment = '<span class="equipment-tag">인력 작업 가능</span>';
+  else if (R_est <= 10) equipment = '<span class="equipment-tag">2인 인력 작업</span>';
+  else if (R_est <= 17) equipment = '<span class="equipment-tag">3톤 굴삭기</span>';
+  else if (R_est <= 25) equipment = '<span class="equipment-tag">5톤 굴삭기 (3BH)</span>';
+  else if (R_est <= 35) equipment = '<span class="equipment-tag">06W 굴삭기</span>';
+  else                  equipment = '<span class="equipment-tag">크레인 필요</span>';
 
   document.getElementById('tree-result').classList.add('show');
-  document.getElementById('r-dbh-calc').textContent    = (rcd * 0.8).toFixed(1) + ' cm';
+  document.getElementById('r-dbh-calc').textContent    = d.toFixed(1) + ' cm';
   document.getElementById('r-above').textContent       = aboveWeight.toFixed(1) + ' kg';
-  document.getElementById('r-ball-d').textContent      = hasBall ? (ballD * 100).toFixed(0) + ' cm' : '-';
+  document.getElementById('r-ball-d').textContent      = hasBall ? ballD.toFixed(0) + ' cm' : '-';
   document.getElementById('r-below').textContent       = hasBall
     ? belowWeight.toFixed(1) + ' kg  (' + ballTypeName + ', ' + ballVol.toFixed(3) + ' ㎥)'
     : '해당없음 (나근)';
   document.getElementById('r-total-weight').textContent = totalWeight.toFixed(1) + ' kg';
   document.getElementById('r-equipment').innerHTML     = equipment;
   document.getElementById('r-tree-note').textContent   =
-    'U=' + U.toLocaleString() + ' kg/㎥, P=' + P +
-    (hasBall ? '\n뿌리분 D=' + (ballD*100).toFixed(0) + 'cm × 단위중량 1,300 kg/㎥' : '') +
-    '\n조경설계기준 기준\n※ 참고용 수치입니다. 현장 조건에 따라 달라질 수 있습니다.';
+    'W0=' + W0.toLocaleString() + ' kg/㎥, P=' + P +
+    (hasBall ? '\n뿌리분 r=' + (ballD/2).toFixed(0) + 'cm, K=1,300 kg/㎥' : '') +
+    '\n2013 한국조경학회 설계기준\n※ 참고용 수치입니다. 현장 조건에 따라 달라질 수 있습니다.';
 
-  renderTreeWeightSVG(aboveWeight, belowWeight, totalWeight, hasBall, h, rcd);
+  renderTreeWeightSVG(aboveWeight, belowWeight, totalWeight, hasBall, h, d / 0.8);
 }
 
 function renderTreeWeightSVG(aboveKg, rootKg, totalKg, hasBall, treeH, rcd) {
@@ -2241,12 +2279,12 @@ function renderTreeWeightSVG(aboveKg, rootKg, totalKg, hasBall, treeH, rcd) {
 }
 
 function resetTree() {
-  document.getElementById('tree-rcd').value = '';
+  document.getElementById('tree-d').value = '';
   document.getElementById('tree-height').value = '';
   document.getElementById('tree-u-class').value = '1320';
-  document.querySelector('input[name="tree-plant"][value="1.0"]').checked = true;
+  document.querySelector('input[name="tree-plant"][value="0.3"]').checked = true;
   document.querySelector('input[name="tree-ball"][value="yes"]').checked  = true;
-  document.querySelector('input[name="tree-root-method"][value="0.4581"]').checked = true;
+  document.querySelector('input[name="tree-root-method"][value="normal"]').checked = true;
   document.getElementById('root-method-wrap').style.display = 'block';
   document.getElementById('tree-result').classList.remove('show');
   const svgWrap = document.getElementById('tree-svg-wrap');
