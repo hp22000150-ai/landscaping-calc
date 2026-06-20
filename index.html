@@ -1940,7 +1940,7 @@ function applyPlantFilters() {
   if (smog)   res = res.filter(p => p.smog);
   const _season = window._plantSeason || '';
   if (_season) {
-    const _sMap = { '봄':/봄|[3-5]월/, '여름':/여름|[6-8]월/, '가을':/가을|단풍|[9-9]월|10월|11월/, '겨울':/겨울|12월|1월|2월/, '상록':/상록/ };
+    const _sMap = { '봄':/봄|[3-5]월/, '여름':/여름|[6-8]월/, '가을':/가을|단풍|9월|10월|11월/, '겨울':/겨울|12월|1월|2월/, '상록':/상록/ };
     const _sRe = _sMap[_season];
     if (_sRe) res = res.filter(p => p.bloom && _sRe.test(p.bloom));
   }
@@ -3483,7 +3483,7 @@ function calcPattern() {
     + '<div style="font-size:11px;color:var(--text-sub);margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;">'
     + '💡 경계부 손실 고려 시 +5~10% 여유 주수 추가 권장</div>'
     + '</div>';
-  saveHistory('식재패턴', n + '주 (' + label + ', ' + spacing + 'm, ' + area + '㎡)');
+  addHistory('식재패턴', n + '주 (' + label + ', ' + spacing + 'm, ' + area + '㎡)');
 }
 function resetPattern() {
   document.getElementById('pat-area').value = '';
@@ -3526,7 +3526,7 @@ function calcSoil() {
     + '</table>'
     + '<div style="font-size:11px;color:var(--text-sub);margin-top:8px;">💡 퇴비 1포 = 20L = 0.02m³ 기준 · 침하 고려 +10% 여유 권장</div>'
     + '</div>';
-  saveHistory('퇴비객토', count + '주 R' + r + ' → 퇴비 ' + bags + '포 · 객토 ' + client + 'm³');
+  addHistory('퇴비객토', count + '주 R' + r + ' → 퇴비 ' + bags + '포 · 객토 ' + client + 'm³');
 }
 function resetSoil() {
   document.getElementById('soil-count').value = '';
@@ -4073,79 +4073,6 @@ async function installPWA() {
     </p>
   </div>
 
-  <!-- 6. 경사도 -->
-  <div class="card" id="hc-slope">
-    <div class="card-title">📏 경사도 환산기</div>
-    <table class="price-table">
-      <tr><th>표기</th><th>관계식</th><th>예시</th></tr>
-      <tr><td>경사율 (%)</td><td>수직 ÷ 수평 × 100</td><td>30%</td></tr>
-      <tr><td>경사각 (°)</td><td>arctan(경사율÷100)</td><td>16.70°</td></tr>
-      <tr><td>1 : n 표기</td><td>n = 100 ÷ 경사율</td><td>1 : 3.33</td></tr>
-      <tr><td>비탈면 길이</td><td>√(수평² + 수직²)</td><td>수평 10m → 10.44m</td></tr>
-    </table>
-    <table class="price-table" style="margin-top:10px;">
-      <tr><th>경사율</th><th>구분</th><th>비고</th></tr>
-      <tr><td>~ 5%</td><td>완만</td><td>배수 설계 주의</td></tr>
-      <tr><td>5 ~ 30%</td><td>일반 경사</td><td>—</td></tr>
-      <tr><td>30 ~ 60%</td><td>급경사</td><td>비탈면 보호공 검토</td></tr>
-      <tr><td>60% 이상</td><td>초급경사</td><td>구조물 설계 필요</td></tr>
-    </table>
-  </div>
-
-  <!-- 6-2. 배수 경사 -->
-  <div class="card" id="hc-drain">
-    <div class="card-title">💧 배수 경사 계산기</div>
-    <table class="price-table">
-      <tr><th>항목</th><th>설명</th></tr>
-      <tr><td>Manning 공식</td><td>V = (1/n) × R^(2/3) × S^(1/2)</td></tr>
-      <tr><td>동수반경 R</td><td>D ÷ 4 (만관 흐름 기준)</td></tr>
-      <tr><td>경사율 S</td><td>i(%) ÷ 100</td></tr>
-      <tr><td>유량 Q</td><td>V × 단면적 (L/s)</td></tr>
-    </table>
-    <table class="price-table" style="margin-top:10px;">
-      <tr><th>관재질</th><th>조도계수 n</th></tr>
-      <tr><td>콘크리트관 (HC)</td><td>0.013</td></tr>
-      <tr><td>주철관·강관</td><td>0.011</td></tr>
-      <tr><td>PVC 관</td><td>0.009</td></tr>
-    </table>
-    <p class="price-note" style="margin-top:10px;">
-      ※ 적정 유속 0.6 ~ 3.0 m/s (미만: 퇴적, 초과: 침식)<br>
-      ※ 만관(100% 충만) 기준 — 실제 유량은 여유율 적용 필요
-    </p>
-  </div>
-
-  <!-- 6-3. 토공·콘크리트 -->
-  <div class="card" id="hc-civil">
-    <div class="card-title">🚜 토공 · 콘크리트 계산기</div>
-    <table class="price-table">
-      <tr><th>항목</th><th>설명</th></tr>
-      <tr><td>자연상태 체적</td><td>굴착 전 원지반 체적 (㎥)</td></tr>
-      <tr><td>운반토량</td><td>자연상태 × L 계수 (팽창)</td></tr>
-      <tr><td>덤프 대수</td><td>운반토량 ÷ 적재량 (올림)</td></tr>
-    </table>
-    <table class="price-table" style="margin-top:10px;">
-      <tr><th>토질</th><th>L 계수</th></tr>
-      <tr><td>사질토</td><td>1.20</td></tr>
-      <tr><td>보통토</td><td>1.25</td></tr>
-      <tr><td>점질토</td><td>1.30</td></tr>
-      <tr><td>풍화암</td><td>1.35</td></tr>
-      <tr><td>연암</td><td>1.50</td></tr>
-      <tr><td>경암</td><td>1.65</td></tr>
-    </table>
-    <table class="price-table" style="margin-top:10px;">
-      <tr><th>추가 기능</th><th>설명</th></tr>
-      <tr><td>사다리꼴 토량</td><td>(W₁+W₂)/2 × H × 연장 — 비탈면 절성토에 사용</td></tr>
-      <tr><td>절성토 평균단면적법</td><td>측점별 단면적 입력 → 구간별 V=(A₁+A₂)/2×L 합산</td></tr>
-      <tr><td>옹벽 간이 검토</td><td>중력식 옹벽 활동·전도 안전율 예비 계산 (전문가 확인 필수)</td></tr>
-    </table>
-    <p class="price-note" style="margin-top:10px;">
-      ※ 콘크리트: 손실 5% 포함, 레미콘 6㎥/대 기준으로 대수 자동 계산<br>
-      ※ 선형(보·벽체): 단면적 × 연장으로 계산<br>
-      ※ 철근 소요량은 같은 탭 아래 🔩 별도 카드에서 계산<br>
-      ※ 옹벽 검토는 예비 설계용 — 실제 시공 전 구조 전문가 검토 필요
-    </p>
-  </div>
-
   <!-- 6-4. 현장 관리 -->
   <div class="card" id="hc-manage">
     <div class="card-title">👷 현장 관리 계산기</div>
@@ -4172,25 +4099,6 @@ async function installPWA() {
       ※ 재료비 VAT: 계약 방식(포함/별도)에 따라 확인 필요<br>
       ※ 체크리스트는 기기 로컬에 저장 — 앱 재실행 후에도 유지됨
     </p>
-  </div>
-
-  <!-- 7. 경계석·보도블록 -->
-  <div class="card" id="hc-pave">
-    <div class="card-title">🧱 경계석 · 보도블록 수량</div>
-    <table class="price-table">
-      <tr><th>항목</th><th>계산 방법</th></tr>
-      <tr><td>경계석 수량</td><td>총 연장 (m) ÷ 경계석 길이 (m)</td></tr>
-      <tr><td>보도블록 수량</td><td>면적 (㎡) ÷ 블록 1매 면적 (㎡)</td></tr>
-    </table>
-    <table class="price-table" style="margin-top:10px;">
-      <tr><th>규격</th><th>1매 면적</th><th>용도</th></tr>
-      <tr><td>300×300mm</td><td>0.09㎡</td><td>일반 보도, 공원</td></tr>
-      <tr><td>400×400mm</td><td>0.16㎡</td><td>광장, 대형 보도</td></tr>
-      <tr><td>250×250mm</td><td>0.0625㎡</td><td>정원, 소형 보도</td></tr>
-      <tr><td>200×200mm</td><td>0.04㎡</td><td>소형, 인조석</td></tr>
-      <tr><td>200×100mm</td><td>0.02㎡</td><td>점토벽돌형</td></tr>
-    </table>
-    <p class="price-note" style="margin-top:10px;">※ 여유율: 경계석 3~5%, 보도블록 5~10% (절단·파손 고려)</p>
   </div>
 
   <!-- 8. 사진 측정 -->
@@ -4246,31 +4154,6 @@ async function installPWA() {
     <p class="price-note" style="margin-top:10px;">
       ※ 지역·현장·업체·시기에 따라 실제 금액 차이 있음 — 반드시 현장 견적 확인<br>
       ※ 조경 자재(수목·잔디·멀칭재)는 시기·규격·산지에 따라 변동 폭이 큼
-    </p>
-  </div>
-
-  <!-- 철근 소요량 -->
-  <div class="card" id="hc-rebar">
-    <div class="card-title">🔩 철근 소요량 계산기</div>
-    <table class="price-table">
-      <tr><th>규격</th><th>단위중량</th><th>주요 용도</th></tr>
-      <tr><td>D10</td><td>0.560 kg/m</td><td>슬래브 배력근, 작은 구조물</td></tr>
-      <tr><td>D13</td><td>0.995 kg/m</td><td>슬래브·벽체 일반 배근</td></tr>
-      <tr><td>D16</td><td>1.560 kg/m</td><td>보·기둥 주근</td></tr>
-      <tr><td>D19</td><td>2.250 kg/m</td><td>큰 보·기초</td></tr>
-      <tr><td>D22</td><td>3.040 kg/m</td><td>대형 기초·옹벽</td></tr>
-      <tr><td>D25</td><td>3.850 kg/m</td><td>대형 구조물</td></tr>
-    </table>
-    <table class="price-table" style="margin-top:10px;">
-      <tr><th>피복두께</th><th>적용 위치</th></tr>
-      <tr><td>30 mm</td><td>실내 슬래브·벽</td></tr>
-      <tr><td>40 mm</td><td>일반 (기본값)</td></tr>
-      <tr><td>60 mm</td><td>흙에 접하는 면</td></tr>
-      <tr><td>80 mm</td><td>수중·기초 저면</td></tr>
-    </table>
-    <p class="price-note" style="margin-top:10px;">
-      ※ 슬래브: X·Y 두 방향 모두 계산 · 손실 5% 포함<br>
-      ※ 벽체·보: 주근(연장 방향) + 띠철근(간격 방향) 합산
     </p>
   </div>
 
@@ -4400,32 +4283,6 @@ async function installPWA() {
       ※ 점적관수: 저유량·저압력 — 수압 1.0~2.5 bar 권장<br>
       ※ 스프링클러: 정방형 배치 vs 삼각형 배치 — 삼각형이 균일 살수에 유리<br>
       ※ 설계 후 시공업체와 수압·유량 실측 필수
-    </p>
-  </div>
-
-  <!-- 강우 합리식 -->
-  <div class="card" id="hc-rain">
-    <div class="card-title">🌧 강우 배수 계산 (합리식)</div>
-    <div class="mulch-info" style="margin-bottom:8px;">Q = (1/360) × C × I × A</div>
-    <table class="price-table">
-      <tr><th>기호</th><th>항목</th><th>단위</th></tr>
-      <tr><td>Q</td><td>첨두유량 (설계유량)</td><td>m³/s</td></tr>
-      <tr><td>C</td><td>유출계수 (0~1)</td><td>무차원</td></tr>
-      <tr><td>I</td><td>강우강도</td><td>mm/h</td></tr>
-      <tr><td>A</td><td>유역 면적</td><td>ha</td></tr>
-    </table>
-    <table class="price-table" style="margin-top:10px;">
-      <tr><th>토지 이용</th><th>유출계수 C</th></tr>
-      <tr><td>아스팔트·콘크리트</td><td>0.85~0.95</td></tr>
-      <tr><td>지붕</td><td>0.75~0.95</td></tr>
-      <tr><td>잔디 (양호)</td><td>0.25~0.35</td></tr>
-      <tr><td>수목·산림</td><td>0.10~0.30</td></tr>
-      <tr><td>주거지역 (혼합)</td><td>0.40~0.60</td></tr>
-    </table>
-    <p class="price-note" style="margin-top:10px;">
-      ※ 합리식은 소규모 유역 (100ha 이하)에 적합<br>
-      ※ 강우강도(I)는 지역별 IDF 곡선에서 설계 빈도에 맞춰 결정<br>
-      ※ 빗물받이 1개 처리 유량: 약 14 L/s (300×300mm형 기준)
     </p>
   </div>
 
