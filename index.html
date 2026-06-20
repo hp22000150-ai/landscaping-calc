@@ -1983,8 +1983,8 @@ function renderPlantList(list) {
     // 계산기 연동
     if (p.rDef > 0) {
       html += '<div style="display:flex;gap:6px;margin-top:8px;">';
-      html += '<button onclick="linkToCalc(this.dataset.t,+this.dataset.r,this.dataset.n)" data-t="weight" data-r="' + p.rDef + '" data-n="' + p.n.replace(/"/g,'&quot;') + '" style="font-size:11px;padding:4px 10px;border:1px solid var(--green-light);border-radius:6px;background:white;color:var(--green);cursor:pointer;font-weight:600;">🌳 중량 계산</button>';
-      html += '<button onclick="linkToCalc(this.dataset.t,+this.dataset.r,this.dataset.n)" data-t="pit"    data-r="' + p.rDef + '" data-n="' + p.n.replace(/"/g,'&quot;') + '" style="font-size:11px;padding:4px 10px;border:1px solid var(--green-light);border-radius:6px;background:white;color:var(--green);cursor:pointer;font-weight:600;">⛏ 구덩이 계산</button>';
+      html += '<button onclick="event.stopPropagation();linkToCalc(this.dataset.t,+this.dataset.r,this.dataset.n)" data-t="weight" data-r="' + p.rDef + '" data-n="' + p.n.replace(/"/g,'&quot;') + '" style="font-size:11px;padding:4px 10px;border:1px solid var(--green-light);border-radius:6px;background:white;color:var(--green);cursor:pointer;font-weight:600;">🌳 중량 계산</button>';
+      html += '<button onclick="event.stopPropagation();linkToCalc(this.dataset.t,+this.dataset.r,this.dataset.n)" data-t="pit"    data-r="' + p.rDef + '" data-n="' + p.n.replace(/"/g,'&quot;') + '" style="font-size:11px;padding:4px 10px;border:1px solid var(--green-light);border-radius:6px;background:white;color:var(--green);cursor:pointer;font-weight:600;">⛏ 구덩이 계산</button>';
       html += '</div>';
     }
     html += '</div>';
