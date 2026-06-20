@@ -1,4 +1,4 @@
-const CACHE = 'field-calc-v260620c';
+const CACHE = 'field-calc-v260620d';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {

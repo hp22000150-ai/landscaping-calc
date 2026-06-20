@@ -1780,133 +1780,133 @@ function resetChecklist() {
 // env:양음, growth:생장속도, salt:내조성, smog:내공해, ornament:관상포인트, tag:키워드
 const PLANT_DB = [
   // ── 낙엽교목 ──
-  {n:'느티나무',      c:'낙엽교목', h:'3.0~6.0', w:'1.5~3.5', r:'R8~20',  rDef:10, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'단풍·수형',    tag:'가로수·공원·내한·내공해', zone:'전국'},
-  {n:'왕벚나무',      c:'낙엽교목', h:'3.5~5.0', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·가로수·관상', zone:'전국'},
-  {n:'이팝나무',      c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃·수형',    tag:'봄꽃·가로수·내한·내공해', zone:'전국'},
-  {n:'회화나무',      c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'R10~20', rDef:12, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'수형·여름꽃',  tag:'가로수·내공해·내건', zone:'전국'},
-  {n:'은행나무',      c:'낙엽교목', h:'3.5~6.0', w:'1.0~2.0', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'단풍',         tag:'가로수·내공해·단풍', zone:'전국'},
-  {n:'단풍나무',      c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R5~8',   rDef:6,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'단풍',         tag:'단풍·정원·관상', zone:'전국'},
-  {n:'홍단풍',        c:'낙엽교목', h:'1.5~2.5', w:'0.8~1.2', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'잎색·단풍',    tag:'정원·포인트·관상', zone:'전국'},
-  {n:'목련',          c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R6~10',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·향기·정원', zone:'전국'},
-  {n:'자목련',        c:'낙엽교목', h:'2.0~3.0', w:'0.8~1.5', r:'R5~8',   rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·자주색·정원', zone:'전국'},
-  {n:'산수유',        c:'낙엽교목', h:'2.0~3.5', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·열매·정원', zone:'전국'},
-  {n:'자귀나무',      c:'낙엽교목', h:'2.5~4.0', w:'2.0~3.0', r:'R8~15',  rDef:10, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'여름꽃·수형',  tag:'여름꽃·내건·정원', zone:'중부이남'},
-  {n:'층층나무',      c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.5', r:'R8~15',  rDef:10, env:'반음', growth:'보통', salt:false, smog:false, ornament:'수형·열매',    tag:'자생·공원·내음', zone:'전국'},
-  {n:'계수나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'R8~15',  rDef:10, env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·향기',    tag:'단풍·향기·공원', zone:'전국'},
-  {n:'튤립나무',      c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'B6~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'여름꽃·단풍',  tag:'가로수·공원·내공해', zone:'전국'},
-  {n:'메타세쿼이아',  c:'낙엽교목', h:'4.0~6.0', w:'1.0~1.5', r:'B6~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형·단풍',    tag:'가로수·수직형·빠른성장', zone:'전국'},
-  {n:'낙우송',        c:'낙엽교목', h:'4.0~6.0', w:'1.5~2.5', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'단풍·기근',    tag:'수변·습지·단풍·내염', zone:'전국'},
-  {n:'벚나무',        c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·가로수·관상', zone:'전국'},
-  {n:'배롱나무',      c:'낙엽교목', h:'2.0~3.0', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃·수피',  tag:'여름꽃·내염·도심', zone:'중부이남'},
-  {n:'모감주나무',    c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃·열매',  tag:'여름꽃·내염·해안', zone:'남부'},
-  {n:'팽나무',        c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.5', r:'R10~20', rDef:12, env:'양수', growth:'느림', salt:true,  smog:true,  ornament:'수형',         tag:'내염·해안·노거수·내공해', zone:'전국'},
-  {n:'상수리나무',    c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·열매',    tag:'자생·내건·산림', zone:'전국'},
-  {n:'수양버들',      c:'낙엽교목', h:'3.0~5.0', w:'2.0~4.0', r:'B6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'수변·수형·빠른성장', zone:'전국'},
-  {n:'칠엽수(마로니에)',c:'낙엽교목',h:'3.5~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃·열매',    tag:'봄꽃·유럽풍·공원·내공해', zone:'전국'},
-  {n:'산딸나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·자생·정원', zone:'전국'},
-  {n:'자작나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.0~1.5', r:'B5~10',  rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'흰수피·수형',  tag:'수피·수직형·내한', zone:'전국'},
-  {n:'때죽나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·흰꽃·자생', zone:'전국'},
-  {n:'꽃사과',        c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·빨간열매·정원·관상', zone:'전국'},
-  {n:'매화나무',      c:'낙엽교목', h:'2.0~3.0', w:'1.0~1.5', r:'R5~8',   rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·향기·정원·이른봄', zone:'중부이남'},
-  {n:'살구나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·열매·정원', zone:'전국'},
-  {n:'복자기',        c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'단풍',         tag:'단풍·자생·주황단풍·가을', zone:'전국'},
-  {n:'감나무',        c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'열매·단풍',    tag:'열매·단풍·정원·주황', zone:'중부이남'},
-  {n:'오리나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'B6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'수변·질소고정·자생·생태', zone:'전국'},
-  {n:'음나무',        c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'잎',           tag:'자생·내한·가시·식용', zone:'전국'},
-  {n:'황금버들',      c:'낙엽교목', h:'4.0~6.0', w:'3.0~5.0', r:'B6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형·황금수피', tag:'수변·수형·황금색·수피', zone:'전국'},
-  {n:'귀룽나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'B6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·자생·흰꽃·자연풍', zone:'전국'},
-  {n:'올벚나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·자생벚나무·분홍꽃', zone:'전국'},
+  {n:'느티나무',      c:'낙엽교목', h:'3.0~6.0', w:'1.5~3.5', r:'R8~20',  rDef:10, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'단풍·수형',    tag:'가로수·공원·내한·내공해', zone:'전국', bloom:'🍂가을단풍', soil:'적습·비옥', use:'가로수·공원·그늘목', care:'흰불나방·빗자루병 주의', transplant:'봄(3~4월)'},
+  {n:'왕벚나무',      c:'낙엽교목', h:'3.5~5.0', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·가로수·관상', zone:'전국', bloom:'🌸봄(4월)', soil:'적습·배수양호', use:'가로수·봄꽃식재', care:'벚나무응애·갈반병 주의', transplant:'봄(3~4월)'},
+  {n:'이팝나무',      c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃·수형',    tag:'봄꽃·가로수·내한·내공해', zone:'전국', bloom:'🌸봄(5월)', soil:'적습', use:'가로수·공원', care:'병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'회화나무',      c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'R10~20', rDef:12, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'수형·여름꽃',  tag:'가로수·내공해·내건', zone:'전국', bloom:'☀️여름(7~8월)', soil:'적습·건조 견딤', use:'가로수·공원', care:'병충해 강함·내공해', transplant:'봄(3~4월)'},
+  {n:'은행나무',      c:'낙엽교목', h:'3.5~6.0', w:'1.0~2.0', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'단풍',         tag:'가로수·내공해·단풍', zone:'전국', bloom:'🍂가을단풍', soil:'적습·배수양호', use:'가로수·공원', care:'열매 악취(암목 배제), 병충해 강함', transplant:'봄(3~4월)'},
+  {n:'단풍나무',      c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R5~8',   rDef:6,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'단풍',         tag:'단풍·정원·관상', zone:'전국', bloom:'🌸봄꽃·🍂가을단풍', soil:'적습·약산성', use:'정원·공원·관상', care:'점박이응애 주의', transplant:'봄(3~4월)'},
+  {n:'홍단풍',        c:'낙엽교목', h:'1.5~2.5', w:'0.8~1.2', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'잎색·단풍',    tag:'정원·포인트·관상', zone:'전국', bloom:'🌸봄붉은새잎·🍂가을단풍', soil:'적습·약산성', use:'정원·포인트식재', care:'여름 직사광선 과다 시 잎 탐', transplant:'봄(3~4월)'},
+  {n:'목련',          c:'낙엽교목', h:'2.5~3.5', w:'1.0~1.5', r:'R6~10',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·향기·정원', zone:'전국', bloom:'🌸봄(3~4월)', soil:'적습·비옥', use:'정원·공원·향기', care:'이식 후 활착 주의·뿌리 손상 최소화', transplant:'봄(개화 전)'},
+  {n:'자목련',        c:'낙엽교목', h:'2.0~3.0', w:'0.8~1.5', r:'R5~8',   rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·자주색·정원', zone:'전국', bloom:'🌸봄(3~4월)', soil:'적습', use:'정원·경계', care:'이식 후 활착 주의', transplant:'봄(개화 전)'},
+  {n:'산수유',        c:'낙엽교목', h:'2.0~3.5', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·열매·정원', zone:'전국', bloom:'🌸봄(3월)', soil:'적습', use:'정원·공원·꽃과열매', care:'비교적 강건', transplant:'봄(3~4월)'},
+  {n:'자귀나무',      c:'낙엽교목', h:'2.5~4.0', w:'2.0~3.0', r:'R8~15',  rDef:10, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'여름꽃·수형',  tag:'여름꽃·내건·정원', zone:'중부이남', bloom:'☀️여름(6~7월)', soil:'건조·척박 견딤', use:'정원·공원', care:'내건성 강·과습 주의', transplant:'봄(4~5월)'},
+  {n:'층층나무',      c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.5', r:'R8~15',  rDef:10, env:'반음', growth:'보통', salt:false, smog:false, ornament:'수형·열매',    tag:'자생·공원·내음', zone:'전국', bloom:'🌸봄(5월)', soil:'적습', use:'공원·자연풍경식', care:'병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'계수나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'R8~15',  rDef:10, env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·향기',    tag:'단풍·향기·공원', zone:'전국', bloom:'🍂가을(단풍·캐러멜향기)', soil:'적습·비옥', use:'공원·정원·향기', care:'건조 주의·이식 후 충분한 관수', transplant:'봄(3~4월)'},
+  {n:'튤립나무',      c:'낙엽교목', h:'4.0~6.0', w:'2.0~3.0', r:'B6~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'여름꽃·단풍',  tag:'가로수·공원·내공해', zone:'전국', bloom:'☀️여름(6월)', soil:'적습·비옥', use:'가로수·공원', care:'이식 후 지주목 필수', transplant:'봄(4~5월)'},
+  {n:'메타세쿼이아',  c:'낙엽교목', h:'4.0~6.0', w:'1.0~1.5', r:'B6~15',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형·단풍',    tag:'가로수·수직형·빠른성장', zone:'전국', bloom:'🍂가을단풍', soil:'적습·수변 가능', use:'가로수·수변·수형', care:'병충해 강함', transplant:'봄(3~4월)'},
+  {n:'낙우송',        c:'낙엽교목', h:'4.0~6.0', w:'1.5~2.5', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'단풍·기근',    tag:'수변·습지·단풍·내염', zone:'전국', bloom:'🍂가을단풍·기근', soil:'습윤·수변', use:'수변·습지', care:'건조지 기근 발달 미흡', transplant:'봄(3~4월)'},
+  {n:'벚나무',        c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·가로수·관상', zone:'전국', bloom:'🌸봄(4월)', soil:'적습·배수양호', use:'가로수·공원', care:'응애·갈반병·천공성해충 주의', transplant:'봄(3~4월)'},
+  {n:'배롱나무',      c:'낙엽교목', h:'2.0~3.0', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃·수피',  tag:'여름꽃·내염·도심', zone:'중부이남', bloom:'☀️여름(7~9월)', soil:'적습·배수양호', use:'정원·가로수', care:'흰가루병 주의·중부 이북 방한', transplant:'봄(4~5월)'},
+  {n:'모감주나무',    c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃·열매',  tag:'여름꽃·내염·해안', zone:'남부', bloom:'☀️여름(6~7월)', soil:'건조·염분 견딤', use:'해안·공원·여름꽃', care:'병충해 강함', transplant:'봄(4~5월)'},
+  {n:'팽나무',        c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.5', r:'R10~20', rDef:12, env:'양수', growth:'느림', salt:true,  smog:true,  ornament:'수형',         tag:'내염·해안·노거수·내공해', zone:'전국', bloom:'🍂가을단풍', soil:'적습·건조 견딤', use:'노거수·공원·해안', care:'병충해 강함·내염성', transplant:'봄(3~4월)'},
+  {n:'상수리나무',    c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·열매',    tag:'자생·내건·산림', zone:'전국', bloom:'🍂가을단풍', soil:'건조·척박', use:'자연풍경·산림복원', care:'참나무시들음병 주의(소나무재선충 매개)', transplant:'봄(3~4월)'},
+  {n:'수양버들',      c:'낙엽교목', h:'3.0~5.0', w:'2.0~4.0', r:'B6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'수변·수형·빠른성장', zone:'전국', bloom:'🌸봄(새잎)', soil:'습윤·수변', use:'수변·수형', care:'가지마름병 주의', transplant:'봄(3~4월)'},
+  {n:'칠엽수(마로니에)',c:'낙엽교목',h:'3.5~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃·열매',    tag:'봄꽃·유럽풍·공원·내공해', zone:'전국', bloom:'🌸봄(5월)', soil:'적습·비옥', use:'공원·유럽풍', care:'잎마름병 주의·여름 반그늘 선호', transplant:'봄(3~4월)'},
+  {n:'산딸나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·자생·정원', zone:'전국', bloom:'🌸봄(5~6월)', soil:'적습·약산성', use:'정원·공원', care:'병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'자작나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.0~1.5', r:'B5~10',  rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'흰수피·수형',  tag:'수피·수직형·내한', zone:'전국', bloom:'🍂가을단풍', soil:'적습·배수양호', use:'정원·흰수피·수형', care:'고온다습 취약·중부이남 식재 주의', transplant:'봄(3~4월)'},
+  {n:'때죽나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·흰꽃·자생', zone:'전국', bloom:'🌸봄(5~6월)', soil:'적습·약산성', use:'정원·공원·흰꽃', care:'병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'꽃사과',        c:'낙엽교목', h:'3.0~4.5', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·빨간열매·정원·관상', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·배수양호', use:'정원·관상·열매', care:'붉은별무늬병·화상병 주의', transplant:'봄(3~4월)'},
+  {n:'매화나무',      c:'낙엽교목', h:'2.0~3.0', w:'1.0~1.5', r:'R5~8',   rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기',    tag:'봄꽃·향기·정원·이른봄', zone:'중부이남', bloom:'🌸봄(2~3월, 이른봄)', soil:'적습·배수양호', use:'정원·향기·봄꽃', care:'진딧물·복숭아축나방 주의', transplant:'봄(개화 후)'},
+  {n:'살구나무',      c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·열매·정원', zone:'전국', bloom:'🌸봄(3~4월)', soil:'적습·배수양호', use:'정원·열매·봄꽃', care:'흑성병·세균구멍병 주의', transplant:'봄(3~4월)'},
+  {n:'복자기',        c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'단풍',         tag:'단풍·자생·주황단풍·가을', zone:'전국', bloom:'🍂가을단풍(주황)', soil:'적습·약산성', use:'정원·공원·단풍', care:'병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'감나무',        c:'낙엽교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'열매·단풍',    tag:'열매·단풍·정원·주황', zone:'중부이남', bloom:'☀️여름(열매)·🍂가을단풍', soil:'적습·비옥', use:'정원·열매·단풍', care:'탄저병·둥근무늬낙엽병 주의', transplant:'봄(4~5월)'},
+  {n:'오리나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'B6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'수변·질소고정·자생·생태', zone:'전국', bloom:'🌸봄(꽃)', soil:'습윤·수변', use:'수변·생태복원', care:'질소고정 수종·이식 후 생육 왕성', transplant:'봄(3~4월)'},
+  {n:'음나무',        c:'낙엽교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'잎',           tag:'자생·내한·가시·식용', zone:'전국', bloom:'☀️여름(꽃)', soil:'적습', use:'자생·공원', care:'가시 주의·어린순 식용(엄나무순)', transplant:'봄(4~5월)'},
+  {n:'황금버들',      c:'낙엽교목', h:'4.0~6.0', w:'3.0~5.0', r:'B6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형·황금수피', tag:'수변·수형·황금색·수피', zone:'전국', bloom:'🌸봄(황금수피)', soil:'습윤·수변', use:'수변·수형·황금색', care:'가지마름병 주의·과습 견딤', transplant:'봄(3~4월)'},
+  {n:'귀룽나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'B6~12',  rDef:8,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',    tag:'봄꽃·자생·흰꽃·자연풍', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·수변 가능', use:'자생·공원·흰꽃', care:'병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'올벚나무',      c:'낙엽교목', h:'3.0~5.0', w:'1.5~2.5', r:'R8~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',         tag:'봄꽃·자생벚나무·분홍꽃', zone:'전국', bloom:'🌸봄(4월)', soil:'적습', use:'공원·자생벚나무', care:'왕벚나무 대안 자생종·강건', transplant:'봄(3~4월)'},
   // ── 상록교목 ──
-  {n:'소나무',        c:'상록교목', h:'2.0~4.0', w:'1.0~2.0', r:'R6~15',  rDef:8,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'수형',         tag:'내건·상징목·조형', zone:'전국'},
-  {n:'향나무',        c:'상록교목', h:'1.5~2.5', w:'0.5~0.8', r:'R4~8',   rDef:5,  env:'양수', growth:'느림', salt:true,  smog:true,  ornament:'수형·향기',    tag:'조형·내염·내공해', zone:'전국'},
-  {n:'가이즈카향나무', c:'상록교목', h:'2.0~3.5', w:'0.6~1.0', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'수형',         tag:'수직형·내염·내공해·경계', zone:'중부이남'},
-  {n:'스트로브잣나무', c:'상록교목', h:'2.0~3.5', w:'1.0~2.0', r:'R5~12',  rDef:6,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'내한·북방계·배경', zone:'전국'},
-  {n:'편백나무',      c:'상록교목', h:'2.0~4.0', w:'0.6~1.2', r:'R5~12',  rDef:6,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'수형·향기',    tag:'피톤치드·수직형·내음', zone:'중부이남'},
-  {n:'구상나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.8', r:'R5~10',  rDef:6,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'수형',         tag:'자생·내한·고산', zone:'고산'},
-  {n:'히말라야시더',  c:'상록교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'대형수목·공원·배경', zone:'중부이남'},
-  {n:'독일가문비',    c:'상록교목', h:'3.0~5.0', w:'1.0~1.5', r:'B5~10',  rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'수직형·내한·배경', zone:'전국'},
-  {n:'동백나무',      c:'상록교목', h:'1.5~3.0', w:'0.8~1.5', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:true,  smog:false, ornament:'겨울꽃',       tag:'겨울꽃·남부·내염', zone:'남부'},
-  {n:'후박나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'수형',         tag:'남부·내염·해안', zone:'남부'},
-  {n:'먼나무',        c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매·수형',    tag:'남부·열매·내염', zone:'남부'},
-  {n:'태산목(양옥란)', c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'여름꽃·잎',    tag:'남부·대형꽃·정원', zone:'남부'},
-  {n:'굴거리나무',    c:'상록교목', h:'2.0~3.0', w:'1.0~1.5', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'잎·수형',      tag:'남부·그늘·내음', zone:'남부'},
-  {n:'잣나무',        c:'상록교목', h:'2.5~5.0', w:'1.0~2.0', r:'R6~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'내한·자생·오엽송·고산', zone:'전국'},
-  {n:'리기다소나무',  c:'상록교목', h:'2.5~4.0', w:'1.0~2.0', r:'R6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'수형',         tag:'내건·황폐지·내공해·사면', zone:'전국'},
-  {n:'녹나무',        c:'상록교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'향기·수형',    tag:'남부·향기·내염·가로수', zone:'남부'},
-  {n:'가시나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'수형',         tag:'남부·내염·해안·상록참나무', zone:'남부'},
-  {n:'붉가시나무',    c:'상록교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'수형',         tag:'남부·내염·방풍·상록참나무', zone:'남부'},
+  {n:'소나무',        c:'상록교목', h:'2.0~4.0', w:'1.0~2.0', r:'R6~15',  rDef:8,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'수형',         tag:'내건·상징목·조형', zone:'전국', bloom:'사계절 상록', soil:'건조·산성·배수양호', use:'조형·상징목·정원', care:'솔잎혹파리·소나무재선충 주의', transplant:'봄(3~4월)·가을(9~10월)'},
+  {n:'향나무',        c:'상록교목', h:'1.5~2.5', w:'0.5~0.8', r:'R4~8',   rDef:5,  env:'양수', growth:'느림', salt:true,  smog:true,  ornament:'수형·향기',    tag:'조형·내염·내공해', zone:'전국', bloom:'사계절 상록', soil:'건조·배수양호', use:'조형·경계', care:'붉은별무늬병(장미과 근처 금지)', transplant:'봄(3~4월)'},
+  {n:'가이즈카향나무', c:'상록교목', h:'2.0~3.5', w:'0.6~1.0', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'수형',         tag:'수직형·내염·내공해·경계', zone:'중부이남', bloom:'사계절 상록', soil:'건조·염분 견딤', use:'수직형·경계', care:'붉은별무늬병(장미과 근처 금지)', transplant:'봄(3~4월)'},
+  {n:'스트로브잣나무', c:'상록교목', h:'2.0~3.5', w:'1.0~2.0', r:'R5~12',  rDef:6,  env:'양수', growth:'빠름', salt:false, smog:false, ornament:'수형',         tag:'내한·북방계·배경', zone:'전국', bloom:'사계절 상록', soil:'적습·산성', use:'배경식재·내한', care:'잎녹병 주의', transplant:'봄(3~4월)'},
+  {n:'편백나무',      c:'상록교목', h:'2.0~4.0', w:'0.6~1.2', r:'R5~12',  rDef:6,  env:'반음', growth:'보통', salt:false, smog:false, ornament:'수형·향기',    tag:'피톤치드·수직형·내음', zone:'중부이남', bloom:'사계절 상록', soil:'적습·약산성', use:'수직형·피톤치드', care:'병충해 강함', transplant:'봄(3~4월)'},
+  {n:'구상나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.8', r:'R5~10',  rDef:6,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'수형',         tag:'자생·내한·고산', zone:'고산', bloom:'사계절 상록', soil:'적습·서늘한 고산', use:'고산·관상', care:'고온 취약·평지 식재 불리', transplant:'봄(4~5월)'},
+  {n:'히말라야시더',  c:'상록교목', h:'3.0~5.0', w:'2.0~3.0', r:'B6~12',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'대형수목·공원·배경', zone:'중부이남', bloom:'사계절 상록', soil:'적습·배수양호', use:'대형공원·배경식재', care:'과습 주의·이식 후 활착 관리', transplant:'봄(3~4월)'},
+  {n:'독일가문비',    c:'상록교목', h:'3.0~5.0', w:'1.0~1.5', r:'B5~10',  rDef:6,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'수직형·내한·배경', zone:'전국', bloom:'사계절 상록', soil:'적습·서늘', use:'수직형·내한·배경', care:'나무좀(바크비틀) 주의', transplant:'봄(3~4월)'},
+  {n:'동백나무',      c:'상록교목', h:'1.5~3.0', w:'0.8~1.5', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:true,  smog:false, ornament:'겨울꽃',       tag:'겨울꽃·남부·내염', zone:'남부', bloom:'❄️겨울(12~3월)', soil:'적습·약산성', use:'남부·겨울꽃', care:'차주머니나방·탄저병 주의', transplant:'봄(4~5월)'},
+  {n:'후박나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'수형',         tag:'남부·내염·해안', zone:'남부', bloom:'사계절 상록', soil:'적습·해안', use:'남부·방풍', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'먼나무',        c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매·수형',    tag:'남부·열매·내염', zone:'남부', bloom:'❄️겨울(빨간열매)', soil:'적습', use:'남부·열매관상', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'태산목(양옥란)', c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'느림', salt:false, smog:false, ornament:'여름꽃·잎',    tag:'남부·대형꽃·정원', zone:'남부', bloom:'☀️여름(6~7월)', soil:'적습·비옥', use:'남부·대형꽃', care:'과습 주의·이식 후 활착 느림', transplant:'봄(4~5월)'},
+  {n:'굴거리나무',    c:'상록교목', h:'2.0~3.0', w:'1.0~1.5', r:'R4~8',   rDef:5,  env:'반음', growth:'느림', salt:false, smog:false, ornament:'잎·수형',      tag:'남부·그늘·내음', zone:'남부', bloom:'사계절 상록', soil:'적습·약산성', use:'남부·음지', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'잣나무',        c:'상록교목', h:'2.5~5.0', w:'1.0~2.0', r:'R6~15',  rDef:8,  env:'양수', growth:'보통', salt:false, smog:false, ornament:'수형',         tag:'내한·자생·오엽송·고산', zone:'전국', bloom:'사계절 상록', soil:'적습·산성', use:'배경·내한·고산', care:'잣나무넓적잎벌·잎떨림병 주의', transplant:'봄(3~4월)'},
+  {n:'리기다소나무',  c:'상록교목', h:'2.5~4.0', w:'1.0~2.0', r:'R6~12',  rDef:8,  env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'수형',         tag:'내건·황폐지·내공해·사면', zone:'전국', bloom:'사계절 상록', soil:'건조·척박·산성', use:'사면녹화·황폐지복원', care:'병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'녹나무',        c:'상록교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'향기·수형',    tag:'남부·향기·내염·가로수', zone:'남부', bloom:'사계절 상록·향기', soil:'적습', use:'남부·가로수·향기', care:'내한성 약·겨울 방한 필요', transplant:'봄(4~5월)'},
+  {n:'가시나무',      c:'상록교목', h:'2.0~3.5', w:'1.0~1.5', r:'R5~10',  rDef:6,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'수형',         tag:'남부·내염·해안·상록참나무', zone:'남부', bloom:'사계절 상록', soil:'적습·해안', use:'남부·해안방풍', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'붉가시나무',    c:'상록교목', h:'2.5~4.0', w:'1.5~2.5', r:'R6~12',  rDef:8,  env:'양수', growth:'보통', salt:true,  smog:false, ornament:'수형',         tag:'남부·내염·방풍·상록참나무', zone:'남부', bloom:'사계절 상록', soil:'적습·해안', use:'남부·방풍', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
   // ── 낙엽관목 ──
-  {n:'철쭉',          c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·산성토·자생', zone:'전국'},
-  {n:'산철쭉',        c:'낙엽관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·자생', zone:'전국'},
-  {n:'개나리',        c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'봄꽃',       tag:'봄꽃·비탈면·내공해', zone:'전국'},
-  {n:'조팝나무',      c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃',       tag:'봄꽃·군식·내공해', zone:'전국'},
-  {n:'수수꽃다리(라일락)',c:'낙엽관목',h:'1.0~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기', tag:'향기꽃·정원·봄', zone:'전국'},
-  {n:'황매화',        c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·내음·정원', zone:'전국'},
-  {n:'무궁화',        c:'낙엽관목', h:'1.0~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃',     tag:'국화·여름꽃·내염·내공해', zone:'전국'},
-  {n:'낙상홍',        c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'겨울열매',   tag:'겨울열매·관상·정원', zone:'전국'},
-  {n:'쥐똥나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'열매',       tag:'생울타리·내염·내공해', zone:'전국'},
-  {n:'화살나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·수피',  tag:'단풍·경계·코르크날개', zone:'전국'},
-  {n:'명자나무',      c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',  tag:'봄꽃·가시·경계', zone:'전국'},
-  {n:'박태기나무',    c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·자홍색·정원', zone:'전국'},
-  {n:'말발도리',      c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'흰꽃·봄·자생', zone:'전국'},
-  {n:'병꽃나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.6~1.0', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'자생·내음·봄', zone:'전국'},
-  {n:'꽃댕강나무',    c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름~가을꽃',tag:'내염·내공해·오래꽃피는', zone:'중부이남'},
-  {n:'미선나무',      c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'자생·천연기념물·봄', zone:'전국'},
-  {n:'수국',          c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.2', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'여름꽃·파란꽃·정원·그늘', zone:'중부이남'},
-  {n:'산수국',        c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'여름꽃·자생·내음·자연풍', zone:'전국'},
-  {n:'작살나무',      c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'가을열매',   tag:'가을열매·보라색·자생·관상', zone:'전국'},
-  {n:'해당화',        c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'여름꽃·향기', tag:'내염·해안·향기꽃·장미과', zone:'전국'},
-  {n:'모란',          c:'낙엽관목', h:'0.8~1.2', w:'0.8~1.2', r:'-', rDef:0, env:'양수', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·대형꽃·정원·관상', zone:'전국'},
-  {n:'황금조팝나무',  c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'황금잎·봄꽃', tag:'황금잎·봄꽃·경계·내공해', zone:'전국'},
-  {n:'매자나무',      c:'낙엽관목', h:'0.5~0.8', w:'0.4~0.6', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'열매',       tag:'내건·경계·가시·빨간열매', zone:'전국'},
-  {n:'앵도나무',      c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',  tag:'봄꽃·빨간열매·자생·정원', zone:'전국'},
-  {n:'덜꿩나무',      c:'낙엽관목', h:'1.0~1.5', w:'0.8~1.2', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'꽃·열매',    tag:'자생·가을열매·자연풍', zone:'전국'},
-  {n:'보리수나무',    c:'낙엽관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매',       tag:'내건·내염·식용열매·자생', zone:'전국'},
+  {n:'철쭉',          c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·산성토·자생', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·약산성·배수양호', use:'군식·경계·법면', care:'철쭉방패벌레 주의·과습 금지', transplant:'봄(꽃 후)·가을'},
+  {n:'산철쭉',        c:'낙엽관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·자생', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·약산성', use:'군식·자생·자연풍', care:'철쭉방패벌레 주의', transplant:'봄(꽃 후)·가을'},
+  {n:'개나리',        c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'봄꽃',       tag:'봄꽃·비탈면·내공해', zone:'전국', bloom:'🌸봄(3~4월)', soil:'건조·척박 견딤', use:'비탈면·군식', care:'병충해 강함', transplant:'봄·가을(삽목 용이)'},
+  {n:'조팝나무',      c:'낙엽관목', h:'0.4~0.6', w:'0.4~0.6', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'봄꽃',       tag:'봄꽃·군식·내공해', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·건조 견딤', use:'군식·경계', care:'병충해 비교적 강함', transplant:'봄·가을'},
+  {n:'수수꽃다리(라일락)',c:'낙엽관목',h:'1.0~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·향기', tag:'향기꽃·정원·봄', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·배수양호', use:'정원·향기', care:'흰가루병 주의·전정 후 개화 촉진', transplant:'봄(꽃 후)·가을'},
+  {n:'황매화',        c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·내음·정원', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·반음', use:'정원·음지', care:'병충해 비교적 강함', transplant:'봄·가을'},
+  {n:'무궁화',        c:'낙엽관목', h:'1.0~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름꽃',     tag:'국화·여름꽃·내염·내공해', zone:'전국', bloom:'☀️여름(7~9월)', soil:'적습·건조 견딤', use:'정원·생울타리', care:'진딧물·무궁화잎벌레 주의', transplant:'봄(4~5월)'},
+  {n:'낙상홍',        c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'겨울열매',   tag:'겨울열매·관상·정원', zone:'전국', bloom:'❄️겨울(빨간열매)', soil:'적습·약산성', use:'관상·정원·겨울', care:'병충해 비교적 강함', transplant:'봄·가을'},
+  {n:'쥐똥나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'열매',       tag:'생울타리·내염·내공해', zone:'전국', bloom:'🌸봄(5~6월)', soil:'건조·염분 견딤', use:'생울타리', care:'병충해 강함', transplant:'봄·가을(삽목 용이)'},
+  {n:'화살나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'단풍·수피',  tag:'단풍·경계·코르크날개', zone:'전국', bloom:'🍂가을단풍', soil:'적습·건조 견딤', use:'경계·단풍관상', care:'병충해 강함', transplant:'봄·가을'},
+  {n:'명자나무',      c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',  tag:'봄꽃·가시·경계', zone:'전국', bloom:'🌸봄(3~4월)', soil:'적습', use:'경계·봄꽃', care:'가시 주의', transplant:'봄(꽃 전후)'},
+  {n:'박태기나무',    c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·자홍색·정원', zone:'전국', bloom:'🌸봄(3~4월)', soil:'적습·건조 견딤', use:'정원·봄꽃', care:'흰불나방 주의', transplant:'봄·가을'},
+  {n:'말발도리',      c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'흰꽃·봄·자생', zone:'전국', bloom:'🌸봄(5~6월)', soil:'적습', use:'정원·흰꽃', care:'병충해 비교적 강함', transplant:'봄·가을'},
+  {n:'병꽃나무',      c:'낙엽관목', h:'0.8~1.2', w:'0.6~1.0', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'자생·내음·봄', zone:'전국', bloom:'🌸봄(5~6월)', soil:'적습·반음', use:'자생·음지', care:'병충해 강함', transplant:'봄·가을'},
+  {n:'꽃댕강나무',    c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:true,  ornament:'여름~가을꽃',tag:'내염·내공해·오래꽃피는', zone:'중부이남', bloom:'☀️여름~🍂가을(5~10월)', soil:'적습·건조 견딤', use:'경계·장기개화', care:'병충해 강함·내공해', transplant:'봄(4~5월)'},
+  {n:'미선나무',      c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'자생·천연기념물·봄', zone:'전국', bloom:'🌸봄(3월, 개나리 전)', soil:'적습·자생지 석회암', use:'희귀자생·천연기념물', care:'희귀종·전정 최소화', transplant:'봄(3~4월)'},
+  {n:'수국',          c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.2', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'여름꽃·파란꽃·정원·그늘', zone:'중부이남', bloom:'☀️여름(6~8월)', soil:'적습·약산성(파란꽃)', use:'정원·그늘', care:'토양 pH에 따라 꽃색 변함·과습 금지', transplant:'봄(4~5월)'},
+  {n:'산수국',        c:'낙엽관목', h:'0.6~1.0', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'여름꽃·자생·내음·자연풍', zone:'전국', bloom:'☀️여름(6~8월)', soil:'적습·약산성', use:'자생·음지', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'작살나무',      c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'가을열매',   tag:'가을열매·보라색·자생·관상', zone:'전국', bloom:'🍂가을(보라열매)', soil:'적습', use:'관상·자생', care:'병충해 비교적 강함', transplant:'봄·가을'},
+  {n:'해당화',        c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'여름꽃·향기', tag:'내염·해안·향기꽃·장미과', zone:'전국', bloom:'☀️여름(5~7월)', soil:'건조·염분·사질토', use:'해안·경계·향기', care:'가시 주의·병충해 강함', transplant:'봄·가을'},
+  {n:'모란',          c:'낙엽관목', h:'0.8~1.2', w:'0.8~1.2', r:'-', rDef:0, env:'양수', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·대형꽃·정원·관상', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·비옥·배수양호', use:'정원·관상·대형꽃', care:'과습·습한 토양 금지', transplant:'가을(9~10월)'},
+  {n:'황금조팝나무',  c:'낙엽관목', h:'0.5~0.8', w:'0.5~0.8', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'황금잎·봄꽃', tag:'황금잎·봄꽃·경계·내공해', zone:'전국', bloom:'🌸봄(황금잎+꽃)', soil:'적습·배수양호', use:'경계·포인트식재', care:'병충해 비교적 강함', transplant:'봄·가을'},
+  {n:'매자나무',      c:'낙엽관목', h:'0.5~0.8', w:'0.4~0.6', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'열매',       tag:'내건·경계·가시·빨간열매', zone:'전국', bloom:'🌸봄꽃·🍂가을빨간열매', soil:'건조·배수양호', use:'경계·가시울타리', care:'병충해 강함', transplant:'봄·가을'},
+  {n:'앵도나무',      c:'낙엽관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃·열매',  tag:'봄꽃·빨간열매·자생·정원', zone:'전국', bloom:'🌸봄(3~4월)', soil:'적습·배수양호', use:'정원·식용열매', care:'비교적 강건·열매 식용', transplant:'봄(3~4월)'},
+  {n:'덜꿩나무',      c:'낙엽관목', h:'1.0~1.5', w:'0.8~1.2', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'꽃·열매',    tag:'자생·가을열매·자연풍', zone:'전국', bloom:'🌸봄꽃·🍂가을열매', soil:'적습', use:'자생·자연풍경', care:'병충해 비교적 강함', transplant:'봄·가을'},
+  {n:'보리수나무',    c:'낙엽관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매',       tag:'내건·내염·식용열매·자생', zone:'전국', bloom:'🌸봄꽃·☀️여름열매', soil:'건조·척박·염분 견딤', use:'사면·경계·식용', care:'병충해 강함·열매 식용', transplant:'봄·가을'},
   // ── 상록관목 ──
-  {n:'영산홍',        c:'상록관목', h:'0.3~0.4', w:'0.3~0.4', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·경계', zone:'중부이남'},
-  {n:'회양목',        c:'상록관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:true,  ornament:'수형',       tag:'조형·경계·내음·내공해', zone:'전국'},
-  {n:'사철나무',      c:'상록관목', h:'0.4~1.0', w:'0.3~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:true,  smog:true,  ornament:'수형',       tag:'생울타리·내염·내공해', zone:'전국'},
-  {n:'꽝꽝나무',      c:'상록관목', h:'0.4~0.8', w:'0.4~0.8', r:'-', rDef:0, env:'반음', growth:'느림', salt:true,  smog:false, ornament:'수형',       tag:'생울타리·내염·해안', zone:'남부'},
-  {n:'피라칸사',      c:'상록관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'열매',       tag:'가을열매·가시·경계', zone:'중부이남'},
-  {n:'남천',          c:'상록관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'열매·단풍',  tag:'겨울열매·단풍·정원', zone:'중부이남'},
-  {n:'눈향나무',      c:'상록관목', h:'0.3~0.5', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'느림', salt:true,  smog:false, ornament:'수형',       tag:'포복형·내염·사면', zone:'전국'},
-  {n:'돈나무',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매·향기',  tag:'남부·내염·해안', zone:'남부'},
-  {n:'아왜나무',      c:'상록관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매',       tag:'남부·내염·방풍', zone:'남부'},
-  {n:'차나무',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'가을꽃',     tag:'차·가을꽃·그늘', zone:'남부'},
-  {n:'호랑가시나무',  c:'상록관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'반음', growth:'느림', salt:true,  smog:false, ornament:'겨울열매·잎', tag:'겨울열매·남부·크리스마스·내염', zone:'남부'},
-  {n:'광나무',        c:'상록관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'열매·수형',  tag:'생울타리·내염·내공해·남부', zone:'남부'},
-  {n:'다정큼나무',    c:'상록관목', h:'0.8~1.5', w:'0.6~1.2', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'봄꽃·열매',  tag:'남부·내염·해안·봄꽃', zone:'남부'},
-  {n:'식나무',        c:'상록관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:true,  ornament:'잎',         tag:'내음·내공해·그늘·황금반점', zone:'남부'},
-  {n:'팔손이',        c:'상록관목', h:'1.0~2.0', w:'1.0~2.0', r:'-', rDef:0, env:'음수', growth:'보통', salt:true,  smog:true,  ornament:'잎·가을꽃',  tag:'내음·내염·내공해·대형잎·도심', zone:'남부'},
-  {n:'백량금',        c:'상록관목', h:'0.3~0.8', w:'0.3~0.6', r:'-', rDef:0, env:'음수', growth:'느림', salt:false, smog:false, ornament:'겨울열매',   tag:'그늘·빨간열매·음지·저목', zone:'남부'},
-  {n:'마취목',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·흰꽃·산성토·내한', zone:'중부이남'},
+  {n:'영산홍',        c:'상록관목', h:'0.3~0.4', w:'0.3~0.4', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·군식·경계', zone:'중부이남', bloom:'🌸봄(4~5월)', soil:'적습·약산성·배수양호', use:'군식·경계', care:'철쭉방패벌레 주의·과습 금지', transplant:'봄(꽃 후)·가을'},
+  {n:'회양목',        c:'상록관목', h:'0.3~0.5', w:'0.3~0.5', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:true,  ornament:'수형',       tag:'조형·경계·내음·내공해', zone:'전국', bloom:'🌸봄(작은꽃)', soil:'적습·석회질', use:'조형·경계·토피어리', care:'회양목나방(최근 급증) 주의', transplant:'봄·가을'},
+  {n:'사철나무',      c:'상록관목', h:'0.4~1.0', w:'0.3~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:true,  smog:true,  ornament:'수형',       tag:'생울타리·내염·내공해', zone:'전국', bloom:'사계절 상록', soil:'건조·염분 견딤', use:'생울타리·경계', care:'흰가루병·깍지벌레 주의', transplant:'봄·가을'},
+  {n:'꽝꽝나무',      c:'상록관목', h:'0.4~0.8', w:'0.4~0.8', r:'-', rDef:0, env:'반음', growth:'느림', salt:true,  smog:false, ornament:'수형',       tag:'생울타리·내염·해안', zone:'남부', bloom:'사계절 상록', soil:'적습·해안', use:'생울타리·해안', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'피라칸사',      c:'상록관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'열매',       tag:'가을열매·가시·경계', zone:'중부이남', bloom:'🌸봄꽃·🍂가을주황열매', soil:'적습·건조 견딤', use:'경계·열매관상', care:'가시 주의·붉은별무늬병 주의', transplant:'봄·가을'},
+  {n:'남천',          c:'상록관목', h:'0.8~1.2', w:'0.5~0.8', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'열매·단풍',  tag:'겨울열매·단풍·정원', zone:'중부이남', bloom:'❄️겨울(빨간열매)', soil:'적습·반음', use:'정원·음지', care:'병충해 비교적 강함·중부 겨울 방한', transplant:'봄(4~5월)'},
+  {n:'눈향나무',      c:'상록관목', h:'0.3~0.5', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'느림', salt:true,  smog:false, ornament:'수형',       tag:'포복형·내염·사면', zone:'전국', bloom:'사계절 상록', soil:'건조·염분·척박 견딤', use:'사면·포복형·경사지', care:'붉은별무늬병(장미과 근처 금지)', transplant:'봄(3~4월)'},
+  {n:'돈나무',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매·향기',  tag:'남부·내염·해안', zone:'남부', bloom:'🌸봄꽃·🍂가을열매', soil:'건조·염분', use:'남부·해안', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'아왜나무',      c:'상록관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'열매',       tag:'남부·내염·방풍', zone:'남부', bloom:'🌸봄(꽃)', soil:'적습·해안', use:'남부·방풍', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'차나무',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'가을꽃',     tag:'차·가을꽃·그늘', zone:'남부', bloom:'🍂가을(10~11월)', soil:'적습·약산성', use:'음지·경계', care:'차독나방 주의', transplant:'봄(4~5월)'},
+  {n:'호랑가시나무',  c:'상록관목', h:'0.8~1.5', w:'0.6~1.0', r:'-', rDef:0, env:'반음', growth:'느림', salt:true,  smog:false, ornament:'겨울열매·잎', tag:'겨울열매·남부·크리스마스·내염', zone:'남부', bloom:'❄️겨울(빨간열매)', soil:'적습·약산성', use:'남부·겨울관상', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'광나무',        c:'상록관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'열매·수형',  tag:'생울타리·내염·내공해·남부', zone:'남부', bloom:'☀️여름(꽃)', soil:'건조·염분 견딤', use:'생울타리·남부', care:'깍지벌레 주의', transplant:'봄·가을'},
+  {n:'다정큼나무',    c:'상록관목', h:'0.8~1.5', w:'0.6~1.2', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'봄꽃·열매',  tag:'남부·내염·해안·봄꽃', zone:'남부', bloom:'🌸봄(꽃)', soil:'건조·염분·해안', use:'남부·해안', care:'병충해 비교적 강함', transplant:'봄(4~5월)'},
+  {n:'식나무',        c:'상록관목', h:'1.0~2.0', w:'0.8~1.5', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:true,  ornament:'잎',         tag:'내음·내공해·그늘·황금반점', zone:'남부', bloom:'🌸봄(작은꽃)', soil:'적습·음지', use:'그늘·내음', care:'병충해 강함·과습 주의', transplant:'봄(4~5월)'},
+  {n:'팔손이',        c:'상록관목', h:'1.0~2.0', w:'1.0~2.0', r:'-', rDef:0, env:'음수', growth:'보통', salt:true,  smog:true,  ornament:'잎·가을꽃',  tag:'내음·내염·내공해·대형잎·도심', zone:'남부', bloom:'🍂가을(10~11월)', soil:'적습·음지', use:'그늘·도심·대형잎', care:'병충해 강함·통풍 중요', transplant:'봄(4~5월)'},
+  {n:'백량금',        c:'상록관목', h:'0.3~0.8', w:'0.3~0.6', r:'-', rDef:0, env:'음수', growth:'느림', salt:false, smog:false, ornament:'겨울열매',   tag:'그늘·빨간열매·음지·저목', zone:'남부', bloom:'❄️겨울(빨간열매)', soil:'적습·음지', use:'그늘·음지저목', care:'탄저병 주의·직사광선 금지', transplant:'봄(4~5월)'},
+  {n:'마취목',        c:'상록관목', h:'0.6~1.2', w:'0.5~1.0', r:'-', rDef:0, env:'반음', growth:'느림', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·흰꽃·산성토·내한', zone:'중부이남', bloom:'🌸봄(3~4월)', soil:'적습·약산성', use:'정원·흰꽃', care:'전체 독성식물·가지 취급 시 주의', transplant:'봄·가을'},
   // ── 지피·잔디 ──
-  {n:'맥문동',        c:'지피',  h:'0.2~0.3', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:true,  ornament:'여름꽃·잎',  tag:'그늘·경계·내음·내공해', zone:'전국'},
-  {n:'옥잠화',        c:'지피',  h:'0.3~0.5', w:'-', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:false, ornament:'꽃·잎',      tag:'그늘·흰꽃·음지', zone:'전국'},
-  {n:'수호초',        c:'지피',  h:'0.1~0.2', w:'-', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:false, ornament:'잎',         tag:'그늘·상록·음지·내음', zone:'전국'},
-  {n:'비비추',        c:'지피', h:'0.3~0.5', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'잎·여름꽃',  tag:'그늘·여름꽃·잎무늬·내음', zone:'전국'},
-  {n:'원추리',        c:'지피', h:'0.5~0.8', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'여름꽃',     tag:'여름꽃·내건·주황꽃·자생', zone:'전국'},
-  {n:'꽃창포',        c:'지피', h:'0.6~0.9', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'수변·여름꽃·보라꽃·습지', zone:'전국'},
-  {n:'붓꽃',          c:'지피', h:'0.3~0.6', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·보라꽃·자생·내건', zone:'전국'},
-  {n:'노루오줌',      c:'지피', h:'0.4~0.7', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'그늘·여름꽃·분홍꽃·자생', zone:'전국'},
-  {n:'억새',          c:'지피', h:'1.0~1.8', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'가을이삭',   tag:'관상초·가을경관·자생·대형', zone:'전국'},
-  {n:'수크령',        c:'지피', h:'0.6~1.0', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'이삭',       tag:'관상초·내건·내공해·경계', zone:'전국'},
-  {n:'패랭이꽃',      c:'지피', h:'0.2~0.4', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·분홍꽃·암석원·내건', zone:'전국'},
-  {n:'기린초',        c:'지피', h:'0.2~0.4', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'내건·암석원·다육·황금꽃', zone:'전국'},
-  {n:'부처꽃',        c:'지피', h:'0.6~1.0', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'수변·여름꽃·자홍색·습지', zone:'전국'},
-  {n:'한국잔디',      c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'-',          tag:'내건·내열·사면·자생', zone:'전국'},
-  {n:'들잔디(금잔디)', c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'-',          tag:'사면·내건·내염·자생', zone:'전국'},
-  {n:'켄터키블루그래스',c:'잔디', h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'-',          tag:'서양잔디·서늘한기후·봄가을', zone:'중부이남'},
-  {n:'톨페스큐',      c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'-',          tag:'서양잔디·내건·내염·내공해', zone:'전국'},
+  {n:'맥문동',        c:'지피',  h:'0.2~0.3', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:true,  ornament:'여름꽃·잎',  tag:'그늘·경계·내음·내공해', zone:'전국', bloom:'☀️여름(7~8월)', soil:'적습·반음', use:'경계·음지·지피', care:'병충해 강함·가뭄 견딤', transplant:'봄·가을(포기나누기)'},
+  {n:'옥잠화',        c:'지피',  h:'0.3~0.5', w:'-', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:false, ornament:'꽃·잎',      tag:'그늘·흰꽃·음지', zone:'전국', bloom:'☀️여름(8~9월)', soil:'적습·음지', use:'음지·흰꽃', care:'달팽이 피해 주의', transplant:'봄·가을(포기나누기)'},
+  {n:'수호초',        c:'지피',  h:'0.1~0.2', w:'-', r:'-', rDef:0, env:'음수', growth:'보통', salt:false, smog:false, ornament:'잎',         tag:'그늘·상록·음지·내음', zone:'전국', bloom:'🌸봄(작은꽃)', soil:'적습·음지', use:'상록음지·지피', care:'병충해 강함·상록성', transplant:'봄·가을(포기나누기)'},
+  {n:'비비추',        c:'지피', h:'0.3~0.5', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'잎·여름꽃',  tag:'그늘·여름꽃·잎무늬·내음', zone:'전국', bloom:'☀️여름(7~8월)', soil:'적습·반음', use:'그늘·경계', care:'달팽이·민달팽이 피해 주의', transplant:'봄·가을(포기나누기)'},
+  {n:'원추리',        c:'지피', h:'0.5~0.8', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'여름꽃',     tag:'여름꽃·내건·주황꽃·자생', zone:'전국', bloom:'☀️여름(6~8월)', soil:'적습·건조 견딤', use:'경계·군식', care:'병충해 강함·어린순 식용', transplant:'봄·가을'},
+  {n:'꽃창포',        c:'지피', h:'0.6~0.9', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'수변·여름꽃·보라꽃·습지', zone:'전국', bloom:'☀️여름(5~6월)', soil:'습윤·수변', use:'수변·습지', care:'병충해 강함', transplant:'봄·가을(포기나누기)'},
+  {n:'붓꽃',          c:'지피', h:'0.3~0.6', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·보라꽃·자생·내건', zone:'전국', bloom:'🌸봄(4~5월)', soil:'건조·배수양호', use:'경계·암석원', care:'과습 주의', transplant:'봄(꽃 후)·가을'},
+  {n:'노루오줌',      c:'지피', h:'0.4~0.7', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'그늘·여름꽃·분홍꽃·자생', zone:'전국', bloom:'☀️여름(6~8월)', soil:'적습·반음', use:'그늘·군식', care:'병충해 비교적 강함', transplant:'봄·가을(포기나누기)'},
+  {n:'억새',          c:'지피', h:'1.0~1.8', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'가을이삭',   tag:'관상초·가을경관·자생·대형', zone:'전국', bloom:'🍂가을(9~10월)', soil:'건조·척박 견딤', use:'군식·가을경관', care:'봄 강전정 실시', transplant:'봄·가을'},
+  {n:'수크령',        c:'지피', h:'0.6~1.0', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:true,  ornament:'이삭',       tag:'관상초·내건·내공해·경계', zone:'전국', bloom:'🍂가을(8~10월)', soil:'건조·척박 견딤', use:'경계·관상초', care:'병충해 강함', transplant:'봄·가을'},
+  {n:'패랭이꽃',      c:'지피', h:'0.2~0.4', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',       tag:'봄꽃·분홍꽃·암석원·내건', zone:'전국', bloom:'🌸봄~☀️여름(5~7월)', soil:'건조·석회질·배수양호', use:'암석원·경계', care:'과습·통풍불량 주의', transplant:'봄·가을'},
+  {n:'기린초',        c:'지피', h:'0.2~0.4', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'내건·암석원·다육·황금꽃', zone:'전국', bloom:'☀️여름(6~7월)', soil:'건조·척박·암석지', use:'암석원·옥상녹화', care:'병충해 강함·다육식물', transplant:'봄·가을'},
+  {n:'부처꽃',        c:'지피', h:'0.6~1.0', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'여름꽃',     tag:'수변·여름꽃·자홍색·습지', zone:'전국', bloom:'☀️여름(6~8월)', soil:'습윤·수변', use:'수변·군식', care:'병충해 강함', transplant:'봄·가을'},
+  {n:'한국잔디',      c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'-',          tag:'내건·내열·사면·자생', zone:'전국', bloom:'☀️여름(생육기)', soil:'건조·산성 견딤', use:'사면·잔디밭', care:'녹병·설부병 주의·봄 갱신 작업', transplant:'봄~여름(5~7월)'},
+  {n:'들잔디(금잔디)', c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:true,  smog:false, ornament:'-',          tag:'사면·내건·내염·자생', zone:'전국', bloom:'☀️여름(생육기)', soil:'건조·척박·염분', use:'사면·해안', care:'병충해 비교적 강함', transplant:'봄~여름(5~7월)'},
+  {n:'켄터키블루그래스',c:'잔디', h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'-',          tag:'서양잔디·서늘한기후·봄가을', zone:'중부이남', bloom:'🌸봄·🍂가을(생육최적)', soil:'적습·비옥', use:'잔디밭·골프장·공원', care:'여름 고온다습 취약·관수 중요', transplant:'가을(9~10월) 파종'},
+  {n:'톨페스큐',      c:'잔디',  h:'-',       w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:true,  smog:true,  ornament:'-',          tag:'서양잔디·내건·내염·내공해', zone:'전국', bloom:'🌸봄·🍂가을(생육최적)', soil:'건조·염분 견딤', use:'공원·사면·내건', care:'병충해 비교적 강함·내건성 강', transplant:'가을(9~10월) 파종'},
   // ── 덩굴 ──
-  {n:'등나무',        c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'봄꽃·향기', tag:'퍼걸러·봄꽃·향기', zone:'전국'},
-  {n:'능소화',        c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'여름꽃',    tag:'여름꽃·담장·내공해', zone:'전국'},
-  {n:'담쟁이덩굴',    c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'빠름', salt:true,  smog:true,  ornament:'단풍',      tag:'벽면녹화·내염·내공해', zone:'전국'},
-  {n:'인동덩굴',      c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'꽃·향기',   tag:'향기꽃·내한·생울타리', zone:'전국'},
-  {n:'으름덩굴',      c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'꽃·열매',   tag:'자생·열매·퍼걸러', zone:'전국'},
-  {n:'송악',          c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:true,  smog:true,  ornament:'잎',        tag:'상록·벽면녹화·내음·내염·내공해', zone:'남부'},
-  {n:'멀꿀',          c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:true,  smog:false, ornament:'꽃·열매',   tag:'상록·남부·내염·열매', zone:'남부'},
-  {n:'클레마티스',    c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',      tag:'봄꽃·대형꽃·퍼걸러·보라꽃', zone:'전국'},
+  {n:'등나무',        c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'봄꽃·향기', tag:'퍼걸러·봄꽃·향기', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·비옥', use:'퍼걸러·터널', care:'진딧물 주의·강전정 가능', transplant:'봄(3~4월)'},
+  {n:'능소화',        c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:true,  ornament:'여름꽃',    tag:'여름꽃·담장·내공해', zone:'전국', bloom:'☀️여름(7~8월)', soil:'적습·배수양호', use:'담장·퍼걸러', care:'수액 독성(눈 주의)·지지대 필수', transplant:'봄(4~5월)'},
+  {n:'담쟁이덩굴',    c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'빠름', salt:true,  smog:true,  ornament:'단풍',      tag:'벽면녹화·내염·내공해', zone:'전국', bloom:'🍂가을단풍', soil:'건조·척박 견딤', use:'벽면녹화', care:'흡착근 자기부착·병충해 강함', transplant:'봄·가을(삽목 용이)'},
+  {n:'인동덩굴',      c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'빠름', salt:false, smog:false, ornament:'꽃·향기',   tag:'향기꽃·내한·생울타리', zone:'전국', bloom:'🌸봄~☀️여름(5~7월)', soil:'건조·척박 견딤', use:'생울타리·지피', care:'병충해 강함·반상록성', transplant:'봄·가을'},
+  {n:'으름덩굴',      c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:false, smog:false, ornament:'꽃·열매',   tag:'자생·열매·퍼걸러', zone:'전국', bloom:'🌸봄(4~5월)', soil:'적습·반음', use:'퍼걸러·열매관상', care:'열매 식용·병충해 비교적 강함', transplant:'봄(3~4월)'},
+  {n:'송악',          c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:true,  smog:true,  ornament:'잎',        tag:'상록·벽면녹화·내음·내염·내공해', zone:'남부', bloom:'🍂가을(꽃)', soil:'적습·음지', use:'벽면녹화·상록', care:'병충해 비교적 강함·상록성', transplant:'봄·가을'},
+  {n:'멀꿀',          c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'반음', growth:'보통', salt:true,  smog:false, ornament:'꽃·열매',   tag:'상록·남부·내염·열매', zone:'남부', bloom:'🌸봄(4~5월)', soil:'적습·해안', use:'남부·퍼걸러', care:'내한성 약·중부이북 월동 불가', transplant:'봄(4~5월)'},
+  {n:'클레마티스',    c:'덩굴', h:'-', w:'-', r:'-', rDef:0, env:'양수', growth:'보통', salt:false, smog:false, ornament:'봄꽃',      tag:'봄꽃·대형꽃·퍼걸러·보라꽃', zone:'전국', bloom:'🌸봄~☀️여름(4~6월)', soil:'적습·비옥·배수양호', use:'퍼걸러·펜스', care:'뿌리썩음 주의·머리는 햇빛 발은 그늘', transplant:'봄(3~4월)'},
 ];
 
 function applyPlantFilters() {
@@ -1958,8 +1958,9 @@ function renderPlantList(list) {
     '고산':    'background:#f3e8ff;color:#7e22ce',
   };
   let html = '<div style="font-size:12px;color:var(--text-sub);margin-bottom:8px;">' + list.length + '종 검색됨</div>';
-  list.forEach(p => {
-    html += '<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;background:white;">';
+  list.forEach((p, idx) => {
+    const _i = PLANT_DB.indexOf(p);
+    html += '<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;background:white;cursor:pointer;" onclick="showPlantModal(' + _i + ')">';
     // 이름 + 분류 + 기후대
     html += '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-bottom:6px;">';
     html += '<span style="font-size:15px;font-weight:700;color:var(--text);">' + p.n + '</span>';
@@ -3370,6 +3371,54 @@ function resetDday() {
 
 // ── 도움말 팝업 ──────────────────────────────────────────
 
+
+function showPlantModal(idx) {
+  const p = PLANT_DB[idx];
+  if (!p) return;
+  const modal = document.getElementById('plant-detail-modal');
+  const zSt = { '전국':'background:#dcfce7;color:#15803d', '중부이남':'background:#dbeafe;color:#1d4ed8', '남부':'background:#fef9c3;color:#a16207', '고산':'background:#f3e8ff;color:#7e22ce' };
+  const eIcon = { 양수:'☀️', 반음:'⛅', 음수:'🌑' };
+  const gColor = { 빠름:'#15803d', 보통:'#92400e', 느림:'#b91c1c' };
+  document.getElementById('pdm-name').textContent = p.n;
+  let badges = '<span style="font-size:11px;background:var(--green-pale);color:var(--green);padding:2px 8px;border-radius:20px;">' + p.c + '</span>';
+  if (p.zone) badges += '<span style="font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;' + (zSt[p.zone]||'') + '">' + p.zone + '</span>';
+  if (p.env)  badges += '<span style="font-size:11px;background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:20px;">' + (eIcon[p.env]||'') + ' ' + p.env + '</span>';
+  document.getElementById('pdm-badges').innerHTML = badges;
+
+  const row = (icon, label, val) => val
+    ? '<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f1f5f9;">'
+      + '<span style="font-size:16px;width:22px;flex-shrink:0;text-align:center;">' + icon + '</span>'
+      + '<div><div style="font-size:11px;color:var(--text-sub);margin-bottom:1px;">' + label + '</div>'
+      + '<div style="font-size:13px;font-weight:500;color:var(--text);">' + val + '</div></div></div>'
+    : '';
+
+  let body = '';
+  body += row('🌸', '개화·단풍 시기', p.bloom);
+  body += row('🌱', '선호 토양', p.soil);
+  body += row('📍', '주요 용도', p.use);
+  body += row('⚠️', '병충해·관리 주의', p.care);
+  body += row('🪴', '이식 적기', p.transplant);
+  if (p.growth) body += row('📈', '생장 속도', '<span style="color:' + (gColor[p.growth]||'#333') + ';font-weight:600;">' + p.growth + '</span>');
+  const tags = '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:3px;">'
+    + p.tag.split('·').map(t => '<span style="background:#f1f5f9;color:#475569;font-size:11px;padding:2px 8px;border-radius:20px;">#' + t + '</span>').join('')
+    + '</div>';
+  body += row('🏷️', '태그', tags);
+  if (p.ornament && p.ornament !== '-') body += row('✨', '관상 포인트', p.ornament);
+  if (p.rDef > 0) {
+    var dn = p.n.replace(/"/g,'&quot;');
+    body += '<div style="display:flex;gap:8px;margin-top:14px;">'
+      + '<button onclick="closePlantModal();linkToCalc(this.dataset.t,+this.dataset.r,this.dataset.n)" data-t="weight" data-r="' + p.rDef + '" data-n="' + dn + '" style="flex:1;padding:10px;border:1.5px solid var(--green);border-radius:20px;background:white;color:var(--green);font-weight:600;font-size:13px;cursor:pointer;">🌳 중량 계산</button>'
+      + '<button onclick="closePlantModal();linkToCalc(this.dataset.t,+this.dataset.r,this.dataset.n)" data-t="pit" data-r="' + p.rDef + '" data-n="' + dn + '" style="flex:1;padding:10px;border:1.5px solid var(--green);border-radius:20px;background:white;color:var(--green);font-weight:600;font-size:13px;cursor:pointer;">⛏ 구덩이</button>'
+      + '</div>';
+  }
+  document.getElementById('pdm-body').innerHTML = body;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closePlantModal() {
+  document.getElementById('plant-detail-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
 function showHelp(key) {
   const src = document.getElementById('hc-' + key);
   if (!src) return;
@@ -3453,6 +3502,20 @@ async function installPWA() {
 </script>
 
 
+
+<!-- 식물 상세 모달 -->
+<div id="plant-detail-modal" onclick="if(event.target===this)closePlantModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9100;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:white;border-radius:16px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;">
+    <div style="padding:16px 20px 0;display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div id="pdm-name" style="font-size:20px;font-weight:700;color:var(--text);"></div>
+        <div id="pdm-badges" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:5px;"></div>
+      </div>
+      <button onclick="closePlantModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--gray);padding:0;line-height:1;">×</button>
+    </div>
+    <div id="pdm-body" style="padding:14px 20px 20px;"></div>
+  </div>
+</div>
 <!-- 식재 수량 탭 -->
 <div id="tab-plant" class="tab-content">
   <div class="card">
