@@ -598,6 +598,9 @@
     z-index: 800;
   }
   #scroll-top-btn.visible { opacity: 1; pointer-events: auto; }
+
+  .sfilter-btn { font-size:12px; padding:4px 10px; border-radius:20px; border:1.5px solid var(--border); background:#fff; color:var(--text-sub); cursor:pointer; font-weight:500; white-space:nowrap; }
+  .sfilter-btn.active { background:var(--green-pale); color:var(--green); border-color:var(--green); font-weight:700; }
 </style>
 </head>
 <body>
@@ -635,6 +638,8 @@
   <button class="tab-btn active" onclick="showTab('plantdb', this)">식물 DB</button>
   <button class="tab-btn" onclick="showTab('tree', this)">수목 중량</button>
   <button class="tab-btn" onclick="showTab('plant', this)">식재 수량</button>
+  <button class="tab-btn" onclick="showTab('pattern', this)">식재 패턴</button>
+  <button class="tab-btn" onclick="showTab('soil', this)">퇴비·객토</button>
   <button class="tab-btn" onclick="showTab('grass', this)">잔디 소요량</button>
   <button class="tab-btn" onclick="showTab('mulch', this)">멀칭 재료</button>
   <button class="tab-btn" onclick="showTab('irrig', this)">관수·포장</button>
@@ -646,6 +651,7 @@
   <div class="tab-group-sep"></div>
   <span class="tab-group-label">💰 참고</span>
   <button class="tab-btn" onclick="showTab('price', this)">단가 참고표</button>
+  <button class="tab-btn" onclick="showTab('defect', this)">수목 하자</button>
 </nav>
 
 <!-- 잔디 소요량 탭 -->
@@ -1517,7 +1523,16 @@
         </label>
       </div>
     </div>
-    <div id="plant-result-list" style="margin-top:12px;"></div>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <span style="font-size:11px;color:var(--text-sub);white-space:nowrap;">계절별:</span>
+      <button class="sfilter-btn active" id="sfilter-all"       onclick="setSeasonFilter('')">전체</button>
+      <button class="sfilter-btn"        id="sfilter-spring"    onclick="setSeasonFilter('봄')">🌸봄</button>
+      <button class="sfilter-btn"        id="sfilter-summer"    onclick="setSeasonFilter('여름')">☀️여름</button>
+      <button class="sfilter-btn"        id="sfilter-autumn"    onclick="setSeasonFilter('가을')">🍂가을</button>
+      <button class="sfilter-btn"        id="sfilter-winter"    onclick="setSeasonFilter('겨울')">❄️겨울</button>
+      <button class="sfilter-btn"        id="sfilter-evergreen" onclick="setSeasonFilter('상록')">🌿상록</button>
+    </div>
+    <div id="plant-result-list" style="margin-top:10px;"></div>
   </div>
 
   <!-- 식재 시기 달력 -->
@@ -1923,6 +1938,12 @@ function applyPlantFilters() {
   if (zone)   res = res.filter(p => p.zone === zone);
   if (salt)   res = res.filter(p => p.salt);
   if (smog)   res = res.filter(p => p.smog);
+  const _season = window._plantSeason || '';
+  if (_season) {
+    const _sMap = { '봄':/봄|[3-5]월/, '여름':/여름|[6-8]월/, '가을':/가을|단풍|[9-9]월|10월|11월/, '겨울':/겨울|12월|1월|2월/, '상록':/상록/ };
+    const _sRe = _sMap[_season];
+    if (_sRe) res = res.filter(p => p.bloom && _sRe.test(p.bloom));
+  }
   renderPlantList(res);
 }
 function searchPlants()       { applyPlantFilters(); }
@@ -3402,6 +3423,18 @@ function showPlantModal(idx) {
       + '<button onclick="closePlantModal();linkToCalc(this.dataset.t,+this.dataset.r,this.dataset.n)" data-t="pit" data-r="' + p.rDef + '" data-n="' + dn + '" style="flex:1;padding:10px;border:1.5px solid var(--green);border-radius:20px;background:white;color:var(--green);font-weight:600;font-size:13px;cursor:pointer;">⛏ 구덩이</button>'
       + '</div>';
   }
+  const _comp = getCompanions(p, 4);
+  if (_comp.length) {
+    body += '<div style="margin-top:14px;padding-top:12px;border-top:2px solid #f1f5f9;">';
+    body += '<div style="font-size:11px;color:var(--text-sub);margin-bottom:8px;font-weight:600;">🤝 함께 심기 좋은 수종</div>';
+    body += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    _comp.forEach(cp => {
+      const ci = PLANT_DB.indexOf(cp);
+      body += '<button onclick="closePlantModal();setTimeout(function(){showPlantModal(' + ci + ')},60)" style="font-size:12px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;background:#fafafa;color:var(--text);cursor:pointer;text-align:left;">'
+        + cp.n + ' <span style="font-size:10px;color:var(--text-sub);">' + cp.c + '</span></button>';
+    });
+    body += '</div></div>';
+  }
   document.getElementById('pdm-body').innerHTML = body;
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -3410,6 +3443,97 @@ function closePlantModal() {
   document.getElementById('plant-detail-modal').style.display = 'none';
   document.body.style.overflow = '';
 }
+
+// ── 계절 필터 ──
+function setSeasonFilter(season) {
+  window._plantSeason = season;
+  const map = {'':'sfilter-all','봄':'sfilter-spring','여름':'sfilter-summer','가을':'sfilter-autumn','겨울':'sfilter-winter','상록':'sfilter-evergreen'};
+  document.querySelectorAll('.sfilter-btn').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(map[season]);
+  if (el) el.classList.add('active');
+  applyPlantFilters();
+}
+
+// ── 혼식 조합 추천 ──
+function getCompanions(p, count) {
+  const lvl = c => c.includes('교목') ? 1 : c.includes('관목') ? 2 : 3;
+  const myL = lvl(p.c);
+  const envOk = {'양수':['양수','반음'], '반음':['양수','반음','음수'], '음수':['반음','음수']};
+  const okE = envOk[p.env] || [p.env];
+  const zoneOk = cp => !p.zone || !cp.zone || p.zone === '전국' || cp.zone === '전국' || cp.zone === p.zone;
+  return PLANT_DB.filter(cp => cp !== p && lvl(cp.c) !== myL && okE.includes(cp.env) && zoneOk(cp)).slice(0, count);
+}
+
+// ── 식재 패턴 계산 ──
+function calcPattern() {
+  const area    = parseFloat(document.getElementById('pat-area').value);
+  const spacing = parseFloat(document.getElementById('pat-spacing').value);
+  const type    = document.querySelector('input[name="pat-type"]:checked').value;
+  const res     = document.getElementById('pat-result');
+  if (!area || !spacing || area <= 0 || spacing <= 0) { res.innerHTML = '<div class="result-box" style="color:#e53e3e;">면적과 간격을 입력해 주세요.</div>'; return; }
+  const factor  = type === 'triangle' ? 0.866 : 1.0;
+  const n       = Math.ceil(area / (spacing * spacing * factor));
+  const density = (1 / (spacing * spacing * factor)).toFixed(3);
+  const label   = type === 'triangle' ? '정삼각형(千鳥) 배식' : '정방형 배식';
+  res.innerHTML = '<div class="result-box">'
+    + '<div style="font-size:13px;color:var(--text-sub);margin-bottom:6px;">' + label + ' · ' + spacing + 'm 간격 · ' + area + '㎡</div>'
+    + '<div style="font-size:24px;font-weight:700;color:var(--green);">' + n.toLocaleString() + ' 주</div>'
+    + '<div style="font-size:12px;color:var(--text-sub);margin-top:4px;">밀도 ' + density + ' 주/㎡'
+    + (type === 'triangle' ? ' (정방형 대비 15% 더 촘촘)' : '') + '</div>'
+    + '<div style="font-size:11px;color:var(--text-sub);margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;">'
+    + '💡 경계부 손실 고려 시 +5~10% 여유 주수 추가 권장</div>'
+    + '</div>';
+  saveHistory('식재패턴', n + '주 (' + label + ', ' + spacing + 'm, ' + area + '㎡)');
+}
+function resetPattern() {
+  document.getElementById('pat-area').value = '';
+  document.getElementById('pat-spacing').value = '';
+  document.getElementById('pat-result').innerHTML = '';
+}
+
+// ── 퇴비·객토 소요량 ──
+const _pitSize = [
+  { max:5,  w:30, d:25 },
+  { max:10, w:40, d:35 },
+  { max:15, w:60, d:50 },
+  { max:20, w:80, d:65 },
+  { max:30, w:100, d:80 },
+  { max:999, w:0, d:0 } // w = R*3.5, d = R*3
+];
+function calcSoil() {
+  const count = parseFloat(document.getElementById('soil-count').value);
+  const r     = parseFloat(document.getElementById('soil-r').value);
+  const res   = document.getElementById('soil-result');
+  if (!count || !r || count <= 0 || r <= 0) { res.innerHTML = '<div class="result-box" style="color:#e53e3e;">주수와 근원직경(R)을 입력해 주세요.</div>'; return; }
+  let w, d;
+  const row = _pitSize.find(x => r <= x.max);
+  if (row.max === 999) { w = Math.round(r * 3.5); d = Math.round(r * 3); }
+  else { w = row.w; d = row.d; }
+  const pitVol = Math.PI * Math.pow(w/200, 2) * (d/100); // m³ per pit
+  const total  = pitVol * count;
+  const client = +(total * 0.60).toFixed(3); // 객토
+  const compost= +(total * 0.30).toFixed(3); // 퇴비
+  const sand   = +(total * 0.10).toFixed(3); // 마사토
+  const bags   = Math.ceil(compost / 0.02);  // 퇴비 20L/bag
+  res.innerHTML = '<div class="result-box">'
+    + '<div style="font-size:13px;color:var(--text-sub);margin-bottom:8px;">R' + r + 'cm · 구덩이 ∅' + w + '×H' + d + 'cm · ' + count + '주</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+    + '<tr style="background:#f8fafc;"><th style="padding:6px 8px;text-align:left;font-weight:600;color:var(--text);">항목</th><th style="padding:6px 8px;text-align:right;">1주</th><th style="padding:6px 8px;text-align:right;color:var(--green);font-weight:700;">합계</th></tr>'
+    + '<tr style="border-top:1px solid #f1f5f9;"><td style="padding:6px 8px;">구덩이 체적</td><td style="padding:6px 8px;text-align:right;">' + pitVol.toFixed(4) + ' m³</td><td style="padding:6px 8px;text-align:right;font-weight:600;">' + total.toFixed(3) + ' m³</td></tr>'
+    + '<tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:6px 8px;">객토 (60%)</td><td style="padding:6px 8px;text-align:right;">' + (client/count).toFixed(4) + ' m³</td><td style="padding:6px 8px;text-align:right;font-weight:600;">' + client + ' m³</td></tr>'
+    + '<tr style="border-top:1px solid #f1f5f9;"><td style="padding:6px 8px;">퇴비 (30%)</td><td style="padding:6px 8px;text-align:right;">' + (compost/count).toFixed(4) + ' m³</td><td style="padding:6px 8px;text-align:right;font-weight:600;">' + compost + ' m³<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">≈' + bags + '포</span></td></tr>'
+    + '<tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:6px 8px;">마사토 (10%)</td><td style="padding:6px 8px;text-align:right;">' + (sand/count).toFixed(4) + ' m³</td><td style="padding:6px 8px;text-align:right;font-weight:600;">' + sand + ' m³</td></tr>'
+    + '</table>'
+    + '<div style="font-size:11px;color:var(--text-sub);margin-top:8px;">💡 퇴비 1포 = 20L = 0.02m³ 기준 · 침하 고려 +10% 여유 권장</div>'
+    + '</div>';
+  saveHistory('퇴비객토', count + '주 R' + r + ' → 퇴비 ' + bags + '포 · 객토 ' + client + 'm³');
+}
+function resetSoil() {
+  document.getElementById('soil-count').value = '';
+  document.getElementById('soil-r').value = '';
+  document.getElementById('soil-result').innerHTML = '';
+}
+
 function showHelp(key) {
   const src = document.getElementById('hc-' + key);
   if (!src) return;
@@ -4305,6 +4429,165 @@ async function installPWA() {
           ※ 카카오톡 인앱 브라우저에서는 하단에 Safari 아이콘이 나타납니다<br>
           ※ iOS 16.4 이상에서 알림 등 PWA 기능이 더 잘 작동합니다
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── 식재 패턴 탭 ── -->
+<div id="tab-pattern" class="tab-content">
+  <div class="card">
+    <div class="card-title">🌳 식재 패턴 계산기 <button class="help-btn" onclick="showHelp('pattern')">?</button></div>
+    <div class="mulch-info">배식 간격 입력 → 면적당 필요 주수 산출</div>
+
+    <label>배식 방법</label>
+    <div class="radio-group">
+      <label><input type="radio" name="pat-type" value="square" checked> <span>정방형 □</span></label>
+      <label><input type="radio" name="pat-type" value="triangle"> <span>정삼각형 ◇</span></label>
+    </div>
+    <div class="mulch-info" style="margin-top:4px;">정삼각형은 정방형 동일 간격 대비 약 15% 더 많은 주수가 소요됩니다</div>
+
+    <label>시공 면적 (㎡)</label>
+    <input type="number" id="pat-area" placeholder="예: 150">
+
+    <label>식재 간격 (m)</label>
+    <input type="number" id="pat-spacing" placeholder="예: 1.5" step="0.1">
+
+    <div class="btn-row">
+      <button class="calc-btn" onclick="calcPattern()">계산하기</button>
+      <button class="reset-btn" onclick="resetPattern()">초기화</button>
+    </div>
+    <div id="pat-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📐 간격별 주수 참고표</div>
+    <div class="mulch-info">100㎡ 기준</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">
+      <tr style="background:#f8fafc;">
+        <th style="padding:7px;text-align:center;font-weight:600;">간격</th>
+        <th style="padding:7px;text-align:center;font-weight:600;">정방형</th>
+        <th style="padding:7px;text-align:center;font-weight:600;">정삼각형</th>
+        <th style="padding:7px;text-align:center;font-weight:600;">주요 수종</th>
+      </tr>
+      <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;text-align:center;">0.3m</td><td style="padding:7px;text-align:center;">1,111주</td><td style="padding:7px;text-align:center;">1,283주</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">잔디류·지피</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;text-align:center;">0.5m</td><td style="padding:7px;text-align:center;">400주</td><td style="padding:7px;text-align:center;">462주</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">소형 지피·초화류</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;text-align:center;">1.0m</td><td style="padding:7px;text-align:center;">100주</td><td style="padding:7px;text-align:center;">115주</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">소관목·철쭉류</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;text-align:center;">1.5m</td><td style="padding:7px;text-align:center;">45주</td><td style="padding:7px;text-align:center;">51주</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">중관목·개나리</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;text-align:center;">2.0m</td><td style="padding:7px;text-align:center;">25주</td><td style="padding:7px;text-align:center;">29주</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">대관목·소교목</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;text-align:center;">3.0m</td><td style="padding:7px;text-align:center;">12주</td><td style="padding:7px;text-align:center;">13주</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">교목류</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;text-align:center;">5.0m</td><td style="padding:7px;text-align:center;">4주</td><td style="padding:7px;text-align:center;">5주</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">대형 교목</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ── 퇴비·객토 탭 ── -->
+<div id="tab-soil" class="tab-content">
+  <div class="card">
+    <div class="card-title">🪣 퇴비·객토 소요량 <button class="help-btn" onclick="showHelp('soil')">?</button></div>
+    <div class="mulch-info">식재 구덩이 수 × 규격별 체적 × 배합비율로 토양개량재 총량 산출</div>
+
+    <label>식재 주수 (주)</label>
+    <input type="number" id="soil-count" placeholder="예: 20">
+
+    <label>근원직경 R (cm)</label>
+    <input type="number" id="soil-r" placeholder="예: 8">
+    <div class="mulch-info" style="margin-top:2px;">R에 따라 구덩이 크기 자동 적용 (표준시방서 기준)</div>
+
+    <div class="btn-row">
+      <button class="calc-btn" onclick="calcSoil()">계산하기</button>
+      <button class="reset-btn" onclick="resetSoil()">초기화</button>
+    </div>
+    <div id="soil-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 구덩이 규격 기준표</div>
+    <div class="mulch-info">조경공사 표준시방서 기준</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">
+      <tr style="background:#f8fafc;">
+        <th style="padding:7px;text-align:center;font-weight:600;">R (cm)</th>
+        <th style="padding:7px;text-align:center;font-weight:600;">지름 (cm)</th>
+        <th style="padding:7px;text-align:center;font-weight:600;">깊이 (cm)</th>
+        <th style="padding:7px;text-align:center;font-weight:600;">1주 체적</th>
+      </tr>
+      <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;text-align:center;">R 3~5</td><td style="padding:7px;text-align:center;">30</td><td style="padding:7px;text-align:center;">25</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">0.018 m³</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;text-align:center;">R 6~10</td><td style="padding:7px;text-align:center;">40</td><td style="padding:7px;text-align:center;">35</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">0.044 m³</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;text-align:center;">R 11~15</td><td style="padding:7px;text-align:center;">60</td><td style="padding:7px;text-align:center;">50</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">0.141 m³</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;text-align:center;">R 16~20</td><td style="padding:7px;text-align:center;">80</td><td style="padding:7px;text-align:center;">65</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">0.326 m³</td></tr>
+      <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;text-align:center;">R 21~30</td><td style="padding:7px;text-align:center;">100</td><td style="padding:7px;text-align:center;">80</td><td style="padding:7px;text-align:center;font-size:11px;color:var(--text-sub);">0.628 m³</td></tr>
+    </table>
+    <div class="mulch-info" style="margin-top:8px;">배합: 객토 60% · 퇴비 30% · 마사토 10% / 퇴비 1포 = 20L</div>
+  </div>
+</div>
+
+<!-- ── 수목 하자 판정 탭 ── -->
+<div id="tab-defect" class="tab-content">
+  <div class="card">
+    <div class="card-title">⚖️ 수목 하자 판정 기준</div>
+    <div class="mulch-info">조경공사 표준시방서 · LH 조경공사 기준 종합</div>
+
+    <div style="margin-top:12px;">
+      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px;">📅 하자 담보 기간</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:#f8fafc;"><th style="padding:7px;text-align:left;">공종</th><th style="padding:7px;text-align:center;">공공공사</th><th style="padding:7px;text-align:center;">민간공사</th></tr>
+        <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;">교목·관목</td><td style="padding:7px;text-align:center;font-weight:600;color:var(--green);">2년</td><td style="padding:7px;text-align:center;">1년</td></tr>
+        <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;">지피·잔디·초화류</td><td style="padding:7px;text-align:center;font-weight:600;color:var(--green);">1년</td><td style="padding:7px;text-align:center;">1년</td></tr>
+      </table>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px;">🍂 고사 판정 기준</div>
+      <div style="background:#fef9c3;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.9;">
+        <div>• 잎 <b>2/3 이상</b> 고사 또는 탈락 (낙엽수: 봄 신초 미발생)</div>
+        <div>• 수피 갈변·이탈 면적 <b>1/2 이상</b></div>
+        <div>• 신초 전혀 발생하지 않는 경우</div>
+        <div>• 뿌리 부패·이식 전 고사 흔적 있는 경우</div>
+      </div>
+      <div style="font-size:11px;color:var(--text-sub);margin-top:6px;">📌 판정 시기: 낙엽수 봄(4~5월) · 상록수 연중 · 잔디 5~6월</div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px;">📏 규격 불량 판정</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <tr style="background:#f8fafc;"><th style="padding:7px;text-align:left;">항목</th><th style="padding:7px;text-align:center;">허용 오차</th><th style="padding:7px;text-align:center;">판정</th></tr>
+        <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;">수고 (H)</td><td style="padding:7px;text-align:center;">설계 규격 −10% 이내</td><td style="padding:7px;text-align:center;color:#e53e3e;font-weight:600;">초과 시 불량</td></tr>
+        <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;">지하고·수관폭 (W)</td><td style="padding:7px;text-align:center;">설계 규격 −10% 이내</td><td style="padding:7px;text-align:center;color:#e53e3e;font-weight:600;">초과 시 불량</td></tr>
+        <tr style="border-top:1px solid #f1f5f9;"><td style="padding:7px;">근원직경 (R)</td><td style="padding:7px;text-align:center;">설계 규격 −10% 이내</td><td style="padding:7px;text-align:center;color:#e53e3e;font-weight:600;">초과 시 불량</td></tr>
+        <tr style="border-top:1px solid #f1f5f9;background:#fafafa;"><td style="padding:7px;">규격 등급 차이</td><td style="padding:7px;text-align:center;">1단계 이내</td><td style="padding:7px;text-align:center;color:#e53e3e;font-weight:600;">2단계↑ 교체</td></tr>
+      </table>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px;">⚠️ 식재 불량 판정</div>
+      <div style="background:#fff0f0;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.9;">
+        <div>• 수목 기울기 <b>15° 이상</b></div>
+        <div>• 지주목 미설치 또는 결속 불량 (완충재 없음)</div>
+        <div>• 뿌리분 노출 <b>5cm 이상</b> 또는 깊게 묻힘</div>
+        <div>• 복토 불량 (공동·침하 발생)</div>
+        <div>• 멀칭 미시공 (교목·관목 필수)</div>
+        <div>• 관수 불량 (도수로 미형성)</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px;">✅ 잔디 하자 기준</div>
+      <div style="background:#f0fdf4;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.9;">
+        <div>• 피복률 <b>80% 미만</b> (하자 판정 시기 기준)</div>
+        <div>• 잡초 혼입률 <b>10% 이상</b></div>
+        <div>• 들뜸·침하·단차 <b>2cm 이상</b></div>
+        <div>• 잔디 고사 면적 <b>20% 이상</b></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:6px;">📋 하자 처리 절차</div>
+      <div style="font-size:12px;line-height:2;color:var(--text);">
+        <div style="display:flex;gap:8px;align-items:flex-start;"><span style="background:var(--green);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;">1</span><span>하자 발생 사진 촬영 (수목 전체·부위 클로즈업)</span></div>
+        <div style="display:flex;gap:8px;align-items:flex-start;"><span style="background:var(--green);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;">2</span><span>하자 목록표 작성 (위치·규격·수량·판정 사유)</span></div>
+        <div style="display:flex;gap:8px;align-items:flex-start;"><span style="background:var(--green);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;">3</span><span>발주처 서면 통보 → 보수 기간 협의 (통상 30일 이내)</span></div>
+        <div style="display:flex;gap:8px;align-items:flex-start;"><span style="background:var(--green);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;">4</span><span>보식 완료 후 재검수 확인</span></div>
       </div>
     </div>
   </div>
