@@ -3925,18 +3925,26 @@ async function installPWA() {
   <!-- 1. 수목 중량 -->
   <div class="card" id="hc-tree">
     <div class="card-title">🌳 수목 중량 계산기</div>
-    <div class="mulch-info" style="margin-bottom:12px;">
-      <b>근원직경 (R)</b> — 지표면에서 30cm 높이의 줄기 직경 (권장 측정 위치)<br>
-      <b>수고 (H)</b> — 지표면에서 수목 최상단까지의 높이 (m)
+    <div class="mulch-info" style="margin-bottom:10px;">
+      수목의 이식·운반 시 장비 선정을 위한 중량 계산 도구입니다.<br>
+      <b>R(근원직경)</b>: 지표면에서 30cm 높이의 줄기 직경 (cm)<br>
+      <b>H(수고)</b>: 지표면에서 수목 최상단까지의 높이 (m)
     </div>
     <table class="price-table">
-      <tr><th>항목</th><th>설명</th></tr>
-      <tr><td>수목 구분 (U)</td><td>수종별 목재 밀도 (kg/㎥). 불명 시 1,200 적용</td></tr>
-      <tr><td>고립목 (P=1.0)</td><td>독립 식재, 가지·잎이 풍성하게 발달한 상태</td></tr>
-      <tr><td>임목 (P=0.3)</td><td>군식·밀식 상태, 가지 발달이 적은 상태</td></tr>
+      <tr><th>입력 항목</th><th>설명</th></tr>
+      <tr><td>수목 밀도 (U)</td><td>수종별 목재 밀도 (kg/㎥). 불명 시 1,200 적용</td></tr>
+      <tr><td>고립목 (P=1.0)</td><td>독립 식재 — 가지·잎이 풍성하게 발달한 상태</td></tr>
+      <tr><td>임목 (P=0.3)</td><td>군식·밀식 상태 — 가지 발달이 적은 상태</td></tr>
       <tr><td>접시분</td><td>얕고 넓은 분 — V = 0.3927 × D³</td></tr>
       <tr><td>보통분 ★</td><td>일반적인 분 형태 — V = 0.4581 × D³ (기본값)</td></tr>
       <tr><td>조개분</td><td>깊고 좁은 분 — V = 0.5236 × D³</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>주요 수종</th><th>밀도 (U)</th><th>비고</th></tr>
+      <tr><td>소나무·잣나무</td><td>800 kg/㎥</td><td>침엽수 경량</td></tr>
+      <tr><td>느티나무·팽나무</td><td>1,000 kg/㎥</td><td>활엽교목 평균</td></tr>
+      <tr><td>참나무류</td><td>1,100 kg/㎥</td><td>단단한 활엽수</td></tr>
+      <tr><td>불명 (기본값)</td><td>1,200 kg/㎥</td><td>안전측 적용</td></tr>
     </table>
     <table class="price-table" style="margin-top:10px;">
       <tr><th>근원직경 (R)</th><th>권장 장비</th></tr>
@@ -3948,10 +3956,9 @@ async function installPWA() {
       <tr><td>R 36cm↑</td><td>크레인 필요</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">
-      ※ 지상부 공식: W = 0.5 × π × (B/2)² × H × U × (1+P), B = R × 0.8 (m)<br>
-      ※ 뿌리분: V × 1,300 kg/㎥, D = R × 4 / 100 (m)<br>
-      ※ 장비 기준은 현장 경험치. 수목 상태·현장 조건에 따라 조정 필요<br>
-      ※ 수목 운반 대수는 수고·수관폭·뿌리분 크기에 따라 달라지므로 운반업체 협의 필요<br>
+      ※ 지상부: W = 0.5 × π × (B/2)² × H × U × (1+P), B = R × 0.8 (m)<br>
+      ※ 뿌리분: V × 1,300 kg/㎥, 분 직경 D = R × 4 / 100 (m)<br>
+      ※ 장비 기준은 현장 경험치 — 수목 상태·현장 조건 따라 조정 필요<br>
       ※ 출처: 조경설계요람 (문석기 외 5인, 1998)
     </p>
   </div>
@@ -3959,43 +3966,79 @@ async function installPWA() {
   <!-- 2. 잔디 소요량 -->
   <div class="card" id="hc-grass">
     <div class="card-title">🌱 잔디 소요량 계산기</div>
-    <div class="mulch-info" style="margin-bottom:0;">1평 = 3.3058㎡</div>
-    <table class="price-table" style="margin-top:12px;">
-      <tr><th>종류</th><th>규격</th><th>특징</th></tr>
-      <tr><td>평떼</td><td>18×18cm</td><td>가장 일반적, 주택·소형 공원</td></tr>
-      <tr><td>평떼</td><td>30×30cm</td><td>빠른 시공, 대형 면적에 유리</td></tr>
-      <tr><td>롤잔디</td><td>40×60cm</td><td>골프장·운동장 등 대규모</td></tr>
-      <tr><td>줄떼 1/2</td><td>18cm 폭</td><td>평떼 수량의 1/2 — 비교적 빠른 피복</td></tr>
-      <tr><td>줄떼 1/3</td><td>18cm 폭</td><td>평떼 수량의 1/3 — 최대 비용 절감</td></tr>
+    <div class="mulch-info" style="margin-bottom:8px;">1평 = 3.3058㎡ &nbsp;|&nbsp; 1㎡ = 0.3025평</div>
+    <table class="price-table" style="margin-top:4px;">
+      <tr><th>종류</th><th>규격</th><th>특징·적용</th></tr>
+      <tr><td>평떼 소형</td><td>18×18cm</td><td>일반 공원·주택 — 가장 많이 사용</td></tr>
+      <tr><td>평떼 대형</td><td>30×30cm</td><td>대형 면적 — 시공 빠름</td></tr>
+      <tr><td>롤잔디</td><td>40×60cm</td><td>골프장·운동장·경기장</td></tr>
+      <tr><td>줄떼 1/2</td><td>18cm 폭</td><td>평떼량 × 0.5 — 6~12개월 피복</td></tr>
+      <tr><td>줄떼 1/3</td><td>18cm 폭</td><td>평떼량 × 0.33 — 12개월 이상 피복</td></tr>
+      <tr><td>씨뿌리기</td><td>15~30g/㎡</td><td>켄터키블루그라스·라이그라스</td></tr>
     </table>
-    <p class="price-note" style="margin-top:10px;">※ 여유율 2% 포함. 경사지·이형 면적은 5~10% 추가 발주 권장</p>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>잔디 종류</th><th>특성</th><th>주요 용도</th></tr>
+      <tr><td>들잔디 (野芝)</td><td>내건·내답압 강함</td><td>공원·법면·일반 조경</td></tr>
+      <tr><td>금잔디</td><td>세엽, 치밀한 밀도</td><td>정원·골프 페어웨이</td></tr>
+      <tr><td>버뮤다그래스</td><td>내열·내답압</td><td>운동장·스포츠 잔디</td></tr>
+      <tr><td>켄터키블루그라스</td><td>한지형, 봄·가을 최적</td><td>정원·공원 (중부 이북)</td></tr>
+      <tr><td>페스큐류</td><td>반음지 적응</td><td>그늘진 사면·법면</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 여유율 2% 기본 포함 — 경사지·이형지 5~10% 추가 발주 권장<br>
+      ※ 잔디 시공 적기: 들잔디 4~6월 / 한지형 잔디 9~10월<br>
+      ※ 식재 후 30일간 관수 필수 (1일 1~2회, 침투 깊이 5cm 이상)
+    </p>
   </div>
 
   <!-- 3. 멀칭 재료 -->
   <div class="card" id="hc-mulch">
     <div class="card-title">🪵 멀칭 재료 계산기</div>
+    <div class="mulch-info" style="margin-bottom:8px;">면적 × 두께(m) = 소요 체적(㎥)</div>
     <table class="price-table">
-      <tr><th>재료</th><th>권장 두께</th><th>특징</th></tr>
-      <tr><td>우드칩 (바크)</td><td>8~12cm</td><td>습기 보존, 잡초 억제</td></tr>
-      <tr><td>마사토</td><td>3~7cm</td><td>배수 우수, 화단 경계</td></tr>
-      <tr><td>규사</td><td>2~4cm</td><td>잔디 하부 포설, 배수층</td></tr>
-      <tr><td>자갈 (쇄석)</td><td>6~10cm</td><td>영구적, 관리 용이</td></tr>
-      <tr><td>배양토</td><td>10~20cm</td><td>식재 기반, 영양 공급</td></tr>
+      <tr><th>재료</th><th>권장 두께</th><th>효과·특징</th></tr>
+      <tr><td>우드칩 (바크)</td><td>8~12cm</td><td>잡초억제 ★★★ · 수분보존 ★★★</td></tr>
+      <tr><td>마사토</td><td>3~7cm</td><td>배수 우수 · 화단 경계 깔끔</td></tr>
+      <tr><td>규사</td><td>2~4cm</td><td>잔디 하부 배수층 · 그린 토핑</td></tr>
+      <tr><td>자갈 (쇄석)</td><td>6~10cm</td><td>영구적 · 관리 최소화</td></tr>
+      <tr><td>배양토</td><td>10~20cm</td><td>식재 기반 조성 · 영양 공급</td></tr>
+      <tr><td>볏짚 멀칭</td><td>5~8cm</td><td>법면 파종 후 토양 보호</td></tr>
     </table>
-    <p class="price-note" style="margin-top:10px;">※ 계산된 체적에 여유율 5% 추가 발주 권장</p>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>항목</th><th>기준</th></tr>
+      <tr><td>우드칩 1㎥</td><td>약 300~400kg (밀도 0.3~0.4 t/㎥)</td></tr>
+      <tr><td>마사토 1㎥</td><td>약 1,600~1,800kg</td></tr>
+      <tr><td>자갈 1㎥</td><td>약 1,500~1,700kg</td></tr>
+      <tr><td>배양토 1㎥</td><td>약 600~800kg</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 체적에 여유율 5~10% 추가 발주 권장<br>
+      ※ 우드칩: 식재 수목 수관폭 외곽 30cm까지 포설, 수간 접촉 피할 것<br>
+      ※ 법면 볏짚: 파종 직후 포설 → 발아 후 자연 분해
+    </p>
   </div>
 
   <!-- 4. 식재 수량 -->
   <div class="card" id="hc-plant">
     <div class="card-title">🌿 식재 수량 계산기</div>
+    <div class="mulch-info" style="margin-bottom:8px;">면적 ÷ 1주당 점유 면적 = 소요 주수 (올림)</div>
     <table class="price-table">
       <tr><th>식재 방식</th><th>1주당 면적</th><th>특징</th></tr>
-      <tr><td>정방형 (방형식)</td><td>가로 × 세로</td><td>일반적, 시공 편리</td></tr>
-      <tr><td>교호식 (삼각형)</td><td>가로 × 세로 × 0.866</td><td>동일 간격 대비 약 15% 더 촘촘</td></tr>
+      <tr><td>정방형 (방형식)</td><td>가로 × 세로 (m²)</td><td>시공 편리 · 관리 쉬움</td></tr>
+      <tr><td>교호식 (삼각형)</td><td>가로 × 세로 × 0.866</td><td>동일 간격 대비 15.5% 촘촘</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>수종 유형</th><th>일반 간격</th><th>비고</th></tr>
+      <tr><td>교목 (H 3m↑)</td><td>4~6m</td><td>수관 겹침 없이 식재</td></tr>
+      <tr><td>소교목 (H 2~3m)</td><td>2~3m</td><td>—</td></tr>
+      <tr><td>대관목 (H 1~2m)</td><td>1.0~1.5m</td><td>단식·군식 혼용</td></tr>
+      <tr><td>소관목 (H 0.5~1m)</td><td>0.4~0.8m</td><td>철쭉·회양목류</td></tr>
+      <tr><td>지피·초화류</td><td>0.2~0.4m</td><td>군식 기준</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">
-      ※ 여유율: 평지 5%, 경사지 10%, 이형지·불규칙 구역 20% 권장<br>
-      ※ 계산 결과는 이론값이며 현장 여건(경계부·장애물)에 따라 조정 필요
+      ※ 여유율: 평지 5%, 경사지 10%, 이형지·불규칙 20% 권장<br>
+      ※ 같은 간격으로 패턴별 주수를 비교하려면 <b>식재 패턴</b> 탭을 이용하세요<br>
+      ※ 구덩이·배합토 소요량은 <b>퇴비·객토</b> 탭에서 계산 가능
     </p>
   </div>
 
@@ -4108,17 +4151,26 @@ async function installPWA() {
     <div class="card-title">👷 현장 관리 계산기</div>
     <table class="price-table">
       <tr><th>기능</th><th>설명</th></tr>
-      <tr><td>인력 계산</td><td>총작업량 ÷ 1인1일량 = 연인원(인·일)</td></tr>
+      <tr><td>인력 계산</td><td>총 작업량 ÷ 1인1일량 = 연인원 (인·일)</td></tr>
       <tr><td>인원→공기</td><td>연인원 ÷ 투입인원 = 필요 공기 (올림)</td></tr>
       <tr><td>공기→인원</td><td>연인원 ÷ 공기 = 최소 인원 (올림)</td></tr>
-      <tr><td>재료비</td><td>단가 × 수량 합계 + 부가세 10%</td></tr>
-      <tr><td>공사 D-day</td><td>착공일·준공일 입력 → 잔여 일수·공정률 표시</td></tr>
-      <tr><td>현장 체크리스트</td><td>수목식재·잔디시공·콘크리트·준공검수 항목 체크 (자동 저장)</td></tr>
+      <tr><td>재료비 계산</td><td>단가 × 수량 합계 + 부가세 10%</td></tr>
+      <tr><td>공사 D-day</td><td>착공일·준공일 → 잔여 일수·공정률 표시</td></tr>
+      <tr><td>현장 체크리스트</td><td>식재·잔디·콘크리트·준공 검수 항목 (자동 저장)</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>작업 종류</th><th>1인1일 작업량 (참고치)</th></tr>
+      <tr><td>교목 식재 (R10 내외)</td><td>5~8본</td></tr>
+      <tr><td>관목 식재</td><td>30~60본</td></tr>
+      <tr><td>잔디 평떼 시공</td><td>80~120㎡</td></tr>
+      <tr><td>잔디 롤 시공</td><td>150~200㎡</td></tr>
+      <tr><td>우드칩 멀칭 포설</td><td>60~80㎡ (10cm 두께)</td></tr>
+      <tr><td>지주목 설치 (삼각지주)</td><td>15~25본</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">
-      ※ 1인1일 작업량 예시: 식재(교목) 5~10본, 잔디떼 80~100㎡, 콘크리트 타설 10~15㎥<br>
-      ※ 재료비 부가세(VAT)는 별도 항목으로 표시 — 계약 방식에 따라 포함/별도 확인<br>
-      ※ 체크리스트는 기기에 저장되며 앱 재실행 후에도 유지됨
+      ※ 작업량은 현장 조건·규격·숙련도에 따라 ±30% 차이 있음<br>
+      ※ 재료비 VAT: 계약 방식(포함/별도)에 따라 확인 필요<br>
+      ※ 체크리스트는 기기 로컬에 저장 — 앱 재실행 후에도 유지됨
     </p>
   </div>
 
@@ -4179,16 +4231,21 @@ async function installPWA() {
       <tr><td>기본 사용료</td><td>4시간 기준 최소 요금 (1일 8시간의 절반)</td></tr>
       <tr><td>1일 사용료</td><td>8시간 기준 일당 요금</td></tr>
       <tr><td>월 사용료</td><td>장기 계약 시 월 단위 요금 (일당보다 유리)</td></tr>
-      <tr><td>유류비</td><td>일대: 임대료에 포함 / 월대: 사용자 부담인 경우 많음 (계약 나름)</td></tr>
-      <tr><td>VAT</td><td>부가세 별도 (10%) — 계약 시 확인 필요</td></tr>
-      <tr><td>어테치먼트</td><td>브레이커·집게·기타 장착 시 추가 요금 발생</td></tr>
+      <tr><td>유류비</td><td>일대: 임대료 포함 / 월대: 사용자 부담 경우 많음</td></tr>
+      <tr><td>VAT</td><td>부가세 10% 별도 — 계약 시 확인 필수</td></tr>
+      <tr><td>어테치먼트</td><td>브레이커·집게 장착 시 추가 요금 발생</td></tr>
       <tr><td>이동비·대기비</td><td>현장 거리·대기 시간에 따라 별도 청구</td></tr>
     </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>단가 기준</th><th>내용</th></tr>
+      <tr><td>굴삭기 (03~06BH)</td><td>2026년 실제 임대 단가표 기준</td></tr>
+      <tr><td>펌프카·레미콘</td><td>2025~2026 시장가 (2022 대비 20~40% 인상)</td></tr>
+      <tr><td>크레인·스카이차</td><td>2025년 시중 참고치</td></tr>
+      <tr><td>노무비 단가</td><td>대한건설협회 2025년 하반기 시중노임단가</td></tr>
+    </table>
     <p class="price-note" style="margin-top:10px;">
-      ※ 굴삭기 03-06BH 단가: 2026년 실제 임대 단가표 기준<br>
-      ※ 펌프카: 2025~2026 시장가 (2022 권장단가 대비 20~40% 인상 수준)<br>
-      ※ 크레인·스카이차: 2025 시중 참고치<br>
-      ※ 지역·현장·업체·시기에 따라 실제 금액 차이 있음 — 반드시 현장 견적 확인
+      ※ 지역·현장·업체·시기에 따라 실제 금액 차이 있음 — 반드시 현장 견적 확인<br>
+      ※ 조경 자재(수목·잔디·멀칭재)는 시기·규격·산지에 따라 변동 폭이 큼
     </p>
   </div>
 
@@ -4221,16 +4278,23 @@ async function installPWA() {
   <div class="card" id="hc-stake">
     <div class="card-title">🪵 지주목 수량 계산기</div>
     <table class="price-table">
-      <tr><th>종류</th><th>대상 수목</th><th>지주목 규격</th></tr>
-      <tr><td>이각지주</td><td>H 2.5m 이하</td><td>φ60 × L2,400 × 2본</td></tr>
-      <tr><td>삼각지주</td><td>H 2.5 ~ 4.5m</td><td>φ70 × L2,400 × 3본</td></tr>
-      <tr><td>사각지주</td><td>H 4.5m 이상</td><td>φ75 × L2,700 × 4본</td></tr>
-      <tr><td>당김줄</td><td>R 10cm 이상 대형목</td><td>강선 φ5.0 · 말뚝 3개</td></tr>
+      <tr><th>종류</th><th>대상 수목</th><th>부재 규격</th></tr>
+      <tr><td>이각지주</td><td>H 2.5m 이하</td><td>φ60 × L2,400mm × 2본</td></tr>
+      <tr><td>삼각지주</td><td>H 2.5 ~ 4.5m</td><td>φ70 × L2,400mm × 3본</td></tr>
+      <tr><td>사각지주</td><td>H 4.5m 이상</td><td>φ75 × L2,700mm × 4본</td></tr>
+      <tr><td>당김줄 (지선)</td><td>R 10cm 이상 대형목</td><td>강선 φ5.0 · 지선 3방향</td></tr>
+      <tr><td>연계지주</td><td>군식 관목</td><td>각재 30×40 · 가로대 연결</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>부자재</th><th>규격·수량</th></tr>
+      <tr><td>결속 철선</td><td>#8 아연도금 철선 (2본 꼬아서 결속)</td></tr>
+      <tr><td>완충 고무</td><td>수피 접촉 부위 전용 고무 삽입 (수피 보호)</td></tr>
+      <tr><td>지주목 방부</td><td>CCA 방부 처리 (지중 매립부 최소 50cm)</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">
       ※ H·R 입력 시 종류 자동 추천<br>
-      ※ 결속재: #8 철선 + 완충 고무 (수피 보호)<br>
       ※ 도로변·바람 강한 지역은 한 단계 위 규격 적용 권장<br>
+      ※ 설치 후 1년 이내 결속 상태 점검 (철선 조임·이완 확인)<br>
       ※ 조경공사 표준시방서 기준
     </p>
   </div>
@@ -4238,6 +4302,7 @@ async function installPWA() {
   <!-- 식재 구덩이 -->
   <div class="card" id="hc-pit">
     <div class="card-title">⛏ 식재 구덩이 · 객토량</div>
+    <div class="mulch-info" style="margin-bottom:8px;">개별 수목 1주 기준으로 구덩이 체적·객토량을 계산합니다.<br>여러 주수의 합산은 <b>퇴비·객토</b> 탭을 이용하세요.</div>
     <table class="price-table">
       <tr><th>항목</th><th>공식 / 기준</th></tr>
       <tr><td>뿌리분 직경 D</td><td>근원직경 R × 4 (cm)</td></tr>
@@ -4245,12 +4310,96 @@ async function installPWA() {
       <tr><td>구덩이 깊이</td><td>뿌리분 높이 (≈ D × 0.5) × 1.2</td></tr>
       <tr><td>굴착 체적</td><td>π × (구덩이 반지름)² × 깊이</td></tr>
       <tr><td>객토량</td><td>굴착 체적 × 객토 비율 (%)</td></tr>
-      <tr><td>부엽토</td><td>굴착 체적 × 부엽토 비율 (%)</td></tr>
+      <tr><td>부엽토 (퇴비)</td><td>굴착 체적 × 부엽토 비율 (%)</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>토질 상태</th><th>객토 비율</th><th>비고</th></tr>
+      <tr><td>양호토 (사질양토)</td><td>30~40%</td><td>부엽토 20% 추가</td></tr>
+      <tr><td>보통토 (점질양토)</td><td>50~60%</td><td>부엽토 25% 추가</td></tr>
+      <tr><td>불량토 (점토·암반)</td><td>70~80%</td><td>부엽토 30% 추가</td></tr>
     </table>
     <p class="price-note" style="margin-top:10px;">
-      ※ 구덩이 규격은 조경공사 표준시방서 기준 (뿌리분의 1.5배)<br>
-      ※ 객토 비율은 현장 토질에 따라 조정 — 불량토일수록 높게 적용<br>
-      ※ 부엽토(배양토) 혼합 비율: 일반적으로 객토량의 20~30%
+      ※ 퇴비 표준 배합(전체 물량): 객토 60% + 퇴비 30% + 마사토 10%<br>
+      ※ 부엽토(배양토) 1포 = 20L = 0.02㎥<br>
+      ※ 구덩이 규격은 조경공사 표준시방서 기준 (뿌리분의 1.5배)
+    </p>
+  </div>
+
+
+  <!-- 식재 패턴 도움말 -->
+  <div class="card" id="hc-pattern">
+    <div class="card-title">🌳 식재 패턴 계산기</div>
+    <div class="mulch-info" style="margin-bottom:8px;">일정 간격으로 수목을 배치할 때 필요한 주수를 면적에서 역산합니다.</div>
+    <table class="price-table">
+      <tr><th>배식 방법</th><th>공식</th><th>특징</th></tr>
+      <tr><td>정방형 (方形式)</td><td>N = A ÷ S²</td><td>시공 편리 · 관리 동선 정형</td></tr>
+      <tr><td>정삼각형 (千鳥式)</td><td>N = A ÷ (S² × 0.866)</td><td>동일 간격보다 15.5% 많은 주수 · 더 균일한 피복</td></tr>
+    </table>
+    <div class="mulch-info" style="margin-top:8px;">N = 주수 · A = 면적(㎡) · S = 간격(m)</div>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>수종 유형</th><th>권장 간격</th><th>대표 수종</th></tr>
+      <tr><td>대형 교목</td><td>5~8m</td><td>느티나무·왕벚나무·이팝나무</td></tr>
+      <tr><td>중형 교목</td><td>3~5m</td><td>단풍나무·산딸나무·꽃사과</td></tr>
+      <tr><td>대관목</td><td>1.5~2m</td><td>개나리·라일락·쥐똥나무</td></tr>
+      <tr><td>소관목</td><td>0.4~1.0m</td><td>철쭉·회양목·눈향나무</td></tr>
+      <tr><td>지피·초화류</td><td>0.2~0.4m</td><td>맥문동·비비추·수호초</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 경계부 수목 손실 고려해 +5~10% 여유 주수 확보 권장<br>
+      ※ 도로변·가로수는 보도 폭 등 법적 이격거리 확인 필요<br>
+      ※ 같은 간격에서 정삼각형 배식이 정방형보다 약 15.5% 더 많은 주수 소요
+    </p>
+  </div>
+
+  <!-- 퇴비·객토 도움말 -->
+  <div class="card" id="hc-soil">
+    <div class="card-title">🪣 퇴비·객토 소요량</div>
+    <div class="mulch-info" style="margin-bottom:8px;">주수·근원직경 입력 → 구덩이 체적 자동 산출 → 배합 재료별 물량 계산</div>
+    <table class="price-table">
+      <tr><th>R (cm)</th><th>구덩이 ∅ (cm)</th><th>깊이 (cm)</th><th>1주 체적</th></tr>
+      <tr><td>R 3~5</td><td>30</td><td>25</td><td>0.018 ㎥</td></tr>
+      <tr><td>R 6~10</td><td>40</td><td>35</td><td>0.044 ㎥</td></tr>
+      <tr><td>R 11~15</td><td>60</td><td>50</td><td>0.141 ㎥</td></tr>
+      <tr><td>R 16~20</td><td>80</td><td>65</td><td>0.326 ㎥</td></tr>
+      <tr><td>R 21~30</td><td>100</td><td>80</td><td>0.628 ㎥</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>배합 재료</th><th>비율</th><th>역할</th></tr>
+      <tr><td>객토 (부토)</td><td>60%</td><td>주 식재 토양 — 양질의 흙으로 치환</td></tr>
+      <tr><td>퇴비 (부엽토)</td><td>30%</td><td>유기물·영양 공급 · 보수성 향상</td></tr>
+      <tr><td>마사토</td><td>10%</td><td>배수성 개선 · 통기성 확보</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 구덩이 규격: 조경공사 표준시방서 기준<br>
+      ※ 퇴비 1포 = 20L = 0.02㎥ 기준으로 포 수 자동 계산<br>
+      ※ 침하 고려해 +10% 여유 발주 권장<br>
+      ※ 불량토 현장은 객토 비율을 60→80%로 상향 조정
+    </p>
+  </div>
+
+  <!-- 관수 시스템 도움말 -->
+  <div class="card" id="hc-irrig">
+    <div class="card-title">💧 관수 시스템 계산기</div>
+    <div class="mulch-info" style="margin-bottom:8px;">스프링클러 또는 점적관수 헤드 수량·Zone 수·유량을 산출합니다.</div>
+    <table class="price-table">
+      <tr><th>방식</th><th>적용 구역</th><th>유량 (헤드당)</th></tr>
+      <tr><td>스프링클러 소형</td><td>소형 잔디 구역</td><td>10~15 L/min</td></tr>
+      <tr><td>스프링클러 중형</td><td>공원 잔디</td><td>20~30 L/min</td></tr>
+      <tr><td>스프링클러 대형</td><td>운동장·골프장</td><td>35~60 L/min</td></tr>
+      <tr><td>점적관수 방울이</td><td>화단·수목·채소원</td><td>2~4 L/hr</td></tr>
+    </table>
+    <table class="price-table" style="margin-top:10px;">
+      <tr><th>항목</th><th>설명</th></tr>
+      <tr><td>구역 (Zone)</td><td>동시 작동 면적 — 총 유량이 공급 가능 유량 이하로 구성</td></tr>
+      <tr><td>헤드 겹침</td><td>스프링클러: 30~50% 겹침 권장 (헤드 간격 ≤ 반경 × 1.3)</td></tr>
+      <tr><td>작동 시간</td><td>수목·잔디: 1회 10~20분 × 주 2~3회 기준</td></tr>
+      <tr><td>주관 직경</td><td>총 유량에 따라 32~50mm PVC 주관 선정</td></tr>
+    </table>
+    <p class="price-note" style="margin-top:10px;">
+      ※ 일반 가정용 수압: 분당 15~20L 공급 가능 (실측 확인 필요)<br>
+      ※ 점적관수: 저유량·저압력 — 수압 1.0~2.5 bar 권장<br>
+      ※ 스프링클러: 정방형 배치 vs 삼각형 배치 — 삼각형이 균일 살수에 유리<br>
+      ※ 설계 후 시공업체와 수압·유량 실측 필수
     </p>
   </div>
 
