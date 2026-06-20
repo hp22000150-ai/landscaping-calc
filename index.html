@@ -634,13 +634,13 @@
 
 <nav class="tab-nav">
   <span class="tab-group-label">🌿 조경</span>
-  <button class="tab-btn" onclick="showTab('area', this)">면적&amp;길이</button>
-  <button class="tab-btn active" onclick="showTab('tree', this)">수목 중량</button>
+  <button class="tab-btn active" onclick="showTab('plantdb', this)">식물 DB</button>
+  <button class="tab-btn" onclick="showTab('tree', this)">수목 중량</button>
+  <button class="tab-btn" onclick="showTab('plant', this)">식재 수량</button>
   <button class="tab-btn" onclick="showTab('grass', this)">잔디 소요량</button>
   <button class="tab-btn" onclick="showTab('mulch', this)">멀칭 재료</button>
-  <button class="tab-btn" onclick="showTab('plant', this)">식재 주수</button>
   <button class="tab-btn" onclick="showTab('irrig', this)">관수·포장</button>
-  <button class="tab-btn" onclick="showTab('plantdb', this)">식물 DB</button>
+  <button class="tab-btn" onclick="showTab('area', this)">면적&amp;길이</button>
   <div class="tab-group-sep"></div>
   <span class="tab-group-label">📋 현장</span>
   <button class="tab-btn" onclick="showTab('manage', this)">현장 관리</button>
@@ -954,7 +954,7 @@
 </div>
 
 <!-- 수목 중량 탭 -->
-<div id="tab-tree" class="tab-content active">
+<div id="tab-tree" class="tab-content">
   <div class="card">
     <div class="card-title">🌳 수목 중량 계산기 <button class="help-btn" onclick="showHelp('tree')">?</button></div>
     <label>흉고직경 D (cm) <span style="font-size:11px;font-weight:400;opacity:.65;">— 근원직경 R이 있으면 D = R × 0.8</span></label>
@@ -1466,7 +1466,7 @@
 </div>
 
 <!-- ── 식물 DB 탭 ── -->
-<div id="tab-plantdb" class="tab-content">
+<div id="tab-plantdb" class="tab-content active">
 
   <!-- 식물 검색 -->
   <div class="card">
@@ -3389,10 +3389,10 @@ async function installPWA() {
 </script>
 
 
-<!-- 식재 주수 탭 -->
+<!-- 식재 수량 탭 -->
 <div id="tab-plant" class="tab-content">
   <div class="card">
-    <div class="card-title">🌿 식재 주수 계산기 <button class="help-btn" onclick="showHelp('plant')">?</button></div>
+    <div class="card-title">🌿 식재 수량 계산기 <button class="help-btn" onclick="showHelp('plant')">?</button></div>
 
     <label>시공 면적</label>
     <div style="display:flex; gap:8px; align-items:center;">
@@ -3743,9 +3743,9 @@ async function installPWA() {
     <p class="price-note" style="margin-top:10px;">※ 계산된 체적에 여유율 5% 추가 발주 권장</p>
   </div>
 
-  <!-- 4. 식재 주수 -->
+  <!-- 4. 식재 수량 -->
   <div class="card" id="hc-plant">
-    <div class="card-title">🌿 식재 주수 계산기</div>
+    <div class="card-title">🌿 식재 수량 계산기</div>
     <table class="price-table">
       <tr><th>식재 방식</th><th>1주당 면적</th><th>특징</th></tr>
       <tr><td>정방형 (방형식)</td><td>가로 × 세로</td><td>일반적, 시공 편리</td></tr>
